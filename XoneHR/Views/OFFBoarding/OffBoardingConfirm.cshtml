@@ -1,0 +1,96 @@
+﻿@model IEnumerable<XoneHR.Models.TblOffBoarding>
+@{
+    ViewBag.Title = "OffBoardingConfirm";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#example2').DataTable();
+        $("#ApproveOffboard").click(function () {
+            var empid=$(this).attr('data-EmpId');
+            $.ajax({
+                url: "/OFFBoarding/UpdateOffBoardStatus",
+                data: { EmpID: $(this).attr('data-EmpId'), status: $(this).attr('data-OFFBoard_Status') }
+            }).done(function () {
+                window.location.href = "/OFFBoarding/OffBoardingConfirm?EmpID=" + empid + "";
+            });
+        });
+
+        $("#Resigbtn").click(function () {
+            var empid = $(this).attr('data-EmpId');
+            $.ajax({
+                url: "/OFFBoarding/ResignationFormality",
+                data: { EmpID: $(this).attr('data-EmpId') }
+            }).done(function () {
+                window.location.href = "/OFFBoarding/OffBoardingConfirm?EmpID=" + empid + "";
+            });
+        });
+
+    });
+</script>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-users"></i>&nbsp;
+        Off Boarding Confirmation
+    </h1>
+</section>
+<div>    
+    <section class="newforms">
+        <table id="example2" class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Notice Period Start Date</th>
+                    <th>Notice Period End Date</th>
+                    <th>Remark</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="ListEmployeeresult">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.CandName</td>
+                        <td>@item.OFFBoard_NoticeStart.ToString("dd/MM/yyy")</td>
+                        <td>@item.OFFBoard_NoticeEnd.ToString("dd/MM/yyy")</td>
+                        <td>@item.OFFBoard_Remark</td>
+                        @if (item.OFFBoard_Status == 1)
+                        {
+                            <td><span class="label label-success">Pending</span></td>
+                            <td><a href="#" id="ApproveOffboard" data-EmpId='@item.EmpID' data-OFFBoard_Status=2 class=''><i class=''>Approve</i></a>&nbsp;</td>
+                        }
+                        else if (item.OFFBoard_Status == 2 && item.OFFBoard_Resgnation != DateTime.Now)
+                        {
+                            <td><span class="label label-success">On notice period</span></td>
+                        }
+                        else if (item.OFFBoard_Status == 3)
+                        {
+                            <td><span class="label label-success">Resigned</span></td>
+                        }
+                        else if ((item.OFFBoard_Resgnation == DateTime.Now && item.OFFBoard_Status == 2) || (item.OFFBoard_Resgnation > DateTime.Now && item.OFFBoard_Status == 2))
+                        {
+                            <td><span class="label label-success">Resigned</span></td>
+                            <td><a href="#Resigbtn" data-EmpId='@item.EmpID' class=''><i class=''>Resignation Formality</i></a></td>
+                        }
+                        @*else if (item.OFFBoard_Status == 1)
+                            {
+                                <td><span class="label label-success">Pending</span></td>
+                                <td><a href="#" id="ApproveOffboard" data-EmpId='@item.EmpID' data-OFFBoard_Status=2 class=''><i class=''>Approve</i></a>&nbsp;</td>
+                            }
+                        *@
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+</div>
+
+

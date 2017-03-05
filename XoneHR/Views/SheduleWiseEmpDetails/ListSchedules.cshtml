@@ -1,0 +1,39 @@
+﻿@{
+    ViewBag.Title = "ListSchedules";
+}
+
+<script type="text/javascript">
+
+</script>
+
+<section class="newforms">
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+
+                <th @*width="12% !important"*@>Schedule</th>
+                <th>Number Of Employees</th>
+                <th>Details</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var i in ViewBag.Scheule)
+            {
+                foreach (var j in ViewBag.EmpCount)
+                {
+                    if (i.SchID == j.SchID)
+                    {
+                        <tr>
+                            <td>@j.Schedule</td>
+                            <td>@i.EmpCount</td>
+                            <td>
+                                <a href="#" class="btn btn-success btnEmpWise" data-toggle="modal" data-id="@j.SchID"><i class="fa fa-fw fa-eye"></i></a>
+                            </td>
+                        </tr>                    
+                    }
+                }
+            }
+        </tbody>
+    </table>
+</section>

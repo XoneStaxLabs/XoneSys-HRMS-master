@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "AttendanceMark";
+}
+
+
+
+<script type="text/javascript">
+
+    function AttendanceBook(codevalue,schid,projectid) {
+
+        $.ajax({
+
+            type: "GET",
+            url: "/Leave/Attendancebook",
+            data: { Codevalue: codevalue, ScheduleID: schid,ProjiD:projectid }
+
+
+        }).done(function (data) {
+
+            $("#AttendanceBook").html(data);
+
+
+        });
+    }
+
+
+    function ComboListMonths() {
+
+        var ddlBox = $("#ddlMonths");
+
+        $.ajax({
+            url: "/Project/ComboListMonths"
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Month</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.MonthID + '>' + item.MonthNames + '</option>').selectpicker('refresh');
+            });
+
+
+        });
+
+
+
+    }
+
+
+    function ComboScheduleList(monthid, projID)
+    {
+        var ddlBox = $("#ddlSchedulelist");
+
+        $.ajax({
+            url: "/Leave/ComboListSchedule",
+            data: { monthid: monthid, ProjID: projID }
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Schedule</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.SchID + '>' + item.Schedule + '</option>').selectpicker('refresh');
+            });
+
+
+        });
+    }
+
+
+    $(document).ready(function () {
+
+        var PjID = $("#ProjectsID").val();
+
+      
+
+        AttendanceBook(1, 1, PjID);
+        ComboListMonths();
+     
+      
+
+        $("#ddlMonths").change(function () {            
+            ComboScheduleList($(this).val(), PjID);
+
+
+        });
+
+
+        $("#ddlSchedulelist").change(function () {
+
+            AttendanceBook(2, $(this).val(), PjID)
+
+
+        });
+
+
+
+    })
+    
+</script>
+
+
+<input type="hidden" id="ProjectsID" value="@ViewBag.prjID" />
+
+<section class="content-header">
+    <h1>
+        Attendance
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/Project/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+<section class="newforms">
+    <form class="proform">
+        <div class="projTop">
+            <div class="col-sm-5 projHd">
+                <h5>@ViewBag.PrjName</h5>
+            </div>
+            <div class="col-sm-7 projcal">
+                <div class="col-sm-3 selectCat">
+
+                    <select class="selectpicker" id="ddlMonths"></select>
+
+                </div>
+                @*<div class="col-sm-5">
+                    <a href="" class="activeSc">Schedule</a>
+                    <a href="">Monthly</a>
+                </div>*@
+                <div class="col-sm-4">
+                    <select class="selectpicker" id="ddlSchedulelist">
+                       
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div id="AttendanceBook"></div>        
+
+    </form>
+</section>

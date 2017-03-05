@@ -1,0 +1,813 @@
+﻿@model XoneHR.Models.AttendanceMaster
+@{
+    ViewBag.Title = "Attendancebook";
+    Layout = null;
+}
+
+
+<input type="hidden" value="@ViewBag.Codevalue" id="HidCodevalue" />
+<input type="hidden" value="@ViewBag.ScheduleID" id="HidScheduleID" />
+<input type="hidden" value="@ViewBag.ProjiD" id="HidProjiD" />
+
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+
+    function GetEmployees() {
+
+        var ddlBox = $("#ddlEmployeeList");
+
+        $.ajax({
+
+            url: "/Leave/GetEmployees",
+            async: false
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.EmpID + '>' + item.CandName + '</option>').selectpicker('refresh');
+
+            });
+
+
+        });
+
+
+
+    }
+
+    function GetDayType() {
+
+        var ddlBox = $("#ddldayType");
+
+        $.ajax({
+
+            url: "/Leave/GetDayType",
+            async: false
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Day Type</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.DayTypID + '>' + item.DayType + '</option>').selectpicker('refresh');
+
+            });
+
+
+        });
+
+
+
+    }
+
+    function GetLeaveType() {
+
+        var ddlBox = $("#ddlLeaveType");
+
+        $.ajax({
+
+            url: "/Leave/GetLeaveType",
+            async: false
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Leave Type</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.LeavetypID + '>' + item.LeaveType + '</option>').selectpicker('refresh');
+
+            });
+
+
+        });
+
+
+
+    }
+
+    
+    $(document).ready(function () {
+
+
+        GetEmployees();
+        GetDayType();
+        GetLeaveType();              
+
+        $('#IsOffFay').change(function () {
+            if ($(this).is(':checked')) {
+                
+                $(".TimePunch").hide();
+                $("#TimeOff").hide();
+                $("#AllocateAdhoc").show();
+            }
+            else {
+                $(".TimePunch").show();
+                $("#TimeOff").show();
+                $("#AllocateAdhoc").hide();
+            }
+        });
+
+        $("#btnleaveapp").click(function () {
+             
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            $("#LeaveAppForm").validate({
+                rules: {
+                    EmpLeaveDate: {
+                        required: true,
+                        //  date: true
+                    },
+                    EmpLeavetodate: {
+                        required: true,
+                        // date: true,
+                    },
+                    DayTypID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    LeavetypID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    }
+                }
+            });
+            if ($('#LeaveAppForm').valid()) {
+
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Leave/AddnewleaveApplication",
+                    data: $("#LeaveAppForm").serialize()
+
+                }).done(function (data) {
+                    
+                    if (data) {
+
+                        $("#LeaveApplicationModal").modal('hide');
+                        $("#txtappremks").val("");
+                        $("#Attendancemodal").modal('hide');
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                    
+                });
+
+            }
+            
+        });
+
+        $("#LeaveAdd").click(function () {
+             
+            $("#ddldayType").selectpicker('val', 0);
+            $("#ddlLeaveType").selectpicker('val', 0);
+            $("#EmpLeaveDate").val("");
+            $("#EmpLeavetodate").val("");
+            $("#txtappremks").val("");
+        })
+
+        $('#ddldayType').change(function () {
+        
+            if ($(this).val() != 0) {
+                $("label[for='ddldayType']").text('');
+            }
+            else {
+                $("label[for='ddldayType']").text('Please select an item from the dropdown list.');
+            }
+        })
+
+        $('#ddlLeaveType').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='ddlLeaveType']").text('');
+            }
+            else {
+                $("label[for='ddlLeaveType']").text('Please select an item from the dropdown list.');
+            }
+        })
+
+        $("#EmpLeaveDate").change(function () {
+            $(this).blur();
+        })
+
+        $("#EmpLeavetodate").change(function () {
+            $(this).blur();
+        })
+       
+        $("#btnAddTimeOff").click(function () {
+
+            $.ajax({
+                type: "POST",
+                url: "/Leave/AddTimeOff",
+                data: $("#TimeOffForm").serialize(),
+                async: false
+
+            }).done(function (data) {
+
+                $.ajax({
+                    url: "/Leave/ListTimeOFFs",
+                    data: { EmpID: $("#HidID").val(), TimeOFFDate: $("#TimeOFFDate").val() }
+                }).done(function (data) {
+                    $("#TimeOFFList").html(data);
+                })
+
+            });
+        });
+                        
+        $(document).on("click", ".RemoveTimeOFF", function () {
+
+            $.ajax({
+                url: "/Leave/RemoveTimeOFF",
+                data: { TimeOFFID: $(this).attr('data-id') },
+                async: false
+            }).done(function (data) {
+
+            });
+            $(this).closest('tr').remove();
+
+            $.ajax({
+                url: "/Leave/ListTimeOFFs",
+                data: { EmpID: $("#HidID").val(), TimeOFFDate: $("#TimeOFFDate").val() }
+            }).done(function (data) {
+                $("#TimeOFFList").html(data);
+            })
+
+        });
+
+        $("#AllocateAdhoc").click(function () {
+
+            var url = "/Leave/LeaveEmpListFromAttendance?ProjID=" + $("#ProjID").val() + " &SchID=" + $("#SchID").val() + " &ShiftID=" + $("#hidShift").val() + " &EmpID=" + $("#HidEmpID").val() + " &OffDay=" + $("#HidEmpDate").val() + " ";
+
+            $.ajax({
+
+                type: "POST",
+                url: "/Leave/AddNewAttendance",
+                data: $("#MarkattendanceFormID").serialize()
+
+            }).done(function (data) {
+
+                if (data == 1) {
+
+                    $.toast({
+
+                        text: "Added",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                    window.location.href = url;
+                }
+                else if (data == 2) {
+                    $.toast({
+
+                        text: "Not Allowed more than 2 offdays continiously",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+
+                else {
+                    $.toast({
+
+                        text: "Application Error Please Contact Administrator!",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+
+            });
+
+            //$.ajax({
+            //    url: "/Leave/LeaveEmpListFromAttendance",
+            //    data: { ProjID: $("#ProjID").val(), SchID: $("#SchID").val(), ShiftID: $("#hidShift").val(), EmpID: $("#HidEmpID").val(), OffDay: $("#HidEmpDate").val() }
+            //}).done(function (data) {              
+            //});           
+        });
+
+    })
+
+</script>
+
+<style>
+    .not-active {
+        pointer-events: none;
+        cursor: default;
+        border:1px solid red;
+    }
+</style>
+
+
+<table class="table table-bordered table-hover projData">
+    <thead>
+        <tr>
+            <th style="width: 190px;">Staff</th>
+            <th>Sun</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+        </tr>
+    </thead>
+    <tbody id="AttendanceBooklist">
+
+    </tbody>
+</table>
+
+<div id="Attendancemodal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Mark Attendance</h4>
+                <p id="Empname"></p><span id="Empdate"></span>
+                <a href="" class="timeoff" data-toggle="modal" id="TimeOff" data-target="#TimeOffModal">Add TimeOFF</a>
+                <a href="" class="timeoff" data-toggle="modal" id="LeaveAdd" data-target="#LeaveApplicationModal">Add Leave</a>
+                <a href="" class="timeoff" data-toggle="modal" id="AllocateAdhoc" @*data-target="#AbsentAllocationModal"*@>Allocate Adhoc Eployee</a>
+            </div>
+            <div class="modal-body">
+                <form id="MarkattendanceFormID">
+
+                    <input type="hidden" id="HidEmpID" name="EmpID" />
+                    <input type="hidden" id="HidEmpDate" name="Attenddate" />
+                    <input type="hidden" id="HidHoliStatus" name="AttendHoliStatus" />
+                    <input type="hidden" value="@ViewBag.ProjiD" name="ProjID" id="ProjID" />    
+                    <input type="hidden" value="@ViewBag.ScheduleID" name="SchID" id="SchID" />
+
+                    <div class="form-group shiftCreate">
+                        <div class="form-group col-sm-2">
+                            <label for="inputEmail3" class="control-label">Is OFF Day</label>            
+                            <div class="input-group">
+                                <input type="checkbox" class="flat-red" id="IsOffFay" name="IsOFFDay">
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-4 TimePunch" >
+                            <label for="inputEmail3" class="control-label">Time In</label>
+                            <div class="">
+                                <div class="bootstrap-timepicker">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control timepicker" name="AttendtimeIN" id="AttendtimeIN" >
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                    </div><!-- /.input group -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-4 TimePunch">
+                            <label for="inputEmail3" class="control-label">Time Out</label>
+                            <div class="">
+                                <div class="bootstrap-timepicker">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control timepicker" name="AttendtimeOut" id="AttendtimeOut">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-clock-o"></i>
+                                        </div>
+                                    </div><!-- /.input group -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <label for="inputEmail3" class="control-label">Note</label>
+                        <textarea class="form-control" rows="3" name="AttendRemks" id="txtremks"></textarea>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <button type="button" class="btn btn-primary" id="BtnAddNewAttendance">Save</button>
+                        @*<button type="button" class="btn btn-primary" id="BtnRemoveAttendance">Remove Attandence</button>*@
+                    </div> 
+                                      
+                </form>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div id="LeaveApplicationModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Request Leave</h4>
+                <p id="EmpNameTimeOff"></p>
+            </div>
+            <div class="modal-body">
+                <form id="LeaveAppForm">
+                    <input type="hidden" id="HidEmpLeave" name="EmpID" />
+                    <div class="form-group shiftCreate">
+                        <div class="form-group">
+                            <div class="col-sm-5">
+                                <select class="selectpicker" name="DayTypID" id="ddldayType"></select>
+                            </div>
+                            <div class="col-sm-4">
+                                <select class="selectpicker" name="LeavetypID" id="ddlLeaveType"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label for="inputEmail3" class="col-sm-8 control-label">From</label>
+                                <div class="col-sm-12">
+                                    <div class='input-group date' id='datetimepicker10'>
+                                        <input type="text" class="form-control daterangepicker-single required" id="EmpLeaveDate" name="EmpLeaveDate" placeholder="From">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="inputEmail3" class="col-sm-8 control-label">To</label>
+                                <div class="col-sm-12">
+                                    <div class='input-group date' id='datetimepicker9'>
+                                        <input type="text" class="form-control daterangepicker-single required" id="EmpLeavetodate" name="EmpLeavetodate" placeholder="To">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <label for="inputEmail3" class="control-label">Note</label>
+                        <textarea class="form-control" rows="3" name="EmpappRemks" placeholder="Full day or Half Day" id="txtappremks"></textarea>
+                    </div>
+                    <div class="form-group col-sm-12">
+                        <button type="button" class="btn btn-success" id="btnleaveapp">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div id="TimeOffModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add Time Off</h4>
+                <p id="TodayDate"></p>
+            </div>
+            <div class="modal-body">
+                <form id="TimeOffForm">
+                    <input type="hidden" id="HidID" name="EmpID" />
+                    <input type="hidden" id="TimeOFFDate" name="TimeOFFDate" />
+                    
+                    <div class="form-group shiftCreate">
+                        
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <label for="inputEmail3" class="col-sm-8 control-label">Time In</label>
+                                <div class="col-sm-12">
+                                    <div class="bootstrap-timepicker">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control timepicker" name="TimeOFFStart" id="TimeOFFStart">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-clock-o"></i>
+                                            </div>
+                                        </div><!-- /.input group -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="inputEmail3" class="col-sm-8 control-label">Time Out</label>
+                                <div class="col-sm-12">
+                                    <div class="bootstrap-timepicker">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control timepicker" name="TimeOFFEnd" id="TimeOFFEnd">
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-clock-o"></i>
+                                            </div>
+                                        </div><!-- /.input group -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-primary" id="btnAddTimeOff">Add <i class="glyphicon glyphicon-plus"></i></button>
+                                </div>                                
+                            </div>                           
+                        </div>
+
+                        <div class="form-group">
+                            <table class="table table-condenced">
+                                <thead>
+                                    <tr>
+                                        <th>TimeOFF Start</th>
+                                        <th>TimeOFF End</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="TimeOFFList">
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>                   
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<input type="hidden" id="hidShift" />
+
+<script type="text/javascript">
+
+
+
+    function AttendanceBookList(codevalue, schid, projectid) {
+
+        $.ajax({
+
+            type: "GET",
+            url: "/Leave/AttendanceBooklist",
+            async: false,
+            data: { Codevalue: codevalue, ScheduleID: schid, ProjiD: projectid }
+
+
+        }).done(function (data) {
+
+            $("#AttendanceBooklist").html(data);
+
+
+        });
+    }
+
+    function AttendCheck()
+    {
+        $(".AddAttend").each(function () {
+
+            
+            if ($(this).attr("data-off") != 0) {
+
+               // $(this).addClass("not-active");
+                $(this).attr("title","Attendance Marked");               
+            }
+            
+            if ($(this).attr("data-offstatus") == "True") {
+
+                $(this).attr("title", "OFF Day");
+            }
+
+            if($(this).attr('data-holistatus') == "True")
+            {
+                $(this).attr("title", "Holiday");
+            }
+            
+            if( ($(this).attr('data-holistatus') == "True") && ($(this).attr("data-off") != 0) )
+            {
+                $(this).attr("title", "Holiday worked");
+            }
+
+        });
+    }
+
+
+    $(document).ready(function () {
+     
+        AttendanceBookList($("#HidCodevalue").val(), $("#HidScheduleID").val(), $("#HidProjiD").val());
+
+        AttendCheck();
+
+
+        $(".timepicker").timepicker({
+            showInputs: false
+        });
+
+        $('.daterangepicker-single').daterangepicker({
+            "singleDatePicker": true,
+            format: "DD/MM/YYYY"
+        });
+
+        $("#AttendanceBooklist").on("click", ".AddAttend", function () {
+          
+       // $(".AddAttend").click(function(){          
+            var EmpID = $(this).attr('data-emp'); 
+            var EmpDate = $(this).attr('data-empdate');
+            var empname = $(this).attr('data-empname');
+            var HoliStatus = $(this).attr('data-holistatus');
+
+            var Shiftfrom = $(this).attr('data-Shift').replace("-"," ");
+            var Shiftto = $(this).attr('data-ShiftTo').replace("-", " ");
+            
+            $("#AttendtimeIN").val(Shiftfrom);
+            $("#AttendtimeOut").val(Shiftto);
+                       
+            $("#Empname").html(empname);
+            $("#EmpNameTimeOff").html(empname);
+            $("#Empdate").html(EmpDate); 
+            
+            $("#TodayDate").html(EmpDate);
+            $("#TimeOFFDate").val(EmpDate);
+
+            $("#HidEmpID").val(EmpID);
+            $("#HidID").val(EmpID);
+            $("#HidEmpLeave").val(EmpID);
+            $("#HidEmpDate").val(EmpDate);
+            $("#HidHoliStatus").val(HoliStatus);
+            $("#hidShift").val($(this).attr('data-Shiftemp'));
+         
+           
+            $.ajax({
+                url: "/Leave/GetLeaveStatus",
+                async: false,
+                data: { EmpID: EmpID, EmpDate: EmpDate }
+            }).done(function (data) {
+                if (data == "True") {                   
+                    $.toast({
+
+                        text: "Leave requested on this date. Please approve or rejected it..",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+                else {
+
+                    $("#Attendancemodal").modal('show');
+                   
+                    $.ajax({
+                        url: "/Leave/GetAttendanceTime",
+                        async: false,
+                        data: { EmpID: EmpID, EmpDate: EmpDate }
+                    }).done(function (data) {
+                        
+                        if (data.IsOFFDay == 1)
+                        {
+                            $(".TimePunch").hide();
+                            $("#IsOffFay").prop('checked', true);
+                            $("#TimeOff").hide();
+                            $("#AllocateAdhoc").show();
+                        }
+                        else {
+                            $(".TimePunch").show();
+                            $("#IsOffFay").prop('checked', false);
+                            $("#TimeOff").show();
+                            $("#AllocateAdhoc").hide();
+                        }
+                        $('#AttendtimeIN').val(data.AttendtimeIN)
+                        $('#AttendtimeOut').val(data.AttendtimeOut);
+                    });
+                    //List time off in timeoff popup
+                    $.ajax({
+                        url: "/Leave/ListTimeOFFs",
+                        data: { EmpID: $("#HidID").val(), TimeOFFDate: $("#TimeOFFDate").val() }
+                    }).done(function (data) {
+                        $("#TimeOFFList").html(data);
+                    });
+
+                }
+            });
+                       
+
+        });
+
+
+        $("#BtnAddNewAttendance").click(function () {
+            
+
+            $.ajax({
+
+                type: "POST",
+                url: "/Leave/AddNewAttendance",
+                data: $("#MarkattendanceFormID").serialize()
+
+            }).done(function (data) {
+
+
+                if (data == 1) {
+
+                    $("#txtremks").val("");
+                    $("#Attendancemodal").modal('hide');
+
+                    AttendanceBookList($("#HidCodevalue").val(), $("#HidScheduleID").val(), $("#HidProjiD").val());
+
+                    $.toast({
+
+                        text: "Added",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                    
+                    $("#IsOffFay").prop('checked', false);
+                    $(".TimePunch").show();
+
+                }
+                else if(data == 2)
+                {
+                    $.toast({
+
+                        text: "Not Allowed more than 2 offdays continiously",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+                else {
+                    $.toast({
+
+                        text: "Application Error Please Contact Administrator!",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+                 
+            });
+
+
+        })
+
+
+        //$("#BtnRemoveAttendance").click(function () {
+
+        //    $.ajax({
+
+        //        type: "POST",
+        //        url: "/Leave/RemoveAttendance",
+        //        data: $("#MarkattendanceFormID").serialize()
+
+        //    }).done(function (data) {
+
+        //        if (data) {
+        //            $("#txtremks").val("");
+        //            $("#Attendancemodal").modal('hide');
+
+        //            AttendanceBookList($("#HidCodevalue").val(), $("#HidScheduleID").val(), $("#HidProjiD").val());
+
+        //            AttendCheck();
+
+        //            $.toast({
+
+        //                text: "Attandence Removed",
+        //                position: 'top-right',
+        //                hideAfter: 3000,
+        //                showHideTransition: 'slide',
+        //                loader: false,
+        //            })
+        //        }
+        //        else {
+        //            $.toast({
+
+        //                text: "Application Error Please Contact Administrator!",
+        //                position: 'top-right',
+        //                hideAfter: 3000,
+        //                showHideTransition: 'slide',
+        //                loader: false,
+        //            })
+        //        }
+
+        //    });
+
+        //})
+
+
+    })
+
+
+</script>

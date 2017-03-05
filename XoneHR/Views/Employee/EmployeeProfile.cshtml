@@ -1,0 +1,752 @@
+﻿@model XoneHR.Models.EmployeeDetails
+@{
+    ViewBag.Title = "EmployeeProfile";
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+<script type="text/javascript">
+
+    function GetDocumentType() {
+
+        var ddlBox = $("#ddlDocumentTypeID");
+
+        $.ajax({
+            url: "/Candidate/GetDocumentType",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.DocTypID + '>' + item.DocTypName + '</option>').selectpicker('refresh');;
+            });
+
+        });
+
+    }
+
+    function GetDocumentSubType(DocumentTypeID) {
+        var ddlBox = $("#ddlDocumentSubtypeID");
+
+        $.ajax({
+            url: "/Candidate/GetDocumentSubType",
+            data: { DocumenTypID: DocumentTypeID },
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.DocStypID + '>' + item.DocStypName + '</option>').selectpicker('refresh');;
+            });
+
+        });
+
+    }
+
+    function LoadDocuments(DocstypeID) {
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Employee/DocumentsLisTablewise",
+            data: { DocstypeID: DocstypeID }
+
+        }).done(function (data) {
+
+            $("#Documentslistss").html(data);
+
+        })
+    }
+
+    function LoadEmpHistory() {
+        $.ajax({
+
+            type: "POST",
+            url: "/Employee/EmployerHistoryList"
+
+        }).done(function (data) {
+
+            $("#EmpHistory").html(data);
+
+        })
+    }
+
+    function LoadSalaryDetails() {
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Employee/EmployeeSalaryDetails"
+
+        }).done(function (data) {
+
+            $("#salary").html(data);
+
+        })
+    }
+
+    function LoadLeaveDetails() {
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Employee/EmployeeLeaves"
+
+        }).done(function (data) {
+
+            $("#Leavedetails").html(data);
+
+        })
+    }
+
+    function DeclarationtabContentList() {
+
+        $.ajax({
+            url: "/Employee/DeclarationContentProfile"
+        }).done(function (data) {
+            $("#DeclarationtabContent").html(data);
+        });
+    }
+
+    $(document).ready(function () {
+
+        LoadDocuments(0);
+        LoadEmpHistory();
+        GetDocumentType();
+        LoadSalaryDetails();
+        LoadLeaveDetails();
+        DeclarationtabContentList();
+
+        $("#ddlDocumentTypeID").change(function () {
+
+            var DocumenttypeID = $(this).val();
+
+            GetDocumentSubType(DocumenttypeID);
+
+        });
+
+        $("#ddlDocumentSubtypeID").change(function () {
+
+            var DocumenSubttypeID = $(this).val();
+            LoadDocuments(DocumenSubttypeID);
+
+        });
+
+    })
+</script>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-users"></i>&nbsp;
+        Employees Profile
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="/Employee/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+
+<section class="newforms p-t-0">
+
+    <div class="tabsnew">
+        <!-- Nav tabs -->
+        <div class="box box-primary">
+
+            <div class="row p-t-20">
+                <div class="col-sm-3">
+                    <div class="box-body box-profile">
+                        <img class="profile-user-img img-responsive img-circle" src="@Model.CandPhoto" alt="User profile picture">
+                        <h3 class="profile-username text-center">@Model.CandName</h3>
+                        <p class="text-muted text-center">@Model.DesigName </p>
+                        <ul class="list-group list-tab">
+                            <li role="presentation" class="list-group-item">
+                                <a href="#a" role="tab" data-toggle="tab"><i class="fa fa-check"></i><b>@Model.EmpTypName</b></a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#profile" class="btn btn-success btn-block" role="tab" data-toggle="tab">Personal Details</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#docs" role="tab" data-toggle="tab">Documents</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#history" role="tab" data-toggle="tab">Employer History</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#emergencycontact" role="tab" data-toggle="tab">Emergency Contact</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#salary" role="tab" data-toggle="tab">Salary Details</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#leave" role="tab" data-toggle="tab">Leave Details</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#declaration" role="tab" data-toggle="tab">Declaration</a>
+                            </li>
+                        </ul>
+                        <div class="p-l-15 p-r-15">
+                            @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                            {
+                                <a href="/Candidate/Edit?CandID=@Model.CandID&EditType=1" class="btn btn-block BtnAppveEmp btn-success"><i class="fa fa-fw fa-edit"></i></a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-9">
+                    <div class="tab-content">
+
+                        <div role="tabpanel" class="tab-pane fade" id="interview">
+
+                            <form>
+                                <div class="ques">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <h6>1. Question 1</h6>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12" for="exampleInputPassword1">Answer</label>
+                                        <div class="col-sm-6">
+                                            <textarea class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12" for="exampleInputPassword1">Rating</label>
+                                        <div class="col-sm-4">
+                                            <input id="input-21e" value="0" type="number" class="rating" min=0 max=5 step=0.5 data-size="xs">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ques">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <h6>2. Question 2</h6>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12" for="exampleInputPassword1">Answer</label>
+                                        <div class="col-sm-6">
+                                            <textarea class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12" for="exampleInputPassword1">Rating</label>
+                                        <div class="col-sm-4">
+                                            <input id="input-21e" value="0" type="number" class="rating" min=0 max=5 step=0.5 data-size="xs">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ques">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <h6>3. Question 3</h6>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12" for="exampleInputPassword1">Answer</label>
+                                        <div class="col-sm-6">
+                                            <textarea class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-12" for="exampleInputPassword1">Rating</label>
+                                        <div class="col-sm-4">
+                                            <input id="input-21e" value="0" type="number" class="rating" min=0 max=5 step=0.5 data-size="xs">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane active" id="profile">
+                            <h3>Personal Details</h3>
+                            <hr class="divider" />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4>Basic Info</h4><hr />
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Name</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.CandName</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Mobile</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandMobile == null || Model.CandMobile == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.CandMobile</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Email</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandEmail == null || Model.CandEmail == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.CandEmail</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Address</label>
+                                            <div class="col-sm-8">
+                                                <p>
+                                                    @Model.CandAddress
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Telephone</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandPhone == null || Model.CandPhone == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <p>
+                                                        @Model.CandPhone
+                                                    </p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <h4> Personal Details</h4><hr />
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Gender</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.CandGender</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Date of Birth</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.CandDob.ToString("dd-MM-yyyy")</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Religion</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.ReligName</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Age</label>
+                                            <div class="col-sm-8">
+                                                @{var Age = DateTime.Now.Year - Model.CandDob.Year;}
+                                                <span>@Age</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Marital Status</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.MaritulStatusType</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Place of Birth</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandPlaceofBirth == null || Model.CandPlaceofBirth == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.CandPlaceofBirth</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Race</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.RaceName</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <h4> Professional Details </h4><hr />
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Highest Education</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandHgEducation == null || Model.CandHgEducation == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.CandHgEducation</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Designation Applied For</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.DesigName</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Grade</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.Gradename</span>
+                                            </div>
+                                        </div>
+                                        @*<div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Salary Expected</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandSalrexpted == 0)
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.CandSalrexpted</span>
+                                                }
+                                            </div>
+                                        </div>*@
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <h4>Nationality & Licensing</h4><hr />
+                                    <div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="" class="col-sm-4 padding-0 control-label">Nationality</label>
+                                                <div class="col-sm-8">
+                                                    <span>@Model.Citizen</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-sm-4 padding-0 control-label">Resident Status</label>
+                                                <div class="col-sm-8">
+                                                    <span>@Model.Resident_Name</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if (Model.Resident_Id == 1 || Model.Resident_Id == 2)
+                                    {
+                                        <div id="sigapore">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-4 padding-0 control-label">NRIC</label>
+                                                    <div class="col-sm-8">
+                                                        <span>@Model.CandNRICNo</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 padding-0 control-label">Passport Number</label>
+                                                    <div class="col-sm-8">
+                                                        <span>@Model.PassportNo</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="workpermit">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-4 padding-0 control-label">Passport Number</label>
+                                                    <div class="col-sm-8">
+                                                        <span>@Model.PassportNo</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 padding-0 control-label">Passport Expiry</label>
+                                                    <div class="col-sm-8">
+                                                        <span>@Model.PassportExpiry.ToString("dd/MM/yyyy")</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="" class="col-sm-4 padding-0 control-label">Fin Number</label>
+                                                    <div class="col-sm-8">
+                                                        <span>@Model.FinNo</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="col-sm-4 padding-0 control-label">Fin Expiry</label>
+                                                    <div class="col-sm-8">
+                                                        <span>@Model.FinExpiry.ToString("dd/MM/yyyy")</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div> 
+
+                                <div class="col-md-12">
+                                    <h4>PLRD Details</h4><hr />
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">PLRD Issue Date</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.IssueDate == null || Model.IssueDate.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.IssueDate.ToString("dd-MM-yyyy")</span>
+                                                }
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">License Number</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.LicenseNum == null)
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.LicenseNum</span>
+                                                }
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">PLRD Expiry Date</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.ExpiryDate == null || Model.ExpiryDate.ToString("dd-MM-yyyy") == "01-01-0001")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.ExpiryDate.ToString("dd-MM-yyyy")</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                                
+
+                                <div class="col-md-12">
+                                    <h4> Other Info</h4><hr />
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Register Date</label>
+                                            <div class="col-sm-8">
+                                                <span>@Model.CandJoinDate.ToString("dd-MM-yyyy")</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Special Notes</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.CandDetails == null || Model.CandDetails == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.CandDetails</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <form>
+
+                                        @*<div class="form-group">
+                                                <label class="col-sm-4 padding-0 control-label">Salary Expected</label>
+                                                <div class="col-sm-8">
+                                                    <span>@Model.CandSalrexpted</span>
+                                                </div>
+                                            </div>*@
+
+                                        @*<div class="form-group">
+                                                <label class="col-sm-4 padding-0 control-label">Basic Salary</label>
+                                                <div class="col-sm-8">
+                                                    <span>@Model.SalaEmpbasicSalary</span>
+                                                </div>
+                                            </div>*@
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="docs">
+                            @*<form class="">
+                                    <div class="form-group">
+                                        <label class="col-sm-1 p-t-5 control-label">Filter</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control select2" id="ddlDocumentTypeID" style="width: 100%;"></select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <select class="form-control select2" id="ddlDocumentSubtypeID" style="width: 100%;"></select>
+                                        </div>
+                                    </div>
+                                </form>*@
+                            <table class="table table-responsive table-condensed table-hover">
+                                <tbody id="Documentslistss"></tbody>
+                            </table>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="history">
+
+                            <table class="table table-condenced">
+                                <thead>
+                                    <tr>
+                                        <th>Employer</th>
+                                        <th>Duration</th>
+                                        <th>Last Salary</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="EmpHistory"></tbody>
+                            </table>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="salary">
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="leave">
+
+                            <table class="table table-responsive">
+
+                                <thead>
+                                    <tr>
+                                        <th>Leave type</th>
+                                        <th>Eligibility</th>
+                                        <th>Earned</th>
+                                        <th>Leaves Taken</th>
+                                        <th>Available Leaves</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="Leavedetails"></tbody>
+                            </table>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="emergencycontact">
+                            <h4>Emergency Contact</h4>
+                            <hr class="divider" />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <form>
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Name</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.EmrgContact == null || Model.EmrgContact == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.EmrgContact</span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="" class="col-sm-4 padding-0 control-label">Relationship</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.EmrgRelationship == null || Model.EmrgRelationship == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.EmrgRelationship</span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Contact Number</label>
+                                            <div class="col-sm-8">
+                                                @if (Model.EmrgContactNo == null || Model.EmrgContactNo == "")
+                                                {
+                                                    <span>NA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@Model.EmrgContactNo</span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-4 padding-0 control-label">Details</label>
+                                            <div class="col-sm-8">
+                                                <p>
+                                                    @if (Model.EmrgDetails == null || Model.EmrgDetails == "")
+                                                    {
+                                                        <span>NA</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @Model.EmrgDetails
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="declaration">
+                            <div id="DeclarationtabContent"></div>
+                        </div>
+                    </div>
+                    <hr class="divider">
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- Tab panes -->
+    </div>
+</section>

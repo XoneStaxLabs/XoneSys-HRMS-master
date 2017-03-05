@@ -1,0 +1,136 @@
+﻿@model IEnumerable<XoneHR.Models.SummaryDetails>
+@{
+    ViewBag.Title = "SummaryDetails";
+    var flg = 0; var flg1 = 0;
+}
+
+<div class="salaryslipData">
+    <div class="pull-left">
+
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th colspan="2">Offday Type</th>
+                </tr>
+            </thead>
+            <tbody align="left">
+                @foreach (var item in Model)
+                {
+                    if (item.stats == 3)
+                    {
+                        if (item.RestDay_Type == 0)
+                        {
+                            if (item.restdaycount != 0)
+                            {
+                                flg1 = 1;
+                                <tr>
+                                    <td>Optional</td>
+                                    <td>@item.restdaycount</td>
+                                </tr>
+                            }
+
+                        }
+                        else
+                        {
+                            flg1 = 1;
+                            <tr>
+                                <td>@item.restdayname</td>
+                                <td>Fixed</td>
+                            </tr>
+                        }
+                    }
+                }
+                @if (flg1 == 0)
+                {
+                    <tr>
+                        <td>No off day types</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<div class="salaryslipData">
+    <div class="pull-left">
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th colspan="2">Work Time Details</th>
+                </tr>
+            </thead>
+            <tbody align="left">
+                @foreach (var item in Model)
+                {
+                    if (item.stats == 4)
+                    {
+                        <tr>
+                            <td>Total Hours Worked</td>
+                            <td>@item.totalhours_worked</td>
+                        </tr>
+
+                        <tr>
+                            <td>Overtime Worked</td>
+                            <td>@item.Overtime_worked</td>
+                        </tr>
+
+                    }
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="salaryslipData">
+    <div class="pull-left">
+        <table class="table table-responsive" >
+            <thead>
+                <tr>
+                    <th colspan="2">Leave Details</th>
+                </tr>
+            </thead>
+            <tbody align="left">
+                @foreach (var item in Model)
+                {
+                    if (item.stats == 1)
+                    {
+                        flg = 1;
+                        <tr>
+                            <td>@item.LeaveType</td>
+                            <td>@item.Leavetypcount</td>                            
+                        </tr>
+                    }
+
+                }
+                @if (flg == 0)
+                {
+                    <tr>
+                        <td>No Leave Details</td>
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+

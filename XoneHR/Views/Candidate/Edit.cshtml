@@ -1,0 +1,3029 @@
+﻿@model XoneHR.Models.CandidateDetails
+@{
+    ViewBag.Title = "Create";
+    var type = 0;
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<style>
+    .TabValidClasss {
+        color: rgb(177, 0, 0) !important;
+    }
+</style>
+
+<script type="text/javascript">
+
+    function checkLength(el) {
+        if (el.value.length < 3) {
+            // alert("length must be exactly 6 characters")
+            $("#lengthchk").html("Name must contains atleast 3 charcters");
+            $("#lengthchk").show();
+            $("#CandName").val("");
+        }
+        else {
+            $("#lengthchk").hide();
+        }
+    }
+
+    function GetDocumentType() {
+
+        var ddlBox = $("#ddlDocumentTypeID");
+
+        $.ajax({
+            url: "/Candidate/GetDocumentType",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="-1">Type</option>').selectpicker('refresh');
+            ddlBox.append('<option value="0">Candidate Photo</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.DocTypID + '>' + item.DocTypName + '</option>').selectpicker('refresh');;
+            });
+
+        });
+
+    }
+
+    function GetDocumentSubType(DocumentTypeID) {
+        var ddlBox = $("#ddlDocumentSubtypeID");
+
+        $.ajax({
+            url: "/Candidate/GetDocumentSubType",
+            data: { DocumenTypID: DocumentTypeID },
+            async: false
+        }).done(function (data) {
+            var selectText = "";
+            ddlBox.empty();
+
+            ddlBox.append('<option value="0">Sub Type</option>').selectpicker('refresh');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.DocStypID + '>' + item.DocStypName + '</option>').selectpicker('refresh');;
+            });
+
+        });
+
+    }
+
+    function GetRace() {
+        var ddlBox = $("#RaceID");
+
+        $.ajax({
+            url: "/Candidate/GetRace",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+            
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.RaceID + '>' + item.RaceName + '</option>').selectpicker('refresh');;
+            });
+            ddlBox.append('<option value="-1">Others</option>').selectpicker('refresh');
+            $("#RaceID").selectpicker('val', $("#selectedRaceID").val());
+
+        });
+    }
+
+    function GetReligion() {
+        var ddlBox = $("#ReiligionID");
+
+        $.ajax({
+            url: "/Candidate/GetReligion",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.ReligID + '>' + item.ReligName + '</option>').selectpicker('refresh');;
+            });
+
+            ddlBox.append('<option value="-1">Others</option>').selectpicker('refresh');
+            $("#ReiligionID").selectpicker('val', $("#selectedReiligionID").val());
+        });
+
+    }
+
+    function GetMariatalStatus() {
+        var ddlBox = $("#MaritalStatusID");
+
+        $.ajax({
+            url: "/Candidate/GetMariatalStatus",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.MaritID + '>' + item.MaritulStatusType + '</option>').selectpicker('refresh');;
+            });
+
+            $('#MaritalStatusID').selectpicker('val', $("#selectedMaritID").val());
+
+        });
+
+    }
+
+    function GetCitizenship() {
+        var ddlBox = $("#CitizenID");
+
+        $.ajax({
+            url: "/Candidate/GetCitizenship",
+            async: false
+        }).done(function (data) {
+            var selectText = "";
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.CizenID + '>' + item.Citizen + '</option>').selectpicker('refresh');
+
+            });
+            $('#CitizenID').selectpicker('val', $("#selectedCitizenID").val());
+        });
+
+        //$.ajax({
+
+        //    type: "POST",
+        //    url: "/Candidate/GetCitizenDetails",
+        //    data: { CitizenID: $("#selectedCitizenID").val() }
+        //}).done(function (data) {
+
+        //    if (data.CitiZenCode != 2) {
+
+        //        $(".passportdiv").show();
+        //        $(".citizenDetails").hide();
+        //        type = 0;
+        //        $(".FinNo").show();
+
+        //    }
+        //    else {
+
+        //        $(".passportdiv").hide();
+        //        $(".citizenDetails").show();
+        //        type = 1;
+        //        $(".FinNo").hide();
+        //    }
+
+        //    //$("#NricText").html(data.CitiZenNoname);
+        //    GetEditCitizenDetails(type);
+        //})
+
+    }
+
+    function GetDesignation() {
+        var ddlBox = $("#DesignationID");
+
+        $.ajax({
+            url: "/Candidate/GetDesignation",
+            async: false,
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.DesigID + '>' + item.DesigName + '</option>').selectpicker('refresh');;
+            });
+
+            $("#DesignationID").selectpicker('val', $("#selectedDesignationID").val());
+
+        });
+
+        // var ddlBox1 = $("#GradeId");
+
+        var select = $("#GradeID");
+        select.empty();
+        select.prepend('<option value=0>--Select--</option>');
+        $.getJSON("/Candidate/GetGrade", { desigid: $("#selectedDesignationID").val() },
+            function (response) {
+                $.each(response, function (index, itemData) {
+
+                    select.append($('<option />', {
+                        value: itemData.GradeID,
+                        text: itemData.Gradename
+                    }));
+
+                    $("#GradeID").val($("#selectedGradeID").val());
+                });
+
+            });
+    }
+
+    function LoadDocuments(DocstypeID) {
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/DocumentsListEdit",
+            data: { DocstypeID: DocstypeID }
+
+        }).done(function (data) {
+
+            $("#DocumentsList").html(data);
+
+        })
+    }
+
+    function LoadEmpHistory(TableID) {
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/EmployerHistoryList",
+            data: { TableID: TableID }
+
+        }).done(function (data) {
+            $("#EmpHistory").append(data);
+
+        });
+    }
+
+    function GetGender() {
+        var ddlBox = $("#CandGender");
+        var selectText = "";
+        ddlBox.empty();
+        ddlBox.append('<option value=' + 'Male' + '>' + 'Male' + '</option>').selectpicker('refresh');
+        ddlBox.append('<option value=' + 'Female' + '>' + 'Female' + '</option>').selectpicker('refresh');
+
+    }
+
+    function GetBankDetails() {
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/GetBankDetails",
+            data: { CandID: $("#CandID").val() }
+
+        }).done(function (data) {
+
+            $("#CandBnkName").val(data.CandBnkName);
+            $("#CandBnkID").val(data.CandBnkID);
+            $("#CandbrnchCode").val(data.CandbrnchCode);
+            $("#CandBnkAcno").val(data.CandBnkAcno);
+            $("#CandBnkCode").val(data.CandBnkCode);
+        });
+    }
+
+    function GetEditCitizenDetails(Type) {
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/GetEditCitizenDetails",
+            data: { CandID: $("#CandID").val() }
+
+        }).done(function (data) {
+            if (Type == 1) {
+
+                $("#CitzDetID").val(data.CitzDetID);
+                $("#CitzDetCandID").val(data.CandID);
+                $("#CitzNsVaction").val(data.CitzNsVaction);
+                $("#CitzOrdrDate").val(moment(data.CitzOrdrDate).format($("#HidDateFormat").val()));    //'MM/DD/YYYY'
+                $("#CitzReglrVaction").val(data.CitzReglrVaction);
+                $("#CitzOrdrDateOne").val(moment(data.CitzOrdrDateOne).format($("#HidDateFormat").val()));   //'MM/DD/YYYY'
+
+                var rad = data.CitzReservist;
+                if (rad == true) {
+                    var $radios = $('input:radio[name=CitzReservist]');
+                    if ($radios.is(':checked') === false) {
+                        $radios.filter('[value=1]').prop('checked', true);
+                    }
+                } else {
+                    var $radios = $('input:radio[name=CitzReservist]');
+                    if ($radios.is(':checked') === false) {
+                        $radios.filter('[value=0]').prop('checked', true);
+                    }
+                }
+
+            }
+            else {
+
+                $("#CitzNsVaction").val("");
+                $("#CitzOrdrDate").val("");
+                $("#CitzReglrVaction").val("");
+                $("#CitzOrdrDateOne").val("");
+                var $radios = $('input:radio[name=CitzReservist]');
+                if ($radios.is(':checked') === false) {
+                    $radios.filter('[value=0]').prop('checked', true);
+                }
+            }
+        })
+    }
+
+    function GetSKillSet() {
+
+        var ddlBox = $("#ddlSkillSet");
+
+        $.ajax({
+            url: "/Candidate/GetSkillSets",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.SkilID + '>' + item.SkilsetName + '</option>').selectpicker('refresh');
+            });
+
+        });
+
+    }
+
+    function GetLangKnown() {
+
+        var ddlBox = $("#ddlLangKnown");
+
+        $.ajax({
+            url: "/Candidate/GetLangKnown",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.LangknID + '>' + item.LanguageName + '</option>').selectpicker('refresh');
+            });
+
+        });
+
+    }
+
+    function GetSelectedSkillset() {
+
+        $.ajax({
+            url: "/Candidate/GetSelectedSkillset",
+            async: false,
+            data: { CandID: $("#CandID").val() }
+        }).done(function (data) {
+
+            $("#ddlSkillSet").val(data);
+            $('#ddlSkillSet').selectpicker('refresh');
+
+        });
+
+    }
+
+    function GetSelectedLangKnown() {
+
+        $.ajax({
+            url: "/Candidate/GetSelectedCandLangKnown",
+            async: false,
+            data: { CandID: $("#CandID").val() }
+        }).done(function (data) {
+
+            $("#ddlLangKnown").val(data);
+            $('#ddlLangKnown').selectpicker('refresh');
+
+        });
+
+    }
+
+    function GetEditLoadEmpHistory(data) {
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/EditEmployerHistoryList",
+            data: { CandID: $("#CandID").val(), EmphID: data },
+
+        }).done(function (data) {
+
+            $("#EmpHistory").append(data);
+
+        })
+    }
+
+    function DeclarationtabContentList() {
+
+        $.ajax({
+            url: "/Candidate/DeclarationtabContentListEdit"
+        }).done(function (data) {
+            $("#DeclarationtabContent").html(data);
+        });
+    }
+
+    function GetEmptype(EmpTypID) {
+
+        var ddlBox = $("#Employeetyp");
+        $.ajax({
+            type: "GET",
+            url: "/Candidate/GetEmployeeType",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.EmpTypID + '>' + item.EmpTypName + '</option>').selectpicker('refresh');;
+            });
+            $("#Employeetyp").selectpicker('val', EmpTypID);
+        });
+    }
+
+    function GetFundTypes(FundType) {
+
+        var ddlBox = $("#FundType");
+
+        $.ajax({
+            url: "/Candidate/GetFundTypes",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.FundTypeID + '>' + item.FundType + '</option>').selectpicker('refresh');
+            });
+            $("#FundType").selectpicker('val', FundType);
+        });
+
+    }
+
+    function GetEmployeeLastTab() {
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/GetEditEmployeeEmpDetails",
+            data: { CandID: $("#CandID").val() },
+            async: false
+        }).done(function (data) {
+
+            if (data == 1) {
+                GetEmptype(0);
+                GetFundTypes(0);
+            } else {
+
+                GetEmptype(data.EmpTypID);
+                GetFundTypes(data.FundType);
+                $("#StartDate").val(moment(data.EmpStartDate).format($("#HidDateFormat").val()));   //'MM/DD/YYYY'
+                if (moment(data.EmpEndDate).format($("#HidDateFormat").val()) != '01/01/0001') {    //'MM/DD/YYYY'
+                    $("#EndDate").val(moment(data.EmpEndDate).format($("#HidDateFormat").val()));   //'MM/DD/YYYY'
+                }
+                else
+                    $("#EndDate").val();
+
+                $("#BasicSalary").val(data.BasicSalary);
+                $("#Levy").val(data.EmpLevyAmnt);
+                $("#HidEmpID").val(data.EmpID);
+                $("#EmployeeID").val(data.EmpID);
+                // $("#HidSalaEmpID").val(data.SalaEmpID);
+                $("#HidEmpPartTime_Pay").val(data.EmpPartTime_Pay);
+                $("#EmpRegNo").val(data.EmpRegNo);
+
+                var rad = data.CPF_Status; 
+                if (rad == true) {
+                    var $radios = $('input:radio[name=CPF]');
+                    //if ($radios.is(':checked') === false) {
+                    //    $radios.filter('[value=1]').prop('checked', true);
+                    //}
+                    $radios.filter('[value=1]').prop('checked', true);
+                } else {
+                    var $radios = $('input:radio[name=CPF]');
+                    //if ($radios.is(':checked') === false) {
+                    //    $radios.filter('[value=0]').prop('checked', true);
+                    //}
+                    $radios.filter('[value=0]').prop('checked', true);
+                }
+
+                $("#Emp_PermenanentType").val(data.Emp_PermenanentType);
+
+                if ($("#HidEmpPartTime_Pay").val() == 1) {
+                    $("#BSal_label").html("Hourly Base Salary");
+                    $("#rd_PayStruct1").attr("checked", "checked");
+                    $("#DivPartemp").show();
+                }
+                else if ($("#HidEmpPartTime_Pay").val() == 2) {
+                    $("#BSal_label").html("Daily Base Salary");
+                    $("#rd_PayStruct1").attr("checked", "checked");
+                    $("#DivPartemp").show();
+                }
+                else {
+                    $("#BSal_label").html("Basic Salary");
+                    $("#DivPartemp").hide();
+                }
+            }
+        })
+    }
+
+    function GetTabValidation() {
+
+        $.ajax({
+            url: "/Candidate/GetTabValdation",
+            async: false,
+            data: { CandID: $("#CandID").val() },
+        }).done(function (data) {
+
+            $.each(data, function (i, item) {
+                if (1 == item.CandTabID) {
+                    $("#1").addClass('TabValidClasss');
+                }
+                else if (3 == item.CandTabID) {
+                    $("#3").addClass('TabValidClasss');
+                }
+                else if (4 == item.CandTabID) {
+                    $("#4").addClass('TabValidClasss');
+                }
+                else if (5 == item.CandTabID) {
+                    $("#5").addClass('TabValidClasss');
+                }
+                else if (6 == item.CandTabID) {
+                    $("#6").addClass('TabValidClasss');
+                }
+                else if (7 == item.CandTabID) {
+                    $("#7").addClass('TabValidClasss');
+                }
+            });
+
+        });
+
+    }
+
+    function GetPLRDDetails() {
+        $.ajax({
+
+            type: "POST",
+            url: "/Candidate/GetPLRDDetails",
+            data: { CandID: $("#CandID").val() }
+
+        }).done(function (data) {
+
+            $("#IssueDate").val(data.dtissue);
+            $("#ExpiryDate").val(data.dtexpiry);
+            $("#LicenseNum").val(data.LicenseNum);
+
+            //var date1 = new Date(parseInt(data.IssueDate.substr(6)));
+            //var IssueDate = (date1.getFullYear() + "-" + (date1.getMonth() + 1) + "-" + date1.getDate() + ' ' + date1.toString().split(' ')[4]);
+            //$("#IssueDate").val(IssueDate);
+            //var date2 = new Date(parseInt(data.ExpiryDate.substr(6)));
+            //var ExpiryDate = (date2.getFullYear() + "-" + (date2.getMonth() + 1) + "-" + date2.getDate() + ' ' + date2.toString().split(' ')[4]);
+            //$("#ExpiryDate").val(ExpiryDate); //new Date(parseInt(data.ExpiryDate.substr(6))).toString("dd/MM/yyyy")
+            //$("#LicenseNum").val(data.LicenseNum);
+        });
+    }
+
+    function GetResidentStatus1() {
+        var ddlBox = $("#Resident_Id");
+        $.ajax({
+            url: "/Candidate/GetResidentStatus",
+            async: false
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+            if ($("#selectedCitizenID").val() == 2) {
+                $.each(data, function (i, item) {
+                    if (item.Resident_Id != 4)
+                        ddlBox.append('<option value=' + item.Resident_Id + '>' + item.Resident_Name + '</option>').selectpicker('refresh');
+                });
+            }
+            else {
+                $.each(data, function (i, item) {
+                    if (item.Resident_Id != 1)
+                        ddlBox.append('<option value=' + item.Resident_Id + '>' + item.Resident_Name + '</option>').selectpicker('refresh');
+                });
+            }
+            $('#Resident_Id').selectpicker('val', $("#selectedResident").val());
+
+        });
+    }
+
+    function GetResidentStatus(CitizenID) {
+        var ddlBox = $("#Resident_Id");
+        $.ajax({
+            url: "/Candidate/GetResidentStatus",
+            async: false
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+            if (CitizenID == 2) {
+                $.each(data, function (i, item) {
+                    if (item.Resident_Id != 4)
+                        ddlBox.append('<option value=' + item.Resident_Id + '>' + item.Resident_Name + '</option>').selectpicker('refresh');
+                });
+                $("#Resident_Id").val(1);
+                $("#Resident_Id").selectpicker('refresh');
+            }
+            else {
+                $.each(data, function (i, item) {
+                    if (item.Resident_Id != 1)
+                        ddlBox.append('<option value=' + item.Resident_Id + '>' + item.Resident_Name + '</option>').selectpicker('refresh');
+                });
+            }
+            $('#Resident_Id').selectpicker('val', $("#selectedResident").val());
+        });
+    }
+
+    $(document).ready(function () {
+        $(".otherracetab").hide();
+        $(".otherreligiontab").hide();
+        $("#lengthchk").hide();
+        $("#mob_unique").hide();
+        $("#mail_unique").hide();
+        $("#phone_unique").hide();
+        if ($("#Cand_Emp").val() == 1) {
+            $("#employee").show();
+            $("#LeaveTab").show();
+            $("#Candidate").hide();
+            $("#EmpTab").show();
+            $(".Cand_Salexp").hide();
+        }
+        else {
+            $("#employee").hide();
+            $("#LeaveTab").hide();
+            $("#Candidate").show();
+            $("#EmpTab").hide();
+            $(".Cand_Salexp").show();
+        }
+        GetTabValidation(); GetPLRDDetails();
+        GetDocumentType();
+        GetRace();
+        GetReligion();
+        GetMariatalStatus();
+        GetCitizenship();
+        GetDesignation();
+        GetGender();
+        GetBankDetails();
+        GetSKillSet();
+        GetLangKnown();
+        GetSelectedSkillset();
+        GetSelectedLangKnown();
+        GetEditLoadEmpHistory();
+        DeclarationtabContentList();
+        LoadDocuments(0);
+        GetEmployeeLastTab();
+        GetResidentStatus1();
+        //GetEmptype(0);
+        //GetFundTypes(0);
+
+        $('select[name=CandGender]').val($("#selectedCandGender").val());
+        $('select[name=CandGender]').selectpicker('refresh');
+
+        $("#CitizenID").change(function () {
+            GetResidentStatus($(this).val());
+        });
+
+        $("#ddlDocumentSubtypeID").append('<option value="0">Sub Type</option>').selectpicker('refresh');
+
+        $("#ddlDocumentTypeID").change(function () {
+
+            var DocumenttypeID = $(this).val();
+            if ($(this).val() == 0) {
+                $(".Filetype").hide();
+                $(".Uploadbutton").show();
+                $("#Doctexts").html("Upload Photo");
+            }
+            else {
+                $(".Filetype").show();
+                $(".Uploadbutton").hide();
+                $("#Doctexts").html("Upload Documents");
+            }
+
+            GetDocumentSubType(DocumenttypeID);
+
+        });
+
+        $("#BtnAddCandprofile").click(function () {
+
+            $.validator.addMethod("custom_number", function (value, element) {
+                return this.optional(element) || value === "NA" ||
+                    value.match(/^[0-9,\+-]+$/);
+            }, "Please enter a valid number");
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+            //initilize validation plugin on this form.
+            $("#CandidateProfile").validate({
+                rules: {
+                    CandMobile: {
+                        //     required: true,
+                        custom_number: true,
+                        minlength: 8,
+                        maxlength: 15
+                    },
+                    CandPhone: {
+                        // required: true,
+                        custom_number: true,
+                        minlength: 8,
+                        maxlength: 15
+                    },
+                    CandDob: {
+                        required: true,
+                        //date: true
+                    },
+                    otherrace: {
+                        required: true,
+                    },
+                    otherreligion: {
+                        required: true,
+                    },
+                    CandRegDate: {
+                        required: true,
+                        //date: true
+                    },
+                    CandSalrexpted: {
+                        //   required: true,
+                        number: true
+                    },
+                    CizenID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    MaritID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    ReligID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    RaceID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    DesigID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    GradeID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    }
+
+                }
+
+            });
+            //run validation process
+            if ($('#CandidateProfile').valid()) {
+
+                if ($("#RaceID").val() == -1 && $("#ReiligionID").val() == -1) {
+                    $.ajax({
+                        url: "/Candidate/RaceCreate",
+                        data: { RaceName: $("#otherrace").val() }
+
+                    }).done(function (data) {
+
+                        if (data > 0) {
+                            $("#Race_name").val(data);
+
+                            $.ajax({
+                                url: "/Candidate/ReligionCreate",
+                                data: { ReligionName: $("#otherreligion").val() }
+
+                            }).done(function (data) {
+
+                                if (data > 0) {
+                                    $("#Religion_name").val(data);
+
+                                    $.ajax({
+
+                                        type: "POST",
+                                        url: "/Candidate/AddNewCandidate",
+                                        data: $("#CandidateProfile").serialize()
+
+                                    }).done(function (data) {
+
+                                        if (data == true && $("#Resident_Id").val() == 1) {
+
+                                            $.ajax({
+
+                                                type: "POST",
+                                                url: "/Candidate/AddNewCitizenDetails",
+                                                data: $("#CandidateProfile").serialize(),
+                                                async: false
+
+                                            }).done(function (data) {
+                                                if (data) {
+                                                    $.toast({
+
+                                                        text: "Saved Successfully",
+                                                        position: 'top-right',
+                                                        hideAfter: 3000,
+                                                        showHideTransition: 'slide',
+                                                        loader: false,
+                                                    })
+                                                }
+                                                else {
+                                                    $.toast({
+                                                        text: "Successfully Saved, Citizen Details Cann't Add!",
+                                                        position: 'top-right',
+                                                        hideAfter: 3000,
+                                                        showHideTransition: 'slide',
+                                                        loader: false,
+                                                    })
+                                                }
+
+                                            });
+
+                                            //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+                                        }
+                                        else if (data == true && $("#Resident_Id").val() != 1) {
+                                            $.toast({
+
+                                                text: "Saved Successfully",
+                                                position: 'top-right',
+                                                hideAfter: 3000,
+                                                showHideTransition: 'slide',
+                                                loader: false,
+                                            })
+                                        }
+                                        else {
+                                            $.toast({
+
+                                                text: "Application Error Please Contact Administrator!",
+                                                position: 'top-right',
+                                                hideAfter: 3000,
+                                                showHideTransition: 'slide',
+                                                loader: false,
+                                            })
+                                        }
+
+                                    })
+
+                                }
+                                else if (data == -1) {
+                                    $.toast({
+                                        text: "Religion Name Already Exists.Please Select Same From Religion List...!",
+                                        position: 'top-right',
+                                        hideAfter: 2000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+
+                                    })
+
+                                }
+                                else {
+                                    $.toast({
+                                        text: "Religion Name Save Failed",
+                                        position: 'top-right',
+                                        hideAfter: 2000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+
+                                    })
+                                }
+
+
+                            });
+
+
+
+                            
+
+                        }
+                        else if (data == -1) {
+                            $.toast({
+                                text: "Race Name Already Exists.Please Select Same From Race List...!",
+                                position: 'top-right',
+                                hideAfter: 2000,
+                                showHideTransition: 'slide',
+                                loader: false,
+
+                            })
+
+                        }
+                        else {
+                            $.toast({
+                                text: "Race Name Save Failed",
+                                position: 'top-right',
+                                hideAfter: 2000,
+                                showHideTransition: 'slide',
+                                loader: false,
+
+                            })
+                        }
+                    });
+
+                }
+                else if ($("#RaceID").val() == -1)
+                {
+                    $.ajax({
+                        url: "/Candidate/RaceCreate",
+                        data: { RaceName: $("#otherrace").val() }
+
+                    }).done(function (data) {
+
+                        if (data > 0) {
+                            $("#Race_name").val(data);
+
+                            $.ajax({
+
+                                type: "POST",
+                                url: "/Candidate/AddNewCandidate",
+                                data: $("#CandidateProfile").serialize()
+
+                            }).done(function (data) {
+
+                                if (data == true && $("#Resident_Id").val() == 1) {
+
+                                    $.ajax({
+
+                                        type: "POST",
+                                        url: "/Candidate/AddNewCitizenDetails",
+                                        data: $("#CandidateProfile").serialize(),
+                                        async: false
+
+                                    }).done(function (data) {
+                                        if (data) {
+                                            $.toast({
+
+                                                text: "Saved Successfully",
+                                                position: 'top-right',
+                                                hideAfter: 3000,
+                                                showHideTransition: 'slide',
+                                                loader: false,
+                                            })
+                                        }
+                                        else {
+                                            $.toast({
+                                                text: "Successfully Saved, Citizen Details Cann't Add!",
+                                                position: 'top-right',
+                                                hideAfter: 3000,
+                                                showHideTransition: 'slide',
+                                                loader: false,
+                                            })
+                                        }
+
+                                    });
+
+                                    //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+                                }
+                                else if (data == true && $("#Resident_Id").val() != 1) {
+                                    $.toast({
+
+                                        text: "Saved Successfully",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    })
+                                }
+                                else {
+                                    $.toast({
+
+                                        text: "Application Error Please Contact Administrator!",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    })
+                                }
+
+                            })
+
+                        }
+                        else if (data == -1) {
+                            $.toast({
+                                text: "Race Name Already Exists.Please Select Same From Race List...!",
+                                position: 'top-right',
+                                hideAfter: 2000,
+                                showHideTransition: 'slide',
+                                loader: false,
+
+                            })
+
+                        }
+                        else {
+                            $.toast({
+                                text: "Race Name Save Failed",
+                                position: 'top-right',
+                                hideAfter: 2000,
+                                showHideTransition: 'slide',
+                                loader: false,
+
+                            })
+                        }
+                    });
+
+                }
+
+                else if ($("#ReiligionID").val() == -1)
+                {
+                    $.ajax({
+                        url: "/Candidate/ReligionCreate",
+                        data: { ReligionName: $("#otherreligion").val() }
+
+                    }).done(function (data) {
+
+                        if (data > 0) {
+
+                            $("#Religion_name").val(data);
+                            $.ajax({
+
+                                type: "POST",
+                                url: "/Candidate/AddNewCandidate",
+                                data: $("#CandidateProfile").serialize()
+
+                            }).done(function (data) {
+
+                                if (data == true && $("#Resident_Id").val() == 1) {
+
+                                    $.ajax({
+
+                                        type: "POST",
+                                        url: "/Candidate/AddNewCitizenDetails",
+                                        data: $("#CandidateProfile").serialize(),
+                                        async: false
+
+                                    }).done(function (data) {
+                                        if (data) {
+                                            $.toast({
+
+                                                text: "Saved Successfully",
+                                                position: 'top-right',
+                                                hideAfter: 3000,
+                                                showHideTransition: 'slide',
+                                                loader: false,
+                                            })
+                                        }
+                                        else {
+                                            $.toast({
+                                                text: "Successfully Saved, Citizen Details Cann't Add!",
+                                                position: 'top-right',
+                                                hideAfter: 3000,
+                                                showHideTransition: 'slide',
+                                                loader: false,
+                                            })
+                                        }
+
+                                    });
+
+                                    //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+                                }
+                                else if (data == true && $("#Resident_Id").val() != 1) {
+                                    $.toast({
+
+                                        text: "Saved Successfully",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    })
+                                }
+                                else {
+                                    $.toast({
+
+                                        text: "Application Error Please Contact Administrator!",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    })
+                                }
+
+                            })
+
+                        }
+                        else if (data == -1) {
+                            $.toast({
+                                text: "Religion Name Already Exists.Please Select Same From Religion List...!",
+                                position: 'top-right',
+                                hideAfter: 2000,
+                                showHideTransition: 'slide',
+                                loader: false,
+
+                            })
+
+                        }
+                        else {
+                            $.toast({
+                                text: "Religion Name Save Failed",
+                                position: 'top-right',
+                                hideAfter: 2000,
+                                showHideTransition: 'slide',
+                                loader: false,
+
+                            })
+                        }
+                    });
+
+
+                }
+
+                else {
+                    $.ajax({
+
+                        type: "POST",
+                        url: "/Candidate/AddNewCandidate",
+                        data: $("#CandidateProfile").serialize()
+
+                    }).done(function (data) {
+
+                        if (data == true && $("#Resident_Id").val() == 1) {
+
+                            $.ajax({
+
+                                type: "POST",
+                                url: "/Candidate/AddNewCitizenDetails",
+                                data: $("#CandidateProfile").serialize(),
+                                async: false
+
+                            }).done(function (data) {
+                                if (data) {
+                                    $.toast({
+
+                                        text: "Saved Successfully",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    })
+                                }
+                                else {
+                                    $.toast({
+                                        text: "Successfully Saved, Citizen Details Cann't Add!",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    })
+                                }
+
+                            });
+
+                            //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+                        }
+                        else if (data == true && $("#Resident_Id").val() != 1) {
+                            $.toast({
+
+                                text: "Saved Successfully",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            })
+                        }
+                        else {
+                            $.toast({
+
+                                text: "Application Error Please Contact Administrator!",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            })
+                        }
+
+                    })
+
+                }
+
+            }
+        });
+
+        $("#BtnCitizenDetails").click(function () {
+
+            $("#Candidatecitizendetails").validate();
+            if ($("#Candidatecitizendetails").valid()) {
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Candidate/AddNewCitizenDetails",
+                    data: $("#Candidatecitizendetails").serialize()
+
+                }).done(function (data) {
+
+                    if (data) {
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+
+                        //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+
+                })
+            }
+        });
+
+        $("#btnAddEmployer").click(function () {
+
+            $("#CandidateEmpDetails").validate({
+                rules: {
+                    EmphSalryLast: {
+                        required: true,
+                        number: true
+                    }
+                }
+            });
+            if ($("#CandidateEmpDetails").valid()) {
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Candidate/AddNewEmployerDetails",
+                    data: $("#CandidateEmpDetails").serialize()
+
+                }).done(function (data) {
+
+                    if (data > 0) {
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+
+                        if ($("#EmpID").val() == 0) {
+                            //  LoadEmpHistory(data);
+                            GetEditLoadEmpHistory(data);
+                        }
+                        else {
+                            GetEditLoadEmpHistory(data);
+                        }
+
+                        $("#EmpID").val(0);
+                        $("#EmphEmployer").val("");
+                        $("#empStartenddate").val("");
+                        $("#EmphSalryLast").val("");
+
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+
+                })
+            }
+
+        });
+
+        $("#BtnAddCandidateBank").click(function () {
+
+            $("#CandidateBankDetails").validate();
+            if ($("#CandidateBankDetails").valid()) {
+
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Candidate/AddNewBankDetails",
+                    data: $("#CandidateBankDetails").serialize()
+
+                }).done(function (data) {
+
+                    if (data) {
+                        //alert(data.Result);
+                        if (data.Result > 0) {
+                            $.toast({
+
+                                text: "Bank A/c Number Already Exists",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            })
+                        }
+                        else {
+                            $.toast({
+
+                                text: "Saved Successfully",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            })
+
+                            //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+                            if ($("#CandBnkID").val() == 0)
+                                GetBankDetails();
+                        }
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+
+                })
+            }
+
+        });
+
+        $("#btnuploadfiles").click(function () {
+
+            var formData = new FormData();
+
+            var totalFiles = document.getElementById("newdoc").files.length;
+            for (var i = 0; i < totalFiles; i++) {
+                var file = document.getElementById("newdoc").files[i];
+
+                formData.append("FileUpload", file);
+                formData.append("DocumentTypeID", $("#ddlDocumentTypeID").val());
+                formData.append("DocumentsubTypeID", $("#ddlDocumentSubtypeID").val());
+            }
+
+            $.ajax({
+
+                type: "POST",
+                url: "/Candidate/UploadNewDocuments",
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false
+
+            }).done(function (data) {
+
+                if (data) {
+                    $.toast({
+
+                        text: "Saved Successfully",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                    LoadDocuments(0);
+
+                }
+                else {
+                    $.toast({
+
+                        text: "Application Error Please Contact Administrator!",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+
+            });
+
+        });
+
+        $("#BtnDocusavecontinue").click(function () {
+
+            //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+
+        });
+
+        $("#BtnemphContinue").click(function () {
+
+            //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+
+        });
+
+        //$("#btnFinishCand").click(function () {
+
+        //    window.location.href = "/Candidate/Index";
+
+        //});
+        ///////////////////
+        //if ($("#selectedCitizenID").val() != 2) {
+        //    $(".passportdiv").show();
+        //    $("#Citizentab").hide();
+        //    $("#div_funds").hide();
+        //    $("#div_levy").show();
+        //    $(".FinNo").show();
+        //}
+        //else {
+        //    $(".passportdiv").hide();
+        //    $("#Citizentab").show();
+        //    //GetFundTypes();
+        //    $("#div_funds").show();
+        //    $("#div_levy").hide();
+        //    $(".FinNo").hide();
+        //}
+
+        //$("#CitizenID").change(function () {
+
+        //    if ($("#CitizenID").val() == 0) {
+        //        $("#Citizentab").hide();
+        //        $("#NricText").html('NRIC');
+        //        $("#Nationalityhtml").html('Citizenship Details');
+        //    }
+        //    else {
+        //        //  $("#Citizentab").show();
+        //        $.ajax({
+
+        //            type: "POST",
+        //            url: "/Candidate/GetCitizenDetails",
+        //            data: { CitizenID: $(this).val() }
+
+        //        }).done(function (data) {
+
+        //            if (data.CitiZenCode != 2) {
+
+        //                $(".passportdiv").show();
+        //                $("#Citizentab").hide();
+        //                // Foreigners  only have levy,
+        //                $("#div_funds").hide();
+        //                $(".citizenDetails").hide();
+        //                $("#div_levy").show();
+        //                $(".FinNo").show();
+        //                $("#Nationalityhtml").html("Citizenship Details");
+        //            }
+        //            else {
+
+        //                $(".passportdiv").hide();
+        //                $("#Citizentab").show();
+        //                GetFundTypes();
+        //                $(".citizenDetails").show();
+        //                $("#div_funds").show();
+        //                $("#div_levy").hide();
+        //                $(".FinNo").hide();
+        //                $("#Nationalityhtml").html("Nationality & Citizenship Details");
+        //            }
+
+        //            $("#NricText").html(data.CitiZenNoname);
+        //        });
+
+        //    }
+
+        //});
+        ///////////////////////
+
+        if ($("#selectedResident").val() == 1) {
+            $("#tr_citizen").show();
+            $("#Citizentab").show();
+            $(".tr_wp").hide();
+            $("#div_levy").hide();
+            $("#div_funds").show();
+            GetEditCitizenDetails(1);
+        }
+        else if ($("#selectedResident").val() == 2) {
+            $("#tr_citizen").show();
+            $("#Citizentab").hide();
+            $(".tr_wp").hide();
+            $("#div_levy").hide();
+            $("#div_funds").show();
+        }
+        else if ($("#selectedResident").val() == 3) {
+            $(".tr_wp").show();
+            $("#tr_citizen").hide();
+            $("#Citizentab").hide();
+            $("#div_levy").show();
+            $("#div_funds").hide();
+        }
+        else {
+            $(".tr_wp").show();
+            $("#tr_citizen").hide();
+            $("#Citizentab").hide();
+            $("#div_levy").hide();
+            $("#div_funds").hide();
+        }
+
+        $("#Resident_Id").change(function () {
+            if ($(this).val() == 1) //Citizen
+            {
+                $("#tr_citizen").show();
+                $("#Citizentab").show();
+                $(".tr_wp").hide();
+                $("#div_levy").hide();
+                $("#div_funds").show();
+
+            }
+            else if ($(this).val() == 2) {
+                $("#tr_citizen").show();
+                $("#Citizentab").hide();
+                $(".tr_wp").hide();
+                $("#div_levy").hide();
+                $("#div_funds").show();
+            }
+
+            else if ($(this).val() == 3) {
+                $(".tr_wp").show();
+                $("#tr_citizen").hide();
+                $("#Citizentab").hide();
+                $("#div_levy").show();
+                $("#div_funds").hide();
+            }
+            else {
+                $(".tr_wp").show();
+                $("#tr_citizen").hide();
+                $("#Citizentab").hide();
+                $("#div_levy").hide();
+                $("#div_funds").hide();
+            }
+        });
+
+        //Photo Upload btton Hide in Form load
+        $(".Uploadbutton").hide();
+
+        $(".uploadphoto").click(function () {
+
+            var Checkvalue = $(this).val();
+
+            if (Checkvalue == 1) {
+
+                $(".Filetype").hide();
+                $(".Uploadbutton").show();
+                $("#Doctexts").html("Upload Photo");
+            }
+            else {
+
+                $(".Filetype").show();
+                $(".Uploadbutton").hide();
+                $("#Doctexts").html("Upload Documents");
+            }
+
+        });
+
+        $("#Btnphotoupload").click(function () {
+
+            var formData = new FormData();
+
+            var totalFiles = document.getElementById("newdoc").files.length;
+            for (var i = 0; i < totalFiles; i++) {
+                var file = document.getElementById("newdoc").files[i];
+
+                formData.append("FileUpload", file);
+            }
+
+            $.ajax({
+
+                type: "POST",
+                url: "/Candidate/UploadPhoto",
+                data: formData,
+                dataType: 'json',
+                contentType: false,
+                processData: false
+
+            }).done(function (data) {
+
+                if (data) {
+                    $.toast({
+
+                        text: "Saved Successfully",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                }
+                else {
+                    $.toast({
+
+                        text: "Application Error Please Contact Administrator!",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+
+            });
+
+        });
+
+        $(document).on("click", ".EditEmployer", function () {
+
+            $("#EmpID").val($(this).attr('data-id'));
+            $("#EmphEmployer").val($(this).attr('data-Employer'));
+            //$("#empStartenddate").val($(this).attr('data-startdate'));
+            $("#EmphSalryLast").val($(this).attr('data-salary'));
+
+            $("#empStartenddate").data('daterangepicker').setStartDate($(this).attr('data-startdate'));
+            $("#empStartenddate").data('daterangepicker').setEndDate($(this).attr('data-enddate'));
+
+            $(this).closest('tr').remove();
+
+        })
+
+        $('#MaritalStatusID').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='MaritalStatusID']").text('');
+            }
+            else {
+                $("label[for='MaritalStatusID']").text('Please select an item from the dropdown list.');
+            }
+
+        })
+        $('#CitizenID').change(function () {
+
+            if ($(this).val() != 0) {
+                $("label[for='CitizenID']").text('');
+            }
+            else {
+                $("label[for='CitizenID']").text('Please select an item from the dropdown list.');
+            }
+
+        })
+
+        $('#ReiligionID').change(function () {
+            $("#Religion_name").val($('#ReiligionID').val());
+
+            if ($(this).val() != 0) {
+                $("label[for='ReiligionID']").text('');
+
+                if ($("#ReiligionID").val() == -1) {
+
+
+                    $(".otherrtab").hide();
+                    $(".otherreligiontab").show();
+                }
+                else {
+
+                    if ($("#RaceID").val() == -1) {
+                        $(".otherrtab").show();
+                    }
+                    else {
+                        $(".otherrtab").hide();
+                    }
+
+
+                    $(".otherreligiontab").hide();
+
+                }
+
+            }
+            else {
+                $("label[for='ReiligionID']").text('Please select an item from the dropdown list.');
+                $(".otherreligiontab").hide();
+                if ($("#RaceID").val() == -1) {
+                    $(".otherrtab").show();
+                }
+                else {
+                    $(".otherrtab").hide();
+                }
+
+            }
+
+        })
+        $('#RaceID').change(function () {
+
+            $("#Race_name").val($("#RaceID").val());
+
+            if ($(this).val() != 0) {
+                $("label[for='RaceID']").text('');
+
+                if ($("#RaceID").val() == -1) {
+
+                    if ($("#ReiligionID").val() == -1) {
+                        $(".otherrtab").hide();
+                    }
+                    else {
+                        $(".otherrtab").show();
+                    }
+
+                    $(".otherracetab").show();
+                }
+                else {
+                    $(".otherrtab").hide();
+                    $(".otherracetab").hide();
+                }
+
+            }
+            else {
+                $("label[for='RaceID']").text('Please select an item from the dropdown list.');
+                $(".otherracetab").hide();
+                if ($("#ReiligionID").val() == -1) {
+                    $(".otherrtab").hide();
+                }
+                else {
+                    $(".otherrtab").show();
+                }
+            }
+
+        })
+
+        
+        $('#DesignationID').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='DesignationID']").text('');
+
+                var select = $("#GradeID");
+                select.empty();
+                select.prepend('<option value=0>--Select--</option>');
+                $.getJSON("/Candidate/GetGrade", { desigid: $('#DesignationID').val() },
+                    function (response) {
+                        $.each(response, function (index, itemData) {
+
+                            select.append($('<option />', {
+                                value: itemData.GradeID,
+                                text: itemData.Gradename
+                            }));
+
+                        });
+
+                    });
+
+            }
+            else {
+                $("label[for='DesignationID']").text('Please select an item from the dropdown list.');
+            }
+
+        });
+
+        $("#GradeId").change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='GradeId']").text('');
+            }
+            else {
+                $("label[for='GradeId']").text('Please select an item from the dropdown list.');
+            }
+        });
+
+        $('#CandRegDate').change(function () {
+            $(this).blur();
+        })
+        $("#ddlSkillSet").change(function () {
+
+            if ($(this).val() != null) {
+                $("label[for='ddlSkillSet']").text('');
+            }
+            else {
+                $("label[for='ddlSkillSet']").text('This field is required');
+            }
+
+        })
+        $("#ddlLangKnown").change(function () {
+
+            if ($(this).val() != null) {
+                $("label[for='ddlLangKnown']").text('');
+            }
+            else {
+                $("label[for='ddlLangKnown']").text('This field is required');
+            }
+
+        })
+        $('#CitzOrdrDate').change(function () {
+            $(this).blur();
+        })
+
+        $("#CandMobile").focusout(function () {
+
+            $.ajax({
+                data: { Mob: $("#CandMobile").val(), flag: 1, CandID: $("#CandID").val() },
+                url: "/Candidate/Mobile_Email_ValidationEdit"
+            }).done(function (data) {
+
+                if (data == 1) {
+                    $("#mob_unique").show();
+                    $("#BtnAddCandprofile").hide();
+                }
+                else {
+                    $("#mob_unique").hide();
+                    $("#BtnAddCandprofile").show();
+                }
+            });
+        });
+
+        $("#CandEmail").focusout(function () {
+
+            $.ajax({
+                data: { email: $("#CandEmail").val(), flag: 2, CandID: $("#CandID").val() },
+                url: "/Candidate/Mobile_Email_ValidationEdit"
+            }).done(function (data) {
+
+                if (data == 1) {
+                    $("#mail_unique").show();
+                    $("#BtnAddCandprofile").hide();
+                }
+                else {
+                    $("#mail_unique").hide();
+                    $("#BtnAddCandprofile").show();
+                }
+            });
+        });
+
+        $("#CandPhone").focusout(function () {
+
+            $.ajax({
+                data: { ph: $("#CandPhone").val(), flag: 3, CandID: $("#CandID").val() },
+                url: "/Candidate/Mobile_Email_ValidationEdit"
+            }).done(function (data) {
+
+                if (data == 1) {
+                    $("#phone_unique").show();
+                    $("#BtnAddCandprofile").hide();
+                }
+                else {
+                    $("#phone_unique").hide();
+                    $("#BtnAddCandprofile").show();
+                }
+            });
+        });
+
+        $("#CandMobile").focus(function () {
+            $("#mob_unique").hide();
+        });
+
+        $("#CandEmail").focus(function () {
+            $("#mail_unique").hide();
+        });
+
+        $("#CandPhone").focus(function () {
+            $("#phone_unique").hide();
+        });
+
+        var flag = 0;
+        if ($("#EmrgID").val() == 0)
+            flag = 1;
+        else
+            flag = 2;
+        $("#BtnAddEmergencyContact").click(function () {
+
+            $.validator.addMethod("custom_number", function (value, element) {
+                return this.optional(element) || value === "NA" ||
+                    value.match(/^[0-9,\+-]+$/);
+            }, "Please enter a valid number");
+
+            $("#EmrContact").validate({
+                rules: {
+                    EmrgContactNo: {
+                        required: true,
+                        custom_number: true,
+                        minlength: 8,
+                        maxlength: 15
+                    },
+
+                }
+            });
+
+            if ($("#EmrContact").valid()) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Candidate/AddEmergencyContact",
+                    data: $("#EmrContact").serialize() + "&flag=" + flag + ""
+                }).done(function (data) {
+
+                    if (data == true) {
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        if (flag == 1)
+                            flag++;
+                        //$('.nav-tabs > .active').next('li').find('a').trigger('click');
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+
+                });
+            }
+
+        });
+
+        $(document).on("click", ".btneditdoc", function () {
+
+            var docfiles = $(this).attr("data-docfiles");
+            var doctypname = $(this).attr("data-doctypid");
+            var docstypname = $(this).attr("data-docstypid");
+            GetDocumentSubType(doctypname);
+
+            $.ajax({
+                url: "/Candidate/RemoveDocuments",
+                data: { DocID: $(this).attr("data-docid") }
+            }).done(function (data) {
+                LoadDocuments(0);
+            });
+
+            document.getElementById("newdoc").innerHTML = docfiles;
+            $('select[name=ddlDocumentTypeID]').val(doctypname);
+            $('select[name=ddlDocumentTypeID]').selectpicker('refresh');
+            $('select[name=ddlDocumentSubtypeID]').val(docstypname);
+            $('select[name=ddlDocumentSubtypeID]').selectpicker('refresh');
+
+        });
+
+        $("#BtnEmpSave").click(function () {
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            $("#employeedatadetails").validate({
+                rules: {
+                    StartDate: {
+                        required: true,
+                        //date: true
+                    },
+                    Employeetyp: {
+                        required: true,
+                        check_item_dropdown: true
+                    },
+                    Emp_PermenanentType: {
+                        required: true
+                    },
+                    EmpRegNo: {
+                        required: true
+                    }
+                }
+            });
+            if ($("#employeedatadetails").valid()) {
+
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Candidate/EditNewEmployee",
+                    data: $("#employeedatadetails").serialize()
+
+                }).done(function (data) {
+
+                    if (data.Id == 1) {
+                        $.toast({
+
+                            text: "Updated Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+
+                        // window.location.href = "/Employee/Index";
+                    }
+                    else if (data.Id == 2) {
+                        $.toast({
+
+                            text: "Employee Code Already Registered",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+
+                });
+            }
+
+        });
+
+        $("#DivEmpEnd").hide();
+        $("#BSal_label").html("Basic Salary");
+        $("#div_Emp_PermenanentType").hide();
+        $("#Employeetyp").change(function () {
+
+            if ($(this).val() == 1) {
+                $("#DivEmpEnd").hide();
+                $("#DivPartemp").hide();
+                $("#BSal_label").html("Basic Salary");
+                $("#div_Emp_PermenanentType").show();
+            }
+            else if ($(this).val() == 2) {
+                $("#DivEmpEnd").hide();
+                $("#DivPartemp").show();
+                $("#div_Emp_PermenanentType").hide();
+            }
+            else {
+                $("#DivEmpEnd").show();
+                $("#DivPartemp").hide();
+                $("#BSal_label").html("Basic Salary");
+                $("#div_Emp_PermenanentType").hide();
+            }
+
+        });
+
+        $("#BtnAddPLRD").click(function () {
+            $("#PLRD_Details").validate();
+            if ($("#PLRD_Details").valid()) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Candidate/AddPLRDDetails",
+                    data: $("#PLRD_Details").serialize()
+                }).done(function (data) {
+
+                    if (data) {
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                });
+            }
+        });
+
+        $(".rd_PayStruct").change(function () {
+
+            if ($("#rd_PayStruct1").is(':checked') == 1) {
+
+                $("#BSal_label").html("Hourly Base Salary");
+            }
+            else if ($("#rd_PayStruct2").is(':checked') == 1) {
+
+                $("#BSal_label").html("Daily Base Salary");
+            }
+            else {
+                $("#DivEmpEnd").show();
+                $("#DivPartemp").hide();
+                $("#BSal_label").html("Basic Salary");
+            }
+        });
+
+        $.ajax({
+            url: "/Candidate/EmployeeLeaves",
+            data: { EmployeeId: $("#HidEmpID").val() }
+        }).done(function (data) {
+            $("#Leavedetail").html(data);
+        });
+
+        $("#BtnLeaveSave").click(function () {
+
+            $.ajax({
+                type: "POST",
+                url: "/Candidate/SaveLeaveDetails",
+                data: $("#LeaveDetails").serialize()
+            }).done(function (data) {
+                if (data == 1) {
+                    $.toast({
+                        text: "Saved Successfully",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+                else {
+                    $.toast({
+                        text: "Application Error Please Contact Administrator!",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+
+            });
+
+        });
+
+    })
+</script>
+
+<input type="hidden" id="Cand_Emp" value="@ViewBag.value" />
+<input type="hidden" id="HidEmpPartTime_Pay" />
+
+<section class="content-header" id="Candidate">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+        Edit Candidate
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="/Candidate/Candidateprofile?CandID=@Model.CandID"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+
+<section class="content-header" id="employee">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+        Edit Employee
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="/Employee/EmployeeProfile?EmpId=@Model.EmpID&CandID=@Model.CandID"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+
+<section class="newforms">
+    <div class="tabsnew">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#profile" aria-controls="home" role="tab" data-toggle="tab">Bio Data</a></li>
+            @*<li role="presentation" id="Citizentab" class="citz"><a href="#citizen" id="1" aria-controls="Citizenship" role="tab" data-toggle="tab">Citizenship</a></li>*@
+            @*<li role="presentation" id=""><a href="#PLRD" aria-controls="" role="tab" data-toggle="tab">PLRD License</a></li>*@
+            <li role="presentation"><a href="#docs" aria-controls="Document" role="tab" id="2" value="2" data-toggle="tab"> Document</a></li>
+            <li role="presentation"><a href="#history" aria-controls="settings" role="tab" id="3" value="3" data-toggle="tab">Work Employment History</a></li>
+            <li role="presentation"><a href="#contact" aria-controls="settings" role="tab" id="4" value="4" data-toggle="tab">Contact & Bank Details</a></li>
+            @*<li role="presentation"><a href="#bank" aria-controls="settings" role="tab" id="5" value="5" data-toggle="tab">Bank Details</a></li>*@
+            <li role="presentation"><a href="#declaration" aria-controls="settings" id="6" value="6" role="tab" data-toggle="tab"> Declaration</a></li>
+            <li role="presentation" id="EmpTab"><a href="#employeedata" aria-controls="settings" id="7" value="7" role="tab" data-toggle="tab">Employee</a></li>
+            <li role="presentation" id="LeaveTab"><a href="#leaves" aria-controls="settings" role="tab" data-toggle="tab">Leave Details</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <div role="tabpanel" class="tab-pane active" id="profile">
+                <form class="" action="#" id="CandidateProfile">
+                    <input type="hidden" id="Race_name" name="Race_name" value="@Model.ReligID" />
+                    <input type="hidden" id="Religion_name" name="Religion_name" value="@Model.RaceID" />
+                    <!---->
+                    <div id="preHTMLContainer">
+                        <div id="secDivBasic Info" class="mT20">
+                            <table id="secHeadBasic Info" width="98%" cellspacing="0" cellpadding="0">
+                                <tbody width="100%"><tr><td class="secHead">Basic Info</td></tr></tbody>
+                            </table>
+                            <table id="secContentBasic Info" class="secContent" width="98%" border="0" cellspacing="1" cellpadding="0">
+                                <tbody width="100%">
+                                    <tr id="row0_Basic Info">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Name</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type="text" class="form-control required" id="CandName" onblur="checkLength(this)" name="CandName" value="@Model.CandName" autocomplete="off"><span style="color:red;font-family: sans-serif;font-weight:400" id="lengthchk"></span>
+                                            <input type="hidden" id="CandID" name="CandID" value="@Model.CandID" />
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Address</label></td>
+                                        <td width="25%" class="col-md-3"><textarea class="form-control " rows="3" name="CandAddress">@Model.CandAddress</textarea></td>
+                                    </tr>
+                                    <tr id="row1_Basic Info">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Mobile</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type="text" class="form-control " name="CandMobile" value="@Model.CandMobile" id="CandMobile" autocomplete="off">
+                                            <span id="mob_unique" style="color:red">Mobile number already registerd</span>
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Telephone</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type="text" class="form-control " name="CandPhone" value="@Model.CandPhone" id="CandPhone" autocomplete="off">
+                                            <span id="phone_unique" style="color:red">Phone number already registerd </span>
+                                        </td>
+                                    </tr>
+                                    <tr id="row2_Basic Info">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Email</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type="email" class="form-control email" name="CandEmail" value="@Model.CandEmail" id="CandEmail" autocomplete="off">
+                                            <span id="mail_unique" style="color:red">Email already registerd</span>
+                                        </td>
+                                        <td width="25%"></td>
+                                        <td width="25%"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p></p>
+                        <div id="secDivPersonal Information" class="mT20">
+                            <table id="secHeadPersonal Information" width="98%" cellspacing="0" cellpadding="0">
+                                <tbody width="100%"><tr><td class="secHead">Personal Details</td></tr></tbody>
+                            </table>
+                            <table id="secContentPersonal Information" class="secContent" width="98%" border="0" cellspacing="1" cellpadding="0">
+                                <tbody width="100%">
+                                    <tr id="row0_Personal Information">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Gender</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control" name="CandGender">
+                                                <option>Male</option>
+                                                <option>Female</option>
+                                            </select>
+                                            <input type="hidden" value="@Model.CandGender" id="selectedCandGender">
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Marital Status</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control required" required name="MaritID" id="MaritalStatusID"></select>
+                                            <input type="hidden" id="selectedMaritID" value="@Model.MaritID" />
+                                        </td>
+                                    </tr>
+                                    <tr id="row1_Personal Information">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Date of Birth</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type='text' class="form-control YearCal" name="CandDob" id="CandDob" value="@Model.CandDob.ToString("dd/MM/yyyy")" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Place of Birth</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control " name="CandPlaceofBirth" value="@Model.CandPlaceofBirth" autocomplete="off"></td>
+                                    </tr>
+                                    <tr id="row2_Personal Information">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-4 control-label">Religion</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control required" name="ReligID" id="ReiligionID"></select>
+                                            <input type="hidden" value="@Model.ReligID" id="selectedReiligionID" />
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Race</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control required" name="RaceID" id="RaceID"></select>
+                                            <input type="hidden" value="@Model.RaceID" id="selectedRaceID">
+                                        </td>
+                                    </tr>
+                                    <tr >
+                                        <td width="25%" class="col-md-3 otherrtab"></td>
+                                        <td width="25%" class="col-md-3 otherrtab"></td>
+                                        <td width="25%" class="col-md-3 otherreligiontab"><label for="inputEmail3" class="col-sm-12 control-label">Religion Name</label></td>
+                                        <td width="25%" class="col-md-3 otherreligiontab">
+                                            <input type='text' class="form-control" name="otherreligion" id="otherreligion" placeholder="Religion" required />
+                                        </td>
+                                        <td width="25%" class="col-md-3 otherracetab"><label for="inputEmail3" class="col-sm-12 control-label">Race Name</label></td>
+                                        <td width="25%" class="col-md-3 otherracetab">
+                                            <input type='text' class="form-control" name="otherrace" id="otherrace" placeholder="Race" required />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p></p>
+                        <div id="secDivProfessional Details" class="mT20">
+                            <table id="secHeadProfessional Details" width="98%" cellspacing="0" cellpadding="0"><tbody width="100%"><tr><td class="secHead">Professional Details</td></tr></tbody></table>
+                            <table id="secContentProfessional Details" class="secContent" width="98%" border="0" cellspacing="1" cellpadding="0">
+                                <tbody width="100%">
+                                    <tr id="row0_Professional Details">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Highest Education</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control " name="CandHgEducation" value="@Model.CandHgEducation" autocomplete="off"></td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Designation Applied For</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control required" name="DesigID" id="DesignationID"></select>
+                                            <input type="hidden" value="@Model.DesigID" id="selectedDesignationID" />
+                                        </td>
+                                    </tr>
+                                    <tr id="row1_Professional Details">
+                                        <td width="25%" class="col-md-3"><label for="inputPassword3" class="col-sm-12 control-label">Skill Set</label></td>
+                                        <td width="25%" class="col-md-3"><select class="selectpicker required" name="SkilID" id="ddlSkillSet" multiple="multiple"></select></td>
+
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Grade</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control required" name="GradeID" id="GradeID"></select>
+                                            <input type="hidden" value="@Model.GradeID" id="selectedGradeID" />
+                                        </td>
+                                    </tr>
+                                    <tr id="row2_Professional Details">
+                                        <td width="25%" class="col-md-3"><label for="inputPassword3" class="col-sm-12 control-label">Languages Known</label></td>
+                                        <td width="25%" class="col-md-3"><select class="selectpicker required" name="LangknID" id="ddlLangKnown" multiple="multiple"></select></td>
+                                        <td width="25%" class="col-md-3 Cand_Salexp"><label for="inputEmail3" class="col-sm-12 control-label">Salary Expected</label></td>
+                                        <td width="25%" class="col-md-3 Cand_Salexp">
+                                            <input type="text" class="form-control " name="CandSalrexpted" value="@Model.CandSalrexpted" autocomplete="off" maxlength="7">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p></p> <!--Citizenship Content-->
+                        <div class="mT20">
+                            <table id="secHeadBasic Info" width="98%" cellspacing="0" cellpadding="0">
+                                <tbody width="100%"><tr><td class="secHead" id="Nationalityhtml">Nationality & Licensing</td></tr></tbody>
+                            </table>
+                            <table width="98%" cellspacing="0" cellpadding="0">
+                                <tbody width="100%">
+                                    <tr>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Nationality</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control" name="CizenID" id="CitizenID"></select>
+                                            <input type="hidden" id="selectedCitizenID" value="@Model.CizenID" />
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Resident Status</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <select class="form-control required" name="Resident_Id" id="Resident_Id"></select>
+                                            <input type="hidden" id="selectedResident" value="@Model.Resident_Id" />
+                                        </td>
+                                    <tr id="tr_citizen">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label" id="NricText">NRIC</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control required" value="@Model.CandNRICNo" name="CandNRICNo" autocomplete="off"></td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label" id="NricText">Passport Number</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control required" name="PassportNo_Sig_Citizen_PR" placeholder="Id" value="@Model.PassportNo" autocomplete="off"></td>
+                                    </tr>
+                                    <tr class="tr_wp">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label" id="NricText">Passport Number</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control required" name="PassportNO_WorkPermit" placeholder="Id" value="@Model.PassportNo" autocomplete="off"></td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label passportdiv" id="PassExp">Passport Expiry</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single required passportdiv" name="PassportExpiry" value="@Model.PassportExpiry.ToString("dd/MM/yyyy")"></td>
+                                    </tr>
+                                    <tr class="tr_wp">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label FinNo" id="FinNoText">Fin Number</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type="text" class="form-control required FinNo" name="FinNo" value="@Model.FinNo" placeholder="Fin Number" autocomplete="off">
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Fin Expiry</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single required" name="FinExpiry" id="FinExpiry" placeholder="Fin Number" value="@Model.FinExpiry.ToString("dd/MM/yyyy")"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table id="Citizentab" class="secContent" width="98%" border="0" cellspacing="1" cellpadding="0">
+                                <tbody width="100%">
+                                    <tr id="row0_Citizen Info">
+                                        <td width="25%" class="col-md-3"><label class="col-sm-12 control-label">NS: Exempted/ Completed Vocation</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <input type="text" class="form-control " id="CitzNsVaction" name="CitzNsVaction">
+                                            <input type="hidden" id="CitzDetID" name="CitzDetID">
+                                            <input type="hidden" id="CitzDetCandID" name="CandID">
+                                        </td>
+                                        <td width="25%" class="col-md-3"><label class="col-sm-12 control-label">ORD Date</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single " id="CitzOrdrDate" name="CitzOrdrDate"></td>
+                                    </tr>
+                                    <tr id="row1_Citizen Info">
+                                        <td width="25%" class="col-md-3"><label class="col-sm-12 control-label">Regular: SPF/SAF/CNB/Prison Dept/SCDF/CPIB Vocation</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control " id="CitzReglrVaction" name="CitzReglrVaction"></td>
+                                        <td width="25%" class="col-md-3"><label class="col-sm-12 control-label">Reservist</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <label><input type="radio" name="CitzReservist" value="1"> Yes</label>
+                                            <label><input type="radio" name="CitzReservist" value="0"> No</label>
+                                        </td>
+                                         @*<td width="25%" class="col-md-3"><label class="col-sm-12 control-label">ORD Date</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single" id="CitzOrdrDateOne" name="CitzOrdrDateOne"></td>*@
+                                    </tr>
+                                    @*<tr id="row2_Citizen Info">
+                                        <td width="25%" class="col-md-3"><label class="col-sm-12 control-label">Reservist</label></td>
+                                        <td width="25%" class="col-md-3">
+                                            <label><input type="radio" name="CitzReservist" value="1"> Yes</label>
+                                            <label><input type="radio" name="CitzReservist" value="0"> No</label>
+                                        </td>
+                                        <td width="25%" class="col-md-3"></td>
+                                        <td width="25%" class="col-md-3"></td>
+                                    </tr>*@
+                                </tbody>
+                            </table>
+                        </div>
+                        <p></p>
+                        <div class="mT20">
+                            <table id="secHeadOther Info" width="98%" cellspacing="0" cellpadding="0"><tbody width="100%"><tr><td class="secHead">PLRD Details</td></tr></tbody></table>
+                            <table id="secContentOther Info" class="secContent" width="98%" border="0" cellspacing="1" cellpadding="0">
+                                <tr id="row0_PLRD Info">
+                                    <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">PLRD Issue Date</label></td>
+                                    <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single" name="IssueDate" id="IssueDate" placeholder="Issue Date"></td>
+                                    <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">PLRD Expiry Date</label></td>
+                                    <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single required" name="ExpiryDate" id="ExpiryDate" placeholder="Expiry Date"></td>
+                                </tr>
+                                <tr id="row1_PLRD Info">
+                                    <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">License Number</label></td>
+                                    <td width="25%" class="col-md-3"><input type="text" class="form-control" name="LicenseNum" id="LicenseNum" placeholder="License Number" autocomplete="off"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p></p>
+                        <div id="secDivOther Info" class="mT20">
+                            <table id="secHeadOther Info" width="98%" cellspacing="0" cellpadding="0"><tbody width="100%"><tr><td class="secHead">Other Info</td></tr></tbody></table>
+                            <table id="secContentOther Info" class="secContent" width="98%" border="0" cellspacing="1" cellpadding="0">
+                                <tbody width="100%">
+                                    <tr id="row0_Other Info">
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Register Date</label></td>
+                                        <td width="25%" class="col-md-3"><input type="text" class="form-control daterangepicker-single" id="CandRegDate" value="@Model.CandJoinDate.ToString("dd/MM/yyyy")" name="CandRegDate"></td>
+                                        <td width="25%" class="col-md-3"><label for="inputEmail3" class="col-sm-12 control-label">Special Notes</label></td>
+                                        <td width="25%" class="col-md-3"><textarea class="form-control " rows="3" name="CandDetails" placeholder="Details">@Model.CandDetails</textarea></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p></p>
+                    </div>
+                    <!---->
+                    @*<div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Name</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" value="@Model.CandName" name="CandName">
+                                        <input type="hidden" id="CandID" name="CandID" value="@Model.CandID" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Nationality</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control " name="CizenID" id="CitizenID" required></select>
+                                        <input type="hidden" id="selectedCitizenID" value="@Model.CizenID" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">PR Status</label>
+                                    <div class="col-sm-8">
+                                        <label><input type="radio" name="PRStatus" value="1"> Yes</label>
+                                        <label><input type="radio" name="PRStatus" value="0"> No</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Address</label>
+                                    <div class="col-sm-8">
+
+                                        <textarea class="form-control required" rows="3" name="CandAddress">@Model.CandAddress</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Telephone</label>
+                                    <div class="col-sm-6 input-group">
+                                        <input type="text" class="form-control" value="@Model.CandPhone" name="CandPhone" id="CandPhone">
+                                        <span id="phone_unique" style="color:red">Phone number already registerd </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Mobile</label>
+                                    <div class="col-sm-6 input-group">
+                                        <input type="text" class="form-control" value="@Model.CandMobile" name="CandMobile" id="CandMobile">
+                                        <span id="mob_unique" style="color:red">Mobile number already registerd</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Email</label>
+                                    <div class="col-sm-7 input-group">
+                                        <input type="email" class="form-control email" value="@Model.CandEmail" name="CandEmail" id="CandEmail">
+                                        <span id="mail_unique" style="color:red">Email already registerd</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Date of Birth</label>
+                                    <div class="col-sm-5">
+
+                                        <div class='input-group date' id=''>
+                                            <input type="text" class="form-control YearCal" value="@Model.CandDob.ToString("dd/MM/yyyy")" name="CandDob">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Place of Birth</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" value="@Model.CandPlaceofBirth" name="CandPlaceofBirth">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Gender</label>
+                                    <div class="col-sm-8 sex">
+
+                                        <select class="form-control" id="CandGender" name="CandGender">
+
+                                            <option value="1">Male</option>
+                                            <option value="2">Female</option>
+                                        </select>
+                                        <input type="hidden" value="@Model.CandGender" id="selectedCandGender">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Marital Status</label>
+                                    <div class="col-sm-8 sex">
+
+                                        <select class="form-control required" name="MaritID" id="MaritalStatusID"></select>
+                                        <input type="hidden" id="selectedMaritID" value="@Model.MaritID" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Details</label>
+                                    <div class="col-sm-8">
+                                        <textarea class="form-control required" rows="3" name="CandDetails" placeholder="Details">@Model.CandDetails</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Highest Education</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control required" value="@Model.CandHgEducation" name="CandHgEducation">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Religion</label>
+                                    <div class="col-sm-8 selectCat">
+                                        <select class="form-control required" name="ReligID" id="ReiligionID"></select>
+                                        <input type="hidden" value="@Model.ReligID" id="selectedReiligionID" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Race</label>
+                                    <div class="col-sm-8 selectCat">
+                                        <select class="form-control required" name="RaceID" id="RaceID"></select>
+                                        <input type="hidden" value="@Model.RaceID" id="selectedRaceID">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="FinNo">
+                                    <label for="inputEmail3" class="col-sm-4 control-label" id="FinNoText">Fin Number</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="FinNo" value="@Model.FinNo" placeholder="Fin Number">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label" id="NricText">NRIC</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" value="@Model.CandNRICNo" name="CandNRICNo">
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="passportdiv">
+                                    <label for="inputEmail3" class="col-sm-4 control-label" id="PassExp">Passport Expiry</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control daterangepicker-single required" name="PassportExpiry" value="@Model.PassportExpiry.ToString("dd/MM/yyyy")">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">User Type</label>
+                                    <div class="col-sm-8 selectCat">
+                                        <select class="form-control required" name="Dep_UserType" id="Dep_UserType">
+                                            <option value="0">--Select--</option>
+                                            <option value="2">Employee</option>
+                                            <option value="3">Organization</option>
+                                        </select>
+                                        <input type="hidden" value="@Model.Dep_UserType" id="selectedUserTypeID" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Designation</label>
+                                    <div class="col-sm-8 selectCat">
+                                        <select class="form-control required" name="DesigID" id="DesignationID"></select>
+                                        <input type="hidden" value="@Model.DesigID" id="selectedDesignationID" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Salary Expected</label>
+                                    <div class="col-sm-8 input-group">
+                                        <input type="text" class="form-control " value="@Model.CandSalrexpted" name="CandSalrexpted">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Register Date</label>
+                                    <div class="col-sm-8 input-group">
+                                        <input type="text" class="form-control daterangepicker-single" id="CandRegDate" value="@Model.CandRegDate.ToString("dd/MM/yyyy")" name="CandRegDate">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-sm-4 control-label">Skill Set</label>
+                                    <div class="col-sm-8 selectCat">
+                                        <select class="selectpicker required" name="SkilID" id="ddlSkillSet" multiple="multiple"></select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputPassword3" class="col-sm-4 control-label">Languages Known</label>
+                                    <div class="col-sm-8 selectCat">
+                                        <select class="selectpicker required" name="LangknID" id="ddlLangKnown" multiple="multiple"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+
+                    @*<hr class="divider">*@
+
+                    <div class="text-right">
+                        <button type="button" class="btn btn-sm btn-success" id="BtnAddCandprofile">Save</button>
+                    </div>
+                </form>
+            </div>
+
+            @*<div role="tabpanel" class="tab-pane fade" id="citizen">
+                    <form class="" action="#" id="Candidatecitizendetails">
+                        <input type="hidden" id="HidTab1" name="HidTab1" value="1" />
+                        <div class="form-group citizenDetails">
+                            <label class="col-sm-4 control-label ">NS: Exempted/ Completed Vocation</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control required" id="CitzNsVaction" name="CitzNsVaction">
+                                <input type="hidden" id="CitzDetID" name="CitzDetID">
+                                <input type="hidden" id="CitzDetCandID" name="CandID">
+                            </div>
+                        </div>
+                        <div class="form-group citizenDetails">
+                            <label class="col-sm-4 control-label">ORD Date</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control daterangepicker-single required" id="CitzOrdrDate" name="CitzOrdrDate">
+                            </div>
+                        </div>
+                        <div class="form-group citizenDetails">
+                            <label class="col-sm-4 control-label">Regular: SPF/SAF/CNB/Prison Dept/SCDF/CPIB Vocation</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control required" id="CitzReglrVaction" name="CitzReglrVaction">
+                            </div>
+                        </div>
+                        <div class="form-group citizenDetails">
+                            <label class="col-sm-4 control-label">ORD Date</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control daterangepicker-single required" id="CitzOrdrDateOne" name="CitzOrdrDateOne">
+                            </div>
+                        </div>
+                        <div class="form-group citizenDetails">
+                            <label class="col-sm-4 control-label">Reservist</label>
+                            <div class="col-sm-4">
+                                <label><input type="radio" name="CitzReservist" value="1"> Yes</label>
+                                <label><input type="radio" name="CitzReservist" value="0"> No</label>
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="button" class="btn btn-sm btn-success" id="BtnCitizenDetails">Save & Continue</button>
+                        </div>
+                    </form>
+                </div>*@
+
+            <div role="tabpanel" class="tab-pane fade" id="docs">
+                @*<div class="form-group">
+                        <label class="col-sm-4 control-label">Upload Candidate photo</label>
+                        <div class="col-sm-4">
+                            <label><input type="radio" name="candPhotoStatus" class="uploadphoto" value="1"> Yes</label>
+                            <label><input type="radio" name="candPhotoStatus" class="uploadphoto" checked="checked" value="0"> No</label>
+                        </div>
+                    </div>*@
+                <div id="DocumentsList">
+                </div>
+                <form method="post" id='UploadDocuments' enctype="multipart/form-data">
+
+                    <hr class="divider">
+
+                    <div class="row">
+
+                        <div class="col-xs-1">
+                            <label class="p-t-5" id="Doctexts">New</label>
+                        </div>
+
+                        <div class="col-xs-3 Filetypes">
+                            <select class="" id="ddlDocumentTypeID" name="ddlDocumentTypeID"></select>
+                        </div>
+
+                        <div class="col-xs-3 Filetype">
+                            <select class="" id="ddlDocumentSubtypeID" name="ddlDocumentSubtypeID"></select>
+                        </div>
+
+                        <div class="col-xs-2">
+                            <label class="btn btn-block btn-default" for="newdoc">Choose File</label>
+                            <input type="file" id="newdoc" name="DocFiles[]" class="hidden">
+                        </div>
+
+                        <div class="col-xs-3 Filetype">
+                            <button class="btn btn-primary" id="btnuploadfiles" type="button">
+                                Upload
+                            </button>
+                        </div>
+
+                        <div class="col-xs-3 Uploadbutton">
+                            <button class="btn btn-primary" id="Btnphotoupload" type="button">
+                                Upload
+                            </button>
+                        </div>
+                    </div>
+                    @*<hr class="divider">*@
+                </form>
+
+                <p></p>
+                <hr />
+                @*<form class="form-horizonatal" action="#" id="PLRD_Details">
+                        <div class="form-group col-sm-12 mT20">
+                            <input type="hidden" id="HidTab8" name="HidTab8" value="8" />
+                            <label class="col-sm-12 control-label secHead">PLRD License</label>
+                            <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">PLRD Issue Date</label>
+                                <div class="col-sm-12">
+                                    <div class="input-group date">
+                                        <input type="text" class="form-control daterangepicker-single " name="IssueDate" id="IssueDate" placeholder="Issue Date">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">PLRD Expiry Date</label>
+                                <div class="col-sm-12">
+                                    <div class="input-group date">
+                                        <input type="text" class="form-control daterangepicker-single required" name="ExpiryDate" id="ExpiryDate" placeholder="Expiry Date">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label class="col-sm-12 control-label">License Number</label>
+                                <div class="col-sm-12">
+                                    <input type="text" class="form-control" name="LicenseNum" id="LicenseNum" placeholder="License Number">
+                                </div>
+                            </div>
+                            <div class="text-right col-sm-1">
+                                <label class="col-sm-12 control-label"></label>
+                                <button type="button" class="btn btn-sm btn-success col-sm-12" id="BtnAddPLRD">Save<i class="fa fa-floppy-o"></i></button>
+                            </div>
+                        </div>
+                    </form>*@
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="history">
+                <form class="" action="#" id="CandidateEmpDetails">
+                    <input type="hidden" id="HidTab3" name="HidTab3" value="3" />
+                    <table class="table table-condenced">
+                        <thead>
+                            <tr>
+                                <th>Employer</th>
+                                <th>Duration</th>
+                                <th>Last Salary</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="EmpHistory">
+                            <tr>
+                                <td>
+                                    <input type="text" id="EmphEmployer" class="form-control required" name="EmphEmployer" autocomplete="off">
+                                    <input type="hidden" id="EmpID" name="EmphID" value="0" />
+                                </td>
+                                <td><input type="text" id="empStartenddate" class="form-control daterangepicker2 required" name="empStartenddate"></td>
+                                <td><input type="text" id="EmphSalryLast" class="form-control " name="EmphSalryLast" maxlength="7" autocomplete="off"></td>
+                                <td><button type="button" class="btn btn-primary" id="btnAddEmployer">Add</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="declaration">
+                <div id="DeclarationtabContent"></div>
+            </div>
+
+            @*<div role="tabpanel" class="tab-pane fade" id="bank">
+                    <form class="form-horizonatal" action="#" id="CandidateBankDetails">
+                        <input type="hidden" id="HidTab5" name="HidTab5" value="5" />
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Bank</label>
+                            <div class="col-sm-4">
+
+                                <input type="text" class="form-control required" id="CandBnkName" name="CandBnkName">
+                                <input type="hidden" id="CandBnkID" name="CandBnkID" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Bank Code</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control required" name="CandBnkCode" placeholder="Bank Code" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Branch Code</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control required" id="CandbrnchCode" name="CandbrnchCode" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">A/C Number</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control required" id="CandBnkAcno" name="CandBnkAcno" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-sm btn-success" id="BtnAddCandidateBank">Save & Continue</button>
+                        </div>
+                    </form>
+                </div>*@
+
+            <div role="tabpanel" class="tab-pane fade" id="employeedata">
+                <form class="form-horizonatal" action="#" id="employeedatadetails">
+                    <input type="hidden" value="0" name="CandID" />
+                    <input type="hidden" name="Emp_IsApproved" value="true" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Employee Code</label>
+                        <div class="col-sm-4">
+                            <span><input type="text" class="form-control required" name="EmpRegNo" id="EmpRegNo" autocomplete="off" /></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Employee Type</label>
+                        <div class="col-sm-4">
+                            <select class="form-control required" name="Employeetyp" id="Employeetyp"></select>
+                            <input type="hidden" id="HidEmpID" name="EmpID" />
+                            <input type="hidden" id="HidSalaEmpID" name="SalaEmpID">
+                        </div>
+                    </div>
+                    <div class="form-group" id="div_Emp_PermenanentType">
+                        <label class="col-sm-2 control-label">Working Type</label>
+                        <div class="col-sm-4">
+                            <span>
+                                <select class="form-control required" name="Emp_PermenanentType" id="Emp_PermenanentType">
+                                    <option value="0">--Select--</option>
+                                    <option value="1">Permanent Day</option>
+                                    <option value="2">Permanent Night</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Start Date</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <input type="text" class="form-control daterangepicker-single required" name="StartDate" id="StartDate" placeholder="Start Date" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="DivEmpEnd">
+                        <label class="col-sm-2 control-label">End Date</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <input type="text" class="form-control daterangepicker-single " name="EndDate" id="EndDate" placeholder="End Date" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="DivPartemp">
+                        <label class="col-sm-2 control-label">Pay Structure</label>
+                        <div class="col-sm-4">
+                            <div class="input-group date">
+                                <input type="radio" id="rd_PayStruct1" class="rd_PayStruct" name="EmpPartTime_Pay" value=1 />Hourly Rate
+                                <input type="radio" id="rd_PayStruct2" class="rd_PayStruct" name="EmpPartTime_Pay" value=2 />Daily Rate
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" id="BSal_label">Basic Salary</label>
+                        @*<label class="col-sm-2 control-label" id="BSal_PermanentEmp"></label>*@
+                        <div class="col-sm-4">
+                            <input type="text" id="BasicSalary" class="form-control required" name="BasicSalary" placeholder="Basic Salary" readonly="readonly" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div id="div_funds">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">CPF Only For Employee</label>
+                            <div class="col-sm-4">
+                                <label><input type="radio" name="CPF" value="0"> Yes</label>
+                                <label><input type="radio" name="CPF" value="1"> No</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Other Fund Types</label>
+                            <div class="col-sm-4">
+                                <span><select class="form-control required" name="FundType" id="FundType" @*multiple="multiple"*@></select></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="div_levy">
+                        <label class="col-sm-2 control-label">Levy</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="Levy" class="form-control required" name="Levy" placeholder="Levy" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-sm btn-success" id="BtnEmpSave">Save<span>&nbsp;&nbsp;</span><i class="fa fa-floppy-o"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="contact">
+                <form class="form-horizonatal col-sm-6" action="#" id="EmrContact">
+                    <h3>Emergency Contact</h3> <br />
+                    <input type="hidden" id="HidTab4" name="HidTab4" value="4" />
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Name</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" name="EmrgContact" placeholder="Name" value="@Model.EmrgContact" autocomplete="off">
+                            <input type="hidden" id="EmrgID" value="@Model.EmrgID" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Relationship</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" name="EmrgRelationship" placeholder="Relationship" value="@Model.EmrgRelationship" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Contact Number</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" name="EmrgContactNo" placeholder="Contact Number" value="@Model.EmrgContactNo" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Details</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" name="EmrgDetails" placeholder="Details" value="@Model.EmrgDetails" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <label class="col-sm-4 control-label">&nbsp;</label>
+                        <button type="button" class="btn btn-sm btn-success col-sm-5" id="BtnAddEmergencyContact">Save<i class="fa fa-floppy-o"></i></button>
+                    </div>
+                </form>
+
+                <form class="form-horizonatal col-sm-6" action="#" id="CandidateBankDetails">
+                    <h3>Bank Details</h3> <br />
+                    <input type="hidden" id="HidTab5" name="HidTab5" value="5" />
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Bank</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" id="CandBnkName" name="CandBnkName">
+                            <input type="hidden" id="CandBnkID" name="CandBnkID" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Bank Code</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" name="CandBnkCode" id="CandBnkCode" placeholder="Bank Code" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Branch Code</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" id="CandbrnchCode" name="CandbrnchCode" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">A/C Number</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control required" id="CandBnkAcno" name="CandBnkAcno" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <label class="col-sm-4 control-label">&nbsp;</label>
+                        <button type="button" class="btn btn-sm btn-success col-sm-5" id="BtnAddCandidateBank">Save</button>
+                    </div>
+                </form>
+            </div>
+
+            @*<div role="tabpanel" class="tab-pane fade" id="PLRD">
+                    <form class="form-horizonatal" action="#" id="PLRD_Details">
+                        <input type="hidden" id="HidTab8" name="HidTab8" value="8" />
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">PLRD Issue Date</label>
+                            <div class="col-sm-4">
+                                <div class="input-group date">
+                                    <input type="text" class="form-control daterangepicker-single required" name="IssueDate" id="IssueDate" placeholder="Issue Date" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">PLRD Expiry Date</label>
+                            <div class="col-sm-4">
+                                <div class="input-group date">
+                                    <input type="text" class="form-control daterangepicker-single required" name="ExpiryDate" id="ExpiryDate" placeholder="Expiry Date" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">License Number</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="LicenseNum" placeholder="License Number">
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="button" class="btn btn-sm btn-success" id="BtnAddPLRD">Save<i class="fa fa-floppy-o"></i></button>
+                        </div>
+                    </form>
+                </div>*@
+
+            <div role="tabpanel" class="tab-pane fade" id="leaves">
+                <form class="form-horizonatal col-sm-12" action="#" id="LeaveDetails">
+                    <input type="hidden" id="EmployeeID" name="EmployeeID" />
+                    <table class="table table-bordered">
+
+                        <thead>
+                            <tr>
+                                <th>Leave type</th>
+                                <th>Eligibility</th>
+                                <th>Earned</th>
+                                <th>Leaves Taken</th>
+                                <th>Available Leaves</th>
+                            </tr>
+                        </thead>
+                        <tbody id="Leavedetail"></tbody>
+                    </table>
+                    <button type="button" class="btn btn-sm btn-success" id="BtnLeaveSave">Save<i class="fa fa-floppy-o"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

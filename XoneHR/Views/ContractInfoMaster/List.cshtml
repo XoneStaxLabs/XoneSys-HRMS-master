@@ -1,0 +1,44 @@
+﻿@model IEnumerable<XoneHR.Models.TblContractInfoMaster>
+@{
+    ViewBag.Title = "List";
+    Layout = null;
+    string status = "";
+}
+
+<table id="example2" class="table table-bordered table-hover masterlist">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>ContractInfo Type</th>
+            <th data-sortable="false">Status</th>
+            <th data-sortable="false">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ConInformation</td>
+                <td>@item.ConInfoDetails</td>
+                <td>@item.ConInfoTypName</td>
+                @if (item.ConInfoStatus.ToString() == "True")
+                {
+                    status = "Active";
+
+                }
+                else
+                {
+                    status = "InActive";
+
+                }
+                <td>@status</td>
+                <td style="width:15%;">
+                    @*<a href="" class="btn btn btn-primary" data-toggle="modal" data-target="#myModal2"><i class="fa fa-fw fa-eye"></i></a>*@
+                    <a href="" class="btn btn-success btnedit" data-toggle="modal" @*data-target="#myModal1"*@ data-id="@item.ConInfoID" data-typeid="@item.ConInfoTypID" data-name="@item.ConInformation" data-desc="@item.ConInfoDetails" data-status="@item.ConInfoStatus"><i class="fa fa-fw fa-edit"></i></a>
+                    <a href="" class="btn btn-danger btndelete" data-toggle="modal" @*data-target="#myModal"*@ data-id="@item.ConInfoID" data-name="@item.ConInformation"><i class="fa fa-fw fa-trash-o"></i></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

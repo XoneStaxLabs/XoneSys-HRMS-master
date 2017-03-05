@@ -1,0 +1,36 @@
+﻿@model List<XoneHR.Models.QuestionAnswer>
+@{
+    ViewBag.Title = "QuestionAnswerListing";
+    int i = 0;
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script src="~/dist/js/star-rating.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+</script>
+
+<form class="" action="#" id="InterViewData">
+    @foreach (var item in Model)
+    {
+        i++;
+        <div class="ques">
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <h4><span>@i. </span>@item.QuestName </h4>
+                </div>
+                <div class="col-sm-12">
+                    <h6>@item.Answer </h6>
+                    @if (@item.AnsRating != 0)
+                    {
+                        <input id="input-21e" value="@item.AnsRating" type="number" name="AnsRating" class="col-sm-2 rating" min=0 max=5 step=0.5 data-size="xs" >
+                    }
+                    
+                </div>
+            </div>
+        </div>
+
+    }
+</form>

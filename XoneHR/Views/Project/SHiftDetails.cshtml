@@ -1,0 +1,48 @@
+﻿@model XoneHR.Models.projectCalendar
+@{
+    ViewBag.Title = "SHiftDetails";
+    Layout = null;
+}
+
+
+
+@foreach (var sitem in Model.ScheduleObj)
+{ 
+<h2>@sitem.Schedule</h2>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="10% !important">CandName</th>
+            <th>Grade</th>
+            <th>Shift</th>
+            <th>Shift From</th>
+            <th>Shift To</th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @if (Model.ListProjectWiseEmp != null)
+        {
+
+            foreach (var item in Model.ListProjectWiseEmp.Where(m=>m.schID==sitem.SchID).ToList())
+            {
+
+                <tr>
+
+                    <td>@item.CandName</td>
+                    <td>@item.Gradename</td>
+                    <td>@item.ShiftName</td>
+                    <td>@item.ShiftFrom</td>
+                    <td>@item.ShiftTo</td>
+
+
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+
+}

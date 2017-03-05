@@ -1,0 +1,152 @@
+﻿@model XoneHR.Models.DesignationAssignment
+@{
+    ViewBag.Title = "GetDesigAllowances";
+    Layout = null;
+    var Mainchild = Model.FixedAllowanceMaster;
+    //var temp = 0;
+}
+
+<link href="~/jqwidgets/jqwidgets/styles/jqx.base.css" rel="stylesheet" />
+<link href="~/jqwidgets/jqwidgets/styles/jqx.metro.css" rel="stylesheet" />
+<script src="~/jqwidgets/jqwidgets/jqxcore.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxdata.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxscrollbar.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxpanel.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxtree.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxcheckbox.js"></script>
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+        $('input[type=checkbox]').click(function () {
+            // children checkboxes depend on current checkbox
+            $(this).next().find('input[type=checkbox]').prop('checked', this.checked);
+            // go up the hierarchy - and check/uncheck depending on number of children checked/unchecked
+            $(this).parents('ul').prev('input[type=checkbox]').prop('checked', function () {
+                return $(this).next().find(':checked').length;
+            });
+        });
+
+        $("#BtnPrev").click(function () {
+
+            $('.nav-tabs > .active').prev('li').find('a').trigger('click');
+        })
+
+        $("#BtnDesigAssignment").click(function () {
+
+            $("#FrmDesigAssignment").validate({
+
+                rules: {
+                    FixallowmAmounts: {
+                        required: true,
+                        number: true
+                    },
+                    LeavesMastNo: {
+                        required: true,
+                        number: true
+                    }
+                }
+            })
+
+            if ($("#FrmDesigAssignment").valid()) {
+
+                var parent = [];
+                var child = [];
+                var leave = [];
+                var i = 0;
+                $('input[name="FixSalaTypID"]:checked').each(function () {
+                    parent.push($(this).val());
+                    var item = $(this).val();
+                });
+                $('input[name="FixallowmID"]:checked').each(function () {
+                    child.push($(this).attr('data-parent'));
+                    child.push($(this).val());
+                    child.push($(this).closest('li').find("input[type=text]").val());
+                    i++;
+                });
+              
+                $.ajax({
+                    type: "POST",
+                    url: "/Candidate/EmployeeAllowanceSave",
+                    data: {
+                        ParentID: JSON.stringify(parent),
+                        ChildId: JSON.stringify(child),
+                        EmpID: $("#EmpId").val()
+                    },
+                }).done(function (data) {
+                    $.toast({
+                        text: data.Message,
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                    if (data.Result == 1) {
+                        // window.location.href = "/Candidate/Candidateprofile?CandID=" + $("#HidCandID").val();
+                        $('.nav-tabs > .active').next('li').find('a').trigger('click');
+                    }
+                })
+            }
+        });
+    })
+
+</script>
+<input type="hidden" id="EmpId" value="@ViewBag.Empid" />
+<input type="hidden" value="@ViewBag.CandID" id="HidCandID" name="CandID" />
+<form class="" action="#" id="FrmDesigAssignment">
+    <input type="hidden" id="HidDesigID" name="DesigID" value="@ViewBag.DesigID" />
+    <div class="row">
+        <div class="col-md-8">
+            <h4>Fixed Allowance </h4>
+            <hr />
+            <div class="form-group">
+                @foreach (var parent in Model.FixedSalaryType)
+                {
+                    <ul class="tree">
+                        <li>
+                            @if (parent.FixSalaStatus == true)
+                            {
+                                <input type="checkbox" name="FixSalaTypID" checked="checked" value="@parent.FixSalaTypID" />
+                            }
+                            else
+                            {
+                                <input type="checkbox" name="FixSalaTypID" value="@parent.FixSalaTypID" />
+                            }
+                            @parent.FixSalaType
+                            @{ var subchid = Mainchild.Where(p => p.FixSalaTypID == parent.FixSalaTypID).ToList();}
+                            <ul>
+                                @foreach (var child in subchid)
+                                {
+                                    <li>
+                                        @if (child.FixallowmStatus == true)
+                                        {
+                                            <input type="checkbox" name="FixallowmID" checked="checked" value="@child.FixallowmID" data-parent="@child.FixSalaTypID" />
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" name="FixallowmID" value="@child.FixallowmID" data-parent="@child.FixSalaTypID" />
+                                        }
+                                        <label>@child.FixallowmTypes</label>
+                                        <input type="text" id="@child.FixallowmID" name="FixallowmAmounts" class="required" value="@child.FixallowmAmounts" />
+                                        
+                                    </li>
+                                }
+                            </ul>
+
+                        </li>
+                    </ul>
+                }
+            </div>
+        </div>                
+    </div>
+    <div class="text-left">
+        <button type="button" class="btn btn-sm btn-success" id="BtnPrev">Previous <span>&nbsp;</span> <i class="fa fa-arrow-circle-left"></i></button>
+        <button type="button" class="btn btn-sm btn-success" id="BtnDesigAssignment">Save <span>&nbsp;</span> <i class="fa fa-floppy-o"></i></button>
+    </div>
+</form>

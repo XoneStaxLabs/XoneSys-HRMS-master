@@ -1,0 +1,327 @@
+﻿@{
+    ViewBag.Title = "Create";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+
+<script type="text/javascript">
+
+    function GetDesignation(filterID)
+    {
+        var ddlDesignation = $("#ddlDesignation");
+        $.ajax({
+            url: "/Memos/GetDesignations",
+            async: false,
+            data: { filterID: filterID }
+        }).done(function (data) {
+            ddlDesignation.empty();
+            //ddlDesignation.append('<option value="0">All</option>').selectpicker('refresh');
+            $.each(data, function (i, item) {
+                ddlDesignation.append('<option value=' + item.DesigID + '>' + item.DesigName + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+
+
+    function GetEmployees(DesigID) {
+
+      
+
+        var ddlEmployee = $("#ddlEmployees");
+
+        $.ajax({
+            url: "/Memos/GetEmployees",
+            data: { DesignationID: JSON.stringify(DesigID) }
+
+        }).done(function (data) {
+
+            
+            if (data != 0) {
+                ddlEmployee.empty();
+                //ddlEmployee.append('<option value="0" >All</option>').selectpicker('refresh');
+
+                $.each(data, function (i, item) {
+                    ddlEmployee.append('<option value=' + item.AppUID + '>' + item.AppFirstName + '</option>').selectpicker('refresh');
+                });
+            }
+            else {
+               
+                ddlEmployee.empty().selectpicker('refresh');
+            }
+
+        });
+    }
+
+    function GetProjects() {
+
+
+
+        var ddlprojects = $("#ddlProject");
+
+        $.ajax({
+            url: "/Memos/GetProjects",
+            
+
+        }).done(function (data) {
+
+            ddlprojects.empty();
+            //ddlEmployee.append('<option value="0" >All</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+                ddlprojects.append('<option value=' + item.ProjID + '>' + item.ProjName + '</option>').selectpicker('refresh');
+            });
+
+        });
+    }
+
+
+    $(document).ready(function () {
+
+
+        $(".employee").hide();
+
+        $("#ddlAppFilter").change(function () {
+
+            GetDesignation($(this).val());
+            $(".employee").hide();
+            $('#SelectEmp').attr("checked", false);
+
+        });
+
+        $("#ddlDesignation").change(function () {
+           
+            GetEmployees($(this).val());
+
+        });
+
+        $("#ddlMemofilter").change(function () {
+
+            var values = $(this).val();
+            if (values == 1) {
+
+                $(".desigwise").show();
+                $(".projectwise").hide();
+                $(".employee").hide();
+                $('#SelectEmp').attr("checked", false);
+            }
+            else {
+
+                GetProjects();
+                $(".desigwise").hide();
+                $(".projectwise").show();
+                $(".employee").hide();
+                $('#SelectEmp').attr("checked", false);
+               
+
+
+            }
+
+
+
+        });
+        
+        $('#SelectEmp').click(function () {
+
+            if ($(this).prop("checked") == true) {
+
+                $(".employee").show();
+            }
+            else if ($(this).prop("checked") == false) {
+
+                $(".employee").hide();
+               
+            }
+
+        });
+        
+        $("#BtnMemosave").click(function () {
+
+            $.ajax({
+
+                type: "POST",
+                url:"/Memos/AddNewmemos",
+                data: $("#FormMemosID").serialize(),
+                
+
+            }).done(function (data) {
+
+                if (data) {
+
+                    $.toast({
+
+                        text: "Saved Successfully",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+                else {
+
+                    $.toast({
+
+                        text: "Saved Failed",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                }
+
+               
+
+            })
+
+        })
+
+       
+
+    })
+
+</script>
+
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+       Memos
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/DashBoard/DashBoard"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+<section class="newforms">
+    <div class="tabsnew">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="profile">
+                <form class="" action="#" id="FormMemosID">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+
+
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Choose Option</label>
+                                    <div class="col-sm-8">
+                                        
+                                        <select class="form-control required" id="ddlMemofilter" name="memo">
+                                            <option value="0">Choose Memo Type</option>
+                                            <option value="1">Designation wise</option>
+                                            <option value="2">Project wise</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group projectwise">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Project</label>
+                                    <div class="col-sm-8">
+
+                                        <select class="form-control selectpicker" id="ddlProject" multiple="multiple" name="projID" title="Choose Project"></select>
+
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group desigwise">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Filter</label>
+                                    <div class="col-sm-8">
+
+                                        <select class="form-control required" id="ddlAppFilter">
+
+                                            <option value="-1">Select</option>
+                                            <option value="0">Application User</option>
+                                            <option value="1">Employee</option>
+
+                                        </select>
+
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="form-group desigwise">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Designation</label>
+                                    <div class="col-sm-8">
+
+                                        <select class="form-control selectpicker" id="ddlDesignation" multiple="multiple" name="DesigID" title="Choose Designation" data-actions-box="true"></select>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group desigwise">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Selected Employees</label>
+                                    <div class="col-sm-8">
+                                        <input type="checkbox" id="SelectEmp" name="selectEmp" />
+
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group desigwise employee">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Employees</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control selectpicker" id="ddlEmployees" multiple="multiple" name="EmpID" data-actions-box="true" title="Choose Employee" data-live-search="true"></select>
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Subject</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="MemoSubject" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Memos</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="MemoText" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">File Attachment</label>
+                                    <div class="col-sm-8">
+                                        <label class="btn btn-block btn-default" for="fileattach">Choose File</label>
+                                        <input type="file" id="fileattach" name="MemoFiles" class="hidden" multiple="multiple">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Priority</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control required" name="MemoPriority">
+                                            <option value="1">High</option>
+                                            <option value="2">Medium</option>
+                                            <option value="3">Low</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                               
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="text-left">
+                        <button type="button" class="btn btn-sm btn-success" id="BtnMemosave">Save<span>&nbsp;</span> <i class="fa fa-floppy-o"></i></button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+

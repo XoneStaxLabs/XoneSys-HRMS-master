@@ -1,0 +1,32 @@
+﻿@model IEnumerable<XoneHR.Models.AllowanceListing>
+@{
+    ViewBag.Title = "AllowanceListing";
+}
+
+
+
+<table class="table no-margin">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Allowance</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+        
+                <tr>
+                    <td>@item.FixSalaType</td>
+                    <td>@item.FixallEmpTypes</td>
+                    <td>@item.FixallEmpAmounts</td>
+                </tr>
+            
+            }
+        }
+    </tbody>
+</table>
+

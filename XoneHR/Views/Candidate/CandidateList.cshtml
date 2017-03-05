@@ -1,0 +1,116 @@
+﻿ @model IEnumerable<XoneHR.Models.CandidateDetails>
+@{
+    ViewBag.Title = "CandidateList";
+    Layout = null;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+
+
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script>
+    $(function () {
+
+        $('#example2').DataTable();
+    });
+</script>
+
+<style>
+#example2 tbody>tr>td:first-child {
+	max-width:300px !important;
+}
+</style>
+
+<section class="newforms">
+    
+    <table id="example2" class="table table-bordered">  @*table-hover*@
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Mobile No</th>
+                <th>Join Date</th>
+                <th>Nationality</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+             <tr>
+
+                <td>
+                 @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.CandidateProfile).Select(m => m.UserPermiStatus).SingleOrDefault())
+                 {
+                    <a href="/Candidate/Candidateprofile?CandID=@item.CandID" class="text-green bio"><b>@item.CandName</b></a>
+                 }
+                 else
+                 {
+                    @item.CandName
+                 }
+                 </td>
+                <td>
+                    @item.DesigName
+                 </td>
+                <td>@item.CandMobile</td>
+                <td>@item.CandRegDate.ToString("dd-MM-yyyy")</td>
+                <td>@item.Citizen</td>
+                @if (item.CandAppStatus == 1)
+                { 
+                <td><span class="label label-success">New</span></td>      
+                <td>
+                    <a href="#" name="2" class="btn btn-block btn-success BtnAppveCand" data-CandID="@item.CandID">Approve</a>
+                    @*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.CandidateProfile).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {
+                        <a href="/Candidate/Candidateprofile?CandID=@item.CandID" class="EmpListColor"><i class="fa fa-laptop"></i></a>
+                    }
+                    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {
+                        <a href="/Candidate/Edit?CandID=@item.CandID" class="EmpListColor"><i class="fa fa-fw fa-edit"></i></a>
+                    }*@                  
+                 </td>       
+                }
+                else if (item.CandAppStatus == 2)
+                { 
+                <td><span class="label label-success">Offer Letter Sent</span></td>
+                <td>
+                    <a href="#" class="btn btn-block btn-success ToworkForce" data-CandID="@item.CandID">Convert To Workforce</a>
+                    @*<a href="/Candidate/CandidateAppoinmentletter?CandID=@item.CandID" class="btn btn-block btn-success EmpListColor">Appointment Letter</a>*@
+                    @*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())   // <i class="fa fa-envelope"></i>
+    {
+        <a href="/Candidate/Edit?CandID=@item.CandID" class="EmpListColor"><i class="fa fa-fw fa-edit"></i></a>
+    }*@
+                 </td>
+                }
+                else if (item.CandAppStatus == 3)
+                { 
+                    
+                <td><span class="label label-danger">Rejected</span></td>
+                <td>
+                    @*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {
+                        <a href="/Candidate/Edit?CandID=@item.CandID" class="EmpListColor"><i class="fa fa-fw fa-edit"></i></a>
+
+                    }*@
+                </td>
+
+                }
+                else if (item.CandAppStatus == 4)
+                {
+
+                <td><span class="label label-warning">Hold</span></td>
+                <td></td>
+                }
+            </tr>
+                
+            }
+            
+
+        </tbody>
+    </table>
+</section>
+

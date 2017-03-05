@@ -1,0 +1,57 @@
+﻿@model XoneHR.Models.SalaryDetails
+@{
+    ViewBag.Title = "EmployeeSalaryDetails";
+    Layout = null;
+    
+    
+}
+
+
+<div role="tabpanel" class="tab-pane active" id="profile">
+    <h4>Salary Details</h4>
+    <hr class="divider" />
+    <div class="row">
+        Basic Salary : @ViewBag.BasicSalary
+    </div>
+</div>
+<br />
+<div>
+    @foreach (var items in Model.empsalarydetails)
+    {
+
+
+        <h4>@items.FixSalaType</h4>
+
+        var salryitems = Model.empsalarytypeDetails.Where(m => m.FixAllEmpD == items.FixAllEmpD).ToList();
+
+        <table class="table table-responsive">
+
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var sitems in salryitems)
+                {
+                    <tr>
+
+                        <td>@sitems.FixallEmpTypes</td>
+                        <td>@sitems.FixallEmpAmounts</td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    }
+     
+</div>
+
+   

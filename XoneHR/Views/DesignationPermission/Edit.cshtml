@@ -1,0 +1,174 @@
+﻿@model XoneHR.Models.DesignationList
+@{
+    ViewBag.Title = "Edit";
+}
+
+<link href="~/jqwidgets/jqwidgets/styles/jqx.base.css" rel="stylesheet" />
+<link href="~/jqwidgets/jqwidgets/styles/jqx.metro.css" rel="stylesheet" />
+<script src="~/jqwidgets/jqwidgets/jqxcore.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxdata.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxscrollbar.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxpanel.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxtree.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxcheckbox.js"></script>
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+
+    function GetMenuMasterData(Desig_ID)
+    {
+        $.ajax({
+            type: "GET",
+            url: "/DesignationPermission/GetjsonData",
+            data: { DesigID: Desig_ID },
+            async: false
+        }).done(function (data) {
+            $('#jqxTree').jqxTree('clear');
+            var dataAdapter = new $.jqx.dataAdapter(data);
+            dataAdapter.dataBind();
+            var records = dataAdapter.getRecordsHierarchy('id', 'parentid', 'items', [{ name: 'text', map: 'label' }]);
+            $('#jqxTree').jqxTree({ source: records, width: '300px', theme: 'metro' });
+        });
+    }
+
+    $(document).ready(function () {
+
+
+        // create jqxTree
+        $('#jqxTree').jqxTree({ height: '400px', hasThreeStates: true, checkboxes: true, width: '330px' });
+        $('#jqxTree').css('visibility', 'visible');
+        
+        var ddlBox = $("#DepID");
+        $.ajax({
+            url: "/DesignationPermission/GetDepartment",
+            async: false,
+            data: { UserType: 0 }
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="-1">--Select--</option>');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.DepID + '>' + item.DepName + '</option>');
+            });
+            $("#Dep_UserType").val(0);
+            $("#DepID").val($("#HidDepID").val());
+        });
+        
+        GetMenuMasterData($("#HidDesigID").val());
+
+        $("#Btnsave").click(function () {
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != -1;
+            }, "Please select an item from the dropdown list.");
+            $("#frmDesigPermission").validate({
+                rules: {
+                    AppDepID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                }
+            }); 
+            if ($("#frmDesigPermission").valid()) {
+                var items = $("#jqxTree").jqxTree('getItems');
+                var checkedItems = new Array();
+                $.each(items, function () {
+                    if (this.checked == true || this.checked == null) {
+                        checkedItems.push(this.id);
+                    }
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "/DesignationPermission/ManageDesigPermission",
+                    data: { Data: JSON.stringify(checkedItems), DesigID: $("#HidDesigID").val(), AppDepID: $("#DepID").val(), AppDesigName: $("#DepName").val(), Flag: 2, DesigUserTyp: 0 },
+                    async: false
+                }).done(function (data) {
+
+                    $.toast({
+                        text: data.Message,
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                    if (data.Result == 1) {
+                        window.location.href = "/DesignationPermission/Index"
+                    }
+
+                })
+            }
+        });
+    })
+
+</script>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+        Designation Permission
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/DesignationPermission/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+<section class="newforms">
+    <div class="tabsnew">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="profile">
+                <form class="" action="#" id="frmDesigPermission">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                @*<div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">User Type</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control required" name="Dep_UserType" id="Dep_UserType" disabled="disabled">
+                                            <option value="0">--Select--</option>
+                                            <option value="1">Application</option>
+                                            <option value="3">Organization</option>
+                                        </select>
+                                        <input type="hidden" id="HidUserType" value="@Model.DesigUserTyp"/>
+                                    </div>
+                                </div>*@
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Department</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control required" name="DepID" id="DepID"></select>
+                                        <input type="hidden" value="@Model.DepID" id="HidDepID"  />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Designation</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" value="@Model.DesigName" name="DepName" id="DepName">
+                                        <input type="hidden" value="@Model.DesigID" id="HidDesigID" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3 class="box-title">Menu Permission</h3>
+                                <hr />
+                                <div id='jqxWidget'>
+                                    <div style='float: left;'>
+                                        <div id='jqxTree' style='visibility: hidden; float: left; margin-left: 20px;'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <button type="button" class="btn btn-sm btn-success" id="Btnsave">Save<span>&nbsp;</span> <i class="fa fa-floppy-o"></i></button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+

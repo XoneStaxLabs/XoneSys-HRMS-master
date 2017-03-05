@@ -1,0 +1,99 @@
+﻿@model IEnumerable<XoneHR.Models.ProjectDetails>
+@{
+    ViewBag.Title = "ProjectList";
+    Layout = null;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+
+
+
+<section class="newforms">
+    <div class="row">
+        <div class="col-sm-6 searchDiv">
+            <div class="dataTables_length" id="example1_length">
+                <label>
+                    Show
+                    <select name="example1_length" aria-controls="example1" class="form-control input-sm">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    entries
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-6 searchFiler">
+            <div id="example1_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="example1"></label></div>
+        </div>
+    </div>
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr> 
+                <th width="10% !important">Project Type</th>
+                <th>Project Name</th>
+                <th>Compensation Type</th>
+                <th>Compensation Amount</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Location</th>
+                <th>No Of Employees</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                var status = "";
+                if (item.ProjStatus == 0)
+                {
+                    status = "Pending";
+                }
+                else if (item.ProjStatus == 1)
+                {
+                    status = "On Going";
+                }
+                else
+                {
+                    status = "Finished";
+                }
+
+                <tr>
+
+                    <td>@item.ProjectType</td>
+                    <td><a href="/Project/EditProject?ProjectID=@item.ProjID" class="text-green bio"><b>@item.ProjName</b></a></td>
+                    <td>@item.ProCompType</td>
+                    <td>@item.ProjCompAmount</td>
+                    <td>@item.ProjFrom.ToString("dd-MM-yyyy")</td>
+                    <td>@item.ProjTo.ToString("dd-MM-yyyy")</td>
+                    <td>@item.ProjLocation</td>
+                    <td>@item.ProjEmpno</td>
+                    <td>
+
+                        @*@if (item.ProjStatus == true)
+                            {*@
+                        <span class="label label-success">@status</span>
+                        @*}*@
+
+                    </td>
+                    <td>
+                    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.AttendanceDetails).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {
+                        <a href="/Project/ProjectAttendance?ProjID=@item.ProjID&DefaultStatus=1"><i class="glyphicon glyphicon-time"></i></a>
+                    }&nbsp;
+                       @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.ProjectRoster).Select(m => m.UserPermiStatus).SingleOrDefault())
+                       {
+                        @*<a href="/Leave/AttendanceMark?projectid=@item.ProjID&projectname=@item.ProjName"><i class="glyphicon glyphicon-calendar"></i></a>*@
+                        <a href="/Project/ProjectSchedule?projectid=@item.ProjID&projectname=@item.ProjName&ProjFromDate=@item.ProjFrom&ProjToDate=@item.ProjTo" ><i class=" glyphicon glyphicon-calendar"></i></a>
+                       }
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</section>

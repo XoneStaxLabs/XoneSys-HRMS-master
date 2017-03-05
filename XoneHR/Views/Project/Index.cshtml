@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+
+<script type="text/javascript">
+
+
+    function Projectlist() {
+
+        $.ajax({
+
+            type: "GET",
+            url: "/Project/ProjectList",
+          
+
+        }).done(function (data) {
+
+            $("#Projectlist").html(data);
+
+
+        });
+    }
+
+    $(document).ready(function () {
+
+        Projectlist();
+       
+
+
+    })
+
+
+</script>
+
+
+
+
+
+
+<section class="content-header">
+
+    <h1>
+        <i class="fa fa-book"></i>&nbsp;Project List
+    </h1>
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
+    <ol class="breadcrumb">
+        <li><a href="/Project/Create"><i class="fa fa-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+}    
+</section>
+
+
+<div id="Projectlist"></div>

@@ -1,0 +1,48 @@
+﻿@{
+    ViewBag.Title = "CandidateInterview";
+}
+
+
+
+<script type="text/javascript">
+
+
+    function CandidateInterviewList() {
+
+        $.ajax({
+
+            type: "GET",
+            url: "/Candidate/CandidateInterviewList"
+
+        }).done(function (data) {
+
+            $("#CandidateInterviewList").html(data);
+
+
+        })
+    }
+
+    $(document).ready(function () {
+
+        CandidateInterviewList();
+
+
+    })
+
+
+</script>
+
+
+
+
+
+<section class="content-header">
+
+    <h1>
+        Candidate List
+    </h1>
+  
+</section>
+
+
+<div id="CandidateInterviewList"></div>

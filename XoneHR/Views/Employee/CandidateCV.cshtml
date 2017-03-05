@@ -1,0 +1,109 @@
+﻿@model XoneHR.Models.EmployeeCVDetails
+@{
+    ViewBag.Title = "CandidateCV"; 
+}
+
+
+@*<script src="~/plugins/jQuery/jQuery-2.1.4.min.js"></script>*@
+<script src="~/plugins/jQuery/print.js"></script>
+ 
+<script type="text/javascript" >
+    $(document).ready(function () {
+      
+        $("#myModal").modal('show');
+
+        $("#BtnPrintProfile").click(function () {
+
+          
+            $("#printcontent").print({
+                globalStyles: true, 
+                mediaPrint: true,
+                stylesheet: null,
+                noPrintSelector: ".no-print",
+                iframe: true,
+                append: null,
+                prepend: null,
+                manuallyCopyFormValues: true,
+                deferred: $.Deferred(),
+                timeout: 250,
+                title: null,
+                doctype: '<!doctype html>'
+
+            });
+
+        });
+    });
+    
+</script> 
+<section class="newforms">
+  @*  <p>For downloading Resume <a href="" data-toggle="modal" data-target="#myModal">click here</a></p>*@
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" >
+                <div class="modal-body offerpop">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div class="resume" id="printcontent">
+                        <div class="resumeHead">
+                            <div class="col-sm-8">
+                                <img src="@Model.EmpDetail.CandPhoto" alt="@Model.EmpDetail.CandName" width="125" height="60" />
+                                <h6>@Model.EmpDetail.CandName</h6>
+                                <span>@Model.EmpDetail.DesigName</span>
+                            </div>
+                            <div class="col-sm-4">
+                                @*<p><b>Email:</b> @Model.EmpDetail.CandEmail</p>
+                                <p><b>Address:</b> @Model.EmpDetail.CandAddress</p>
+                                <p><b>Mobile No:</b> @Model.EmpDetail.CandMobile</p>*@
+                            </div>
+                        </div>
+                        <table class="table table-responsive resumeTable">
+                            <tbody>
+                                @*<tr>
+                                    <th>Employee Type</th>
+                                    <td>@Model.EmpDetail.EmpTypName</td>
+                                </tr>*@
+                                <tr>
+                                    <th>Personal Profile</th>
+                                    <td>@Model.EmpDetail.CandDetails</td>
+                                </tr>
+                                <tr>
+                                    <th>Work Experience</th>
+                                    <td>
+                                        @foreach (var items in Model.EmpHistory)
+                                        {
+                                            <h6>@items.EmphEmployer</h6>
+                                            <span>@items.EmphStartDate.ToString("dd/MM/yyyy") - @items.EmphEndDate.ToString("dd/MM/yyyy")</span>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Key Skills</th>
+                                    <td>
+                                        @foreach (var items in Model.EmpSkillSet)
+                                        {
+                                            <p>@items.SkilsetName</p>
+                                        }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Education</th>
+                                    <td>@Model.EmpDetail.CandHgEducation</td>
+                                </tr>
+                                <tr>
+                                    <th>Languages Known</th>
+                                    <td>
+                                        @foreach (var items in Model.EmpLangKnown)
+                                        {
+                                            <p>@items.LanguageName</p>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>                        
+                    </div>
+                    <button type="button" class="btn btn-default printright" id="BtnPrintProfile">Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

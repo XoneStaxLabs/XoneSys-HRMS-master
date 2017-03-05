@@ -1,0 +1,33 @@
+﻿@model IEnumerable<XoneHR.Models.TblEmployeeSalary>
+@{
+    ViewBag.Title = "ListEmployeeSalary";
+    Layout = null;
+
+}
+
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        if (item.SalEndDate.ToString("dd-MM-yyyy") == "01-01-0001")
+        {
+            <tr>
+                <td>@item.BasicSalary</td>
+                <td>@item.SalStartDate.ToString("dd-MM-yyyy")</td>
+                <td>No Date</td>
+                @*<td><a href="#" class="btn btn-success BtnSalEdit" data-SalID="@item.SalMastID" data-SalStart="@item.SalStartDate" data-SalendDate="@item.SalEndDate" data-toggle="modal"><i class="fa fa-fw fa-edit"></i></a></td>*@
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td>@item.BasicSalary</td>
+                <td>@item.SalStartDate.ToString("dd-MM-yyyy")</td>
+                <td>@item.SalEndDate.ToString("dd-MM-yyyy")</td>
+            </tr>
+        }
+
+
+    }
+}

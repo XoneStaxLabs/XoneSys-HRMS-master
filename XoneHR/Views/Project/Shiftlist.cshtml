@@ -1,0 +1,154 @@
+﻿@model XoneHR.Models.RosterShiftList
+@{
+    ViewBag.Title = "Shiftlist";
+    Layout = null;
+}
+
+
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var projID = $("#ProjectsID").val();
+        
+        $(".selectpicker").selectpicker('refresh');
+
+        $(".RosterSave").on("click", function () {
+
+            $("#RosterFormID").validate();
+             
+            var ShiftId = $(this).attr("name");
+            var ScheduleID = $(this).attr("data-schid");           
+            var EmpIdentifier = ScheduleID + ShiftId;           
+            var EmpIDs = $('select[name^="' + EmpIdentifier + '"]').val();
+            
+            //if ($("#RosterFormID").valid())
+            //{
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Project/AddnewEmpShiftsSingle",
+                    data: { ShiftId: ShiftId, EmpIDs: JSON.stringify(EmpIDs), ScheduleID: ScheduleID, ProjectID: projID }
+
+                }).done(function (data) {                    
+
+                    if (data.Result == 1) {
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })                        
+                    }
+                    else if (data.Result == 2)
+                    {
+                         $.toast({
+                            text: "Please Select Atleast One Employee In Employee List",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                    else if (data.Result == -1) {
+                        $.toast({
+                            text: 'This Employee <b style = "color: red">' + data.Message + '</b> Assigned already to Another Shift',
+                            position: 'top-right',
+                            //hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                })
+          //  }
+
+        })     
+    })
+    
+</script>
+
+    <div class="shift">
+@foreach(var items in Model.ShiftList)
+    {
+
+        <div class="col-sm-6 shiftTime">
+            <div class="shiftHd bg-teal">
+                <h3>@items.ShiftName</h3>
+                <span class="info-box-text">@items.ShiftFrom to @items.ShiftTo</span>
+            </div>
+
+
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                
+              
+
+                @foreach (var schedule in Model.ProjectSchedule)
+                { 
+                    
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#@schedule.SchID@items.ShiftID" aria-expanded="false" aria-controls="collapseOne">
+                               @schedule.Schedule
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="@schedule.SchID@items.ShiftID" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            <div class="selectemployee">
+
+                                <p>Add @items.ShiftEmpNo Employees to Shift</p>
+                                <select class="selectpicker ddlEmployeeList required" multiple data-max-options="@items.ShiftEmpNo" name="@schedule.SchID@items.ShiftID">
+
+                                    @foreach (var sitem in Model.EmployeeProfile)
+                                    {
+                                        var count = Model.ProjectmasterIDs.Where(m => m.ShiftID == items.ShiftID && m.EmpID == sitem.EmpID && m.SchID==schedule.SchID).Count();
+                                        if (count != 0)
+                                        {
+                                            <option value="@sitem.EmpID" selected="selected">@sitem.CandName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@sitem.EmpID">@sitem.CandName</option>
+                                        }
+
+
+
+
+                                    }
+                                </select>
+
+
+                            </div>
+                            <button type="button" class="btn btn-success RosterSave" name="@items.ShiftID" data-schid="@schedule.SchID">Save</button>
+
+                        </div>
+                    </div>
+                </div>
+                    
+                }
+
+              
+
+            </div>
+
+        </div>
+}
+
+    </div>

@@ -1,0 +1,481 @@
+﻿@{
+    ViewBag.Title = "LeaveEmpListFromAttendance";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script type="text/javascript">
+
+    function GetLeaveEmployee(ProjID, SchID, ShiftID) {
+        var ddlBox = $("#EmpID");
+        $.ajax({
+            url: "/Leave/GetLeaveEmployeeList",
+            async: false,
+            data: { ProjID: ProjID, SchID: SchID, ShiftID: ShiftID, }
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.EmpID + '>' + item.CandName + '</option>');
+            });
+        });
+    }
+
+    $(document).ready(function () {
+
+        var ddlBox = $("#ProjID");
+        $.ajax({
+            url: "/Leave/GetProjectList",
+            async: false
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.ProjID + '>' + item.ProjName + '</option>');
+            });
+        });
+
+        //---Set values based on link----------///
+        $("#ProjID").val($("#HidProjID").val());
+        //Schedule-----------
+        $.ajax({
+            url: "/Leave/GetScheduleList",
+            async: false,
+            data: { ProjID: $("#ProjID").val() }
+        }).done(function (data) {
+            $("#SchID").empty();
+            $("#SchID").append('<option value="0">--Select--</option>');
+            $.each(data, function (i, item) {
+                $("#SchID").append('<option value=' + item.SchID + '>' + item.Schedule + '</option>');
+            });
+        });
+        $("#SchID").val($("#HidSchID").val());
+        //Shift------------
+        $.ajax({
+            url: "/Leave/GetShiftList",
+            async: false,
+            data: { ProjID: $("#ProjID").val() }
+        }).done(function (data) {
+            $("#ShiftID").empty();
+            $("#ShiftID").append('<option value="0">--Select--</option>');
+            $.each(data, function (i, item) {
+                $("#ShiftID").append('<option value=' + item.ShiftID + '>' + item.ShiftName + '</option>');
+            });
+        });
+        $("#ShiftID").val($("#HidShiftID").val());
+        //Leave employees--------
+        GetLeaveEmployee($("#ProjID").val(), $("#SchID").val(), $("#ShiftID").val());
+        $("#EmpID").val($("#HidEmpID").val());
+        //Assigned Employees-----
+        $.ajax({
+            url: "/Leave/GetAssignedEmployee",
+            data: { EmpID: $("#EmpID").val() },
+            async: false,
+        }).done(function (data) {
+            $("#AssignEmpID").empty();
+            $("#AssignEmpID").append('<option value="0">--Select--</option>');
+            $.each(data, function (i, item) {
+                $("#AssignEmpID").append('<option value=' + item.EmpID + '>' + item.CandName + '</option>');
+            });
+        });   
+        //Leave type------- 
+        $.ajax({
+            type: "Get",
+            url: "/Leave/GetAssignedDateList",
+            data: { EmpID: $("#EmpID").val(), SchID: $("#SchID").val() },
+            async:false,
+        }).done(function (data) {
+
+            $("#LeaveDate").empty();
+            $("#LeaveDate").append('<option value="0">--Select--</option>');
+            $.each(data, function (i, item) {
+                $("#LeaveDate").append('<option value=' + item.Value + '>' + item.Text + '</option>'); 
+            });
+        }); 
+        $("#LeaveDate").val($("#HidOff").val()); 
+        if ($("#LeaveDate").val() != $("#HidOff").val())
+        {
+            $("#LeaveDate").append('<option value=' + $("#HidOff").val() + '>' + $("#HidOff").val().toString("dd/MM/yyyy") + '</option>');
+        }
+
+        $.ajax({
+            url: "/Leave/GetLeaveEmpDetails",
+            async: false,
+            data: { EmpID: $("#EmpID").val(), SchID: $("#SchID").val(), Date: $("#LeaveDate").val() },
+            async:false
+        }).done(function (data) {
+
+            $("#EmpLeaveDate").text(moment(data.EmpLeaveDate).format('DD/MM/YYYY'));
+            $("#HIdEmpLeaveDate").val(moment(data.EmpLeaveDate).format('M/DD/YY'));
+            $("#EmpLeavetodate").text(moment(data.EmpLeavetodate).format('DD/MM/YYYY'));
+            $("#HidEmpLeavetodate").val(moment(data.EmpLeavetodate).format('M/DD/YY'));
+            $("#LeaveType").text(data.LeaveType);
+            $("#HidLeavetypID").val(data.LeavetypID);
+            $("#DayType").text(data.DayType);
+            $("#DayTypID").val(data.DayTypID);
+            $("#EmpappRemks").text(data.EmpappRemks);
+            $("#HideEmpappRemks").val(data.EmpappRemks);
+        });
+            
+        //-----------------------------------///
+
+        $("#ProjID").change(function () {
+
+            var ddlBox = $("#SchID");
+            $.ajax({
+                url: "/Leave/GetScheduleList",
+                async: false,
+                data: { ProjID: $(this).val() }
+            }).done(function (data) {
+                ddlBox.empty();
+                ddlBox.append('<option value="0">--Select--</option>');
+                $.each(data, function (i, item) {
+                    ddlBox.append('<option value=' + item.SchID + '>' + item.Schedule + '</option>');
+                });
+            });
+
+            var ddlBox = $("#ShiftID");
+            $.ajax({
+                url: "/Leave/GetShiftList",
+                async: false,
+                data: { ProjID: $(this).val() }
+            }).done(function (data) {
+                ddlBox.empty();
+                ddlBox.append('<option value="0">--Select--</option>');
+                $.each(data, function (i, item) {
+                    ddlBox.append('<option value=' + item.ShiftID + '>' + item.ShiftName + '</option>');
+                });
+            });
+            
+            $("#EmpID").empty();
+            $("#EmpID").append('<option value="0">--Select--</option>');
+            //--------------
+            $('#table').empty();
+            $("#LeaveType").html("");
+            $("#DayType").html("");
+            $("#EmpappRemks").html("");
+            //--------------------
+
+        });
+
+        $("#SchID").change(function () {
+
+            if ($("#ShiftID").val() != 0) {
+                GetLeaveEmployee($("#ProjID").val(), $("#SchID").val(), $("#ShiftID").val());
+                //--------------
+                $('#table').empty();
+                $("#LeaveType").html("");
+                $("#DayType").html("");
+                $("#EmpappRemks").html("");
+                //--------------------
+            }
+
+          
+        })
+        $("#ShiftID").change(function () {
+
+            if ($("#SchID").val() != 0) {
+                GetLeaveEmployee($("#ProjID").val(), $("#SchID").val(), $("#ShiftID").val());
+                //--------------
+                $('#table').empty();
+                $("#LeaveType").html("");
+                $("#DayType").html("");
+                $("#EmpappRemks").html("");
+                //--------------------
+            }
+        })
+        $("#EmpID").change(function () {
+
+            var ddlBox = $("#AssignEmpID");
+            $.ajax({
+                url: "/Leave/GetAssignedEmployee",
+                data: { EmpID: $("#EmpID").val() },
+                async: false,
+            }).done(function (data) {
+                ddlBox.empty();
+                ddlBox.append('<option value="0">--Select--</option>');
+                $.each(data, function (i, item) {
+                    ddlBox.append('<option value=' + item.EmpID + '>' + item.CandName + '</option>');
+                });
+            });
+
+
+            var ddlBox1 = $("#LeaveDate");
+            $.ajax({
+                type: "Get",
+                url: "/Leave/GetAssignedDateList",
+                data: { EmpID: $("#EmpID").val(), SchID: $("#SchID").val() }
+            }).done(function (data) {
+
+                ddlBox1.empty();
+                ddlBox1.append('<option value="0">--Select--</option>');
+                $.each(data, function (i, item) {
+
+                    ddlBox1.append('<option value=' + item.Value + '>' + item.Text + '</option>');
+                });
+            });
+
+        });
+
+        $("#LeaveDate").change(function () {
+
+            $.ajax({
+                url: "/Leave/GetLeaveEmpDetails",
+                async: false,
+                data: { EmpID: $("#EmpID").val(), SchID: $("#SchID").val(), Date: $(this).val() }
+            }).done(function (data) {
+
+                $("#EmpLeaveDate").text(moment(data.EmpLeaveDate).format('DD/MM/YYYY'));
+                $("#HIdEmpLeaveDate").val(moment(data.EmpLeaveDate).format('M/DD/YY'));
+                $("#EmpLeavetodate").text(moment(data.EmpLeavetodate).format('DD/MM/YYYY'));
+                $("#HidEmpLeavetodate").val(moment(data.EmpLeavetodate).format('M/DD/YY'));
+                $("#LeaveType").text(data.LeaveType);
+                $("#HidLeavetypID").val(data.LeavetypID);
+                $("#DayType").text(data.DayType);
+                $("#DayTypID").val(data.DayTypID);
+                $("#EmpappRemks").text(data.EmpappRemks);
+                $("#HideEmpappRemks").val(data.EmpappRemks);
+
+            });
+        });
+        $("#BtnAddCandprofile").click(function () {
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            $("#FrmEmpLeave").validate({
+                rules: {
+                    ProjID: {
+                        required: true,
+                        check_item_dropdown: true,
+                    },
+                    SchID: {
+                        required: true,
+                        check_item_dropdown: true,
+                    },
+                    ShiftID: {
+                        required: true,
+                        check_item_dropdown: true,
+                    },
+                    AbsEmpID: {
+                        required: true,
+                        check_item_dropdown: true,
+                    },
+                    rules: {
+                        //other rules,
+                        validProductList: true
+                    }
+                }
+
+            })
+            if ($("#FrmEmpLeave").valid()) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Leave/SaveAssignedEmp",
+                    data: $("#FrmEmpLeave").serialize()
+                }).done(function (data) {
+                    $.toast({
+                        text: data.Message,
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                    if (data.Result > 0) {
+                        location.reload();
+                    }
+
+                })
+            }
+        })
+
+        $("#AddAssignedDate").click(function () {
+            var temp = 0;
+            var flag = 0;
+            if ($("#AssignEmpID").val() == 0 || $("#AssignEmpID").val() == null) {
+                temp = 1;
+                flag = 1;
+            } else if ($("#LeaveDate").val() == 0 || $("#LeaveDate").val() == null) {
+                temp = 1;
+                flag = 1;
+            }
+            else {
+
+            }
+
+            $('#table tr').each(function () {
+                if ($(this).find(".EmpLeaveDate").val() == $("#LeaveDate").val()) {
+                    temp = 1;
+                }
+
+            });
+            if (temp == 0) {
+                $.ajax({
+                    type: "Get",
+                    url: "/Leave/CheckingAbsenceAssignedEmp",
+                    data: { AbsallEmpID: $("#AssignEmpID").val(), LeaveDate: $("#LeaveDate").val(), ProjID: $("#ProjID").val(), SchID: $("#SchID").val(), ShiftID: $("#ShiftID").val() }
+                }).done(function (data) {
+                    if (data == 0) {
+                        $('#table').append('<tr><td>' + $("#AssignEmpID option:selected").text() + ' <input type="hidden" class="AbsallEmpID" value=' + $("#AssignEmpID").val() + ' name="AbsallEmpID" /> </td><td>' + $("#LeaveDate").val() + '<input type="Hidden" value=' + $("#LeaveDate").val() + ' class="EmpLeaveDate" name="EmpLeaveDate" /> </td><td><input type="button" class="fa fa-plus RemoveAssignedDate" value="-" /></td></tr>');
+                        $("#AssignEmpID").val(0);
+                        $("#LeaveDate").val(0);
+
+                        $("#LeaveType").html("");
+                        $("#DayType").html("");
+                        $("#EmpappRemks").html("");
+
+                    }
+                    else {
+                        $.toast({
+                            text: 'Already Assigned',
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                })
+
+            }
+            else {
+                if (flag == 1) {
+                    $.toast({
+                        text: 'Please Select a Valid Field',
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                } else {
+                    $.toast({
+                        text: 'Already Added in Same Date',
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+            }
+
+        })
+        $(document).on("click", ".RemoveAssignedDate", function () {
+            $(this).closest('tr').remove();
+        });
+
+
+
+    });
+
+
+</script>
+
+<input type="hidden" id="HidSdate" />
+<input type="hidden" id="HidEdate" />
+<input type="hidden" id="HidProjID" value="@ViewBag.ProjID"/>
+<input type="hidden" id="HidSchID" value="@ViewBag.SchID" />
+<input type="hidden" id="HidShiftID" value="@ViewBag.ShiftID" />
+<input type="hidden" id="HidEmpID" value="@ViewBag.EmpID" />
+<input type="hidden" id="HidOff" value="@ViewBag.Offdate" />
+
+<section class="content-header">
+    <h1>
+        Employee Absence/OFF Day Allocation
+    </h1>
+</section>
+<section class="newforms">
+    <form class="projectadding form-horizontal" action="#" id="FrmEmpLeave">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label">Project</label>
+                    <div class="col-sm-8">
+                        <select class="form-control required" name="ProjID" id="ProjID"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label">Schedule</label>
+                    <div class="col-sm-8">
+                        <select class="form-control required" name="SchID" id="SchID"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label">Shift</label>
+                    <div class="col-sm-8">
+                        <select class="form-control required" name="ShiftID" id="ShiftID"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label">Employee</label>
+                    <div class="col-sm-8">
+                        <select class="form-control required" name="AbsEmpID" id="EmpID"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label">Assigned Employee</label>
+                    <div class="col-sm-8">
+                        <select class="form-control " name="" id="AssignEmpID"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label">Assigned Date</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" name="" id="LeaveDate"></select>
+                        <input type="button" class="fa fa-plus" id="AddAssignedDate" value="+" />
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                       
+                        <tr>
+                            <th>Leave Type</th>
+                            <td>
+                                <span id="LeaveType"></span>
+                                <input type="hidden" id="HidLeavetypID" name="LeavetypID" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Day Type</th>
+                            <td>
+                                <span id="DayType"></span>
+                                <input type="hidden" id="DayTypID" name="DayTypID" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Note</th>
+                            <td>
+                                <span id="EmpappRemks"></span>
+                                <input type="hidden" id="HideEmpappRemks" name="EmpappRemks" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-bordered table-hover" id="TblAssignedEmpID" action="whatever">
+                    <thead>
+                        <tr>
+                            <th>Assigned Employee</th>
+                            <th>Assigned Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table">
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="text-right">
+            <button type="button" class="btn btn-sm btn-success" id="BtnAddCandprofile">Assign New Employee <span>&nbsp;&nbsp;</span><i class="fa fa-floppy-o"></i></button>
+        </div>
+    </form>
+</section>

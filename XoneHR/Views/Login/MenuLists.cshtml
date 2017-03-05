@@ -1,0 +1,28 @@
+﻿@model IEnumerable<XoneHR.Models.TblMenuMaster>
+@{
+    ViewBag.Title = "MenuLists";
+    Layout = null;
+}
+
+@{var menuItems = Model.Where(m => m.MenuParentID == 0).OrderBy(m=>m.MenuOrdNo).ToList();}
+
+@foreach (var mitems in menuItems)
+{ 
+<li class="treeview">
+   
+    <a href="#">
+        <i class="@mitems.MenuIcons"></i> <span>@mitems.MenuName</span>
+    </a>
+    <ul class="treeview-menu">
+        @{var SubmenuItems = Model.Where(m => m.MenuParentID == mitems.MenuID).OrderBy(m=>m.MenuOrdNo).ToList();}
+
+        @foreach(var subitems in SubmenuItems)
+        { 
+            var Path = ("/"+subitems.MenuController+"/"+subitems.MenuAction);
+        <li><a href="@Path"  class="MenuClick"><i class="fa fa-circle-o"></i>@subitems.MenuName</a></li>
+      
+        }
+
+    </ul>
+</li>
+}

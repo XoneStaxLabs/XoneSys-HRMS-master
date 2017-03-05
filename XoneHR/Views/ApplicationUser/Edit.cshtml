@@ -1,0 +1,399 @@
+﻿@model XoneHR.Models.TblAppUser
+@{
+    ViewBag.Title = "Edit";
+}
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<link href="~/jqwidgets/jqwidgets/styles/jqx.base.css" rel="stylesheet" />
+<link href="~/jqwidgets/jqwidgets/styles/jqx.metro.css" rel="stylesheet" />
+<script src="~/jqwidgets/jqwidgets/jqxcore.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxdata.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxscrollbar.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxpanel.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxtree.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxcheckbox.js"></script>
+
+<script type="text/javascript">
+
+    function GetCitizenship() {
+        var ddlBox = $("#CizenID");
+
+        $.ajax({
+            url: "/ApplicationUser/GetCitizenship",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>');
+
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.CizenID + '>' + item.Citizen + '</option>');
+            });
+            $("#CizenID").val($("#HidCitizenID").val());
+        });
+    }
+
+    function GetDesignation() {
+        var ddlBox = $("#DesigID");         
+        $.ajax({
+            url: "/ApplicationUser/GetDesignation",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>');
+
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.DesigID + '>' + item.DesigName + '</option>');
+            });
+            $("#DesigID").val($("#HidDesigID").val());
+           
+        });
+
+    }
+
+    function GetMenuMasterData(AppUser_ID) {
+
+        $.ajax({
+            type: "GET",
+            url: "/ApplicationUser/GetjsonData",
+            data: { AppUserID: AppUser_ID, DesigID: $("#DesigID").val(), Flag: 1 },
+            async: false
+        }).done(function (data) {
+            $('#jqxTree').jqxTree('clear');
+            var dataAdapter = new $.jqx.dataAdapter(data);
+            dataAdapter.dataBind();
+            var records = dataAdapter.getRecordsHierarchy('id', 'parentid', 'items', [{ name: 'text', map: 'label' }]);
+            $('#jqxTree').jqxTree({ source: records, width: '300px', theme: 'metro' });
+        });
+    }
+
+    $(document).ready(function () {
+        GetCitizenship();
+        //GetDesignation();
+
+        var ddlBox = $("#DesigID");
+        $.ajax({
+            url: "/ApplicationUser/GetDesignations",
+            async: false,
+            data: { UserTypID: $("#HidAppUserTypID").val() }
+        }).done(function (data) {
+
+            ddlBox.empty();
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.DesigID + '>' + item.DesigName + '</option>');
+            });
+            $("#DesigID").val($("#HidDesigID").val()); 
+        });
+        
+        $("#AppGender").val($("#HidAppGender").val());         
+        $('#CizenID').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='CizenID']").text('');
+            }
+            else {
+                $("label[for='CizenID']").text('Please select an item from the dropdown list.');
+            }
+
+        })
+        
+        $('#DesigID').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='DesigID']").text('');
+            }
+            else {
+                $("label[for='DesigID']").text('Please select an item from the dropdown list.');
+            }
+
+        })
+
+        $("#BtnAddUserprofile").click(function (event) {
+
+            $.validator.addMethod("custom_number", function (value, element) {
+                return this.optional(element) || value === "NA" ||
+                    value.match(/^[0-9,\+-]+$/);
+            }, "Please enter a valid number");
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            //initilize validation plugin on this form.
+            $("#UserProfile").validate({
+                rules: {
+                    AppMobile: {
+                        required: true,
+                        custom_number: true,
+                        minlength: 8,
+                        maxlength: 15
+                    },
+                    CitizenID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    DesigID: {
+                        check_item_dropdown: true,
+                        required: true,
+                    },
+                    AppEmail: {
+                        required: true
+                    }
+                }
+
+            });
+
+            //run validation process
+            if ($('#UserProfile').valid()) {
+                var file = "";
+                var formData = new FormData();
+                 
+                var totalFiles = document.getElementById("newdoc").files.length;
+
+                if (totalFiles > 0) {
+
+                    for (var i = 0; i < totalFiles; i++) {
+                        file = document.getElementById("newdoc").files[i];
+                    }
+                }                 
+
+                    formData.append("FileUpload", file);
+                    formData.append("AppFirstName", $("#AppFirstName").val());
+                    formData.append("CizenID", $("#CizenID").val());
+                    formData.append("DesigID", $("#DesigID").val());
+                    formData.append("AppAddress", $("#AppAddress").val());
+                    formData.append("AppMobile", $("#AppMobile").val());
+                    formData.append("AppUserName", $("#AppUserName").val());
+                    formData.append("AppPwd", $("#AppPwd").val());
+                    formData.append("AppEmail", $("#AppEmail").val());
+                    formData.append("AppGender", $("#AppGender").val());
+                    formData.append("AppUID", $("#HidAppUID").val());
+                    
+
+                    $.ajax({
+
+                        type: "POST",
+                        url: "/ApplicationUser/ManageApplicationUser",
+                        data: formData,
+                        dataType: 'json',
+                        contentType: false,
+                        processData: false
+                    }).done(function (data) {
+
+                        $.toast({
+                            text: data.Message,
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        if (data.Result > 0) {
+
+                            $('.nav-tabs > .active').next('li').find('a').trigger('click');
+                           
+                        }
+
+                     })
+                
+            }
+        });
+        // create jqxTree
+        $('#jqxTree').jqxTree({ height: '400px', hasThreeStates: true, checkboxes: true, width: '330px' });
+        $('#jqxTree').css('visibility', 'visible');
+
+        GetMenuMasterData($("#HidAppUID").val());
+
+        $("#BtnUserPermission").click(function () {
+
+            var items = $("#jqxTree").jqxTree('getItems');
+            var checkedItems = new Array();
+            $.each(items, function () {
+                if (this.checked == true || this.checked == null) {
+                    checkedItems.push(this.id);
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/ApplicationUser/ManageUserPermission",
+                data: { Data: JSON.stringify(checkedItems), AppUserID: $("#HidAppUID").val(), Flag: 2 },
+                async: false
+            }).done(function (data) {
+
+                    $.toast({
+                        text: data.Message,
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                    if (data.Result == 1) {
+                        window.location.href = "/ApplicationUser/Index"
+                    }
+
+                })
+
+        });
+        $("#newdoc").change(function () {
+            readURL(this);
+        });
+    })
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#PhotoID').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+<section class="content-header" id="Candidate">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+        User
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="/ApplicationUser/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+
+
+<section class="newforms">
+    <div class="tabsnew">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs " role="tablist">
+            <li role="presentation" class="active"><a href="#profile" aria-controls="home" role="tab" data-toggle="tab">User Data</a></li>
+            <li role="presentation" id="Citizentab"><a href="#permission" aria-controls="Citizenship" role="tab" data-toggle="tab">User Permission</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <div role="tabpanel" class="tab-pane active" id="profile">
+                <form class="" action="#" id="UserProfile" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Name</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control required" id="AppFirstName" value="@Model.AppFirstName" name="AppFirstName" placeholder="Name" autocomplete="off">
+                                    <input type="hidden" id="HidAppUID" value="@Model.AppUID" />
+                                    <input type="hidden" id="HidAppUserTypID" value="@Model.AppUserTypID"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Nationality</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="CitizenID" id="CizenID"></select>
+                                    <input type="hidden" value="@Model.CitizenID" id="HidCitizenID">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Designation</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="DesigID" id="DesigID"></select>
+                                    <input type="hidden" value="@Model.DesigID" id="HidDesigID">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Address</label>
+                                <div class="col-sm-8">
+                                    <textarea class="form-control" rows="3" name="AppAddress" id="AppAddress"  placeholder="Address">@Model.AppAddress</textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Mobile</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control required" name="AppMobile" placeholder="Mobile" value="@Model.AppMobile" id="AppMobile" autocomplete="off">
+                                    @*<span id="mob_unique" style="color:red">Mobile number already registerd</span>*@
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Username</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control required" name="AppUserName" value="@Model.AppUserName" placeholder="Username" id="AppUserName" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Password</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control required" name="AppPwd" value="@Model.AppPwd" placeholder="Password" id="AppPwd" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Email</label>
+                                <div class="col-sm-8"> 
+                                    <input type="email" class="form-control email" name="AppEmail" placeholder="Email" value="@Model.AppEmail" id="AppEmail" autocomplete="off">
+                                    @*<span id="mail_unique" style="color:red">Email already registerd</span>*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Gender</label>
+                                <div class="col-sm-8 ">
+
+                                    <select class="form-control" name="AppGender" id="AppGender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    <input type="hidden" value="@Model.AppGender" id="HidAppGender" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-4 control-label">Upload Photo</label>
+                                <div class="col-sm-8">
+                                    <img src="@Model.AppPhoto" id="PhotoID" height="100" width="100">
+                                    <input type="file" value="@Model.AppPhoto" id="newdoc" name="DocFiles[]">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="text-right">
+                        <button type="button" class="btn btn-sm btn-success" id="BtnAddUserprofile">Save & Continue <span>&nbsp;</span><i class="fa fa-floppy-o"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="permission">
+
+                <form class="" action="#" id="FrmIdUserPermission">
+                  
+                    <div class="col-md-12">
+                        <div class="col-md-6">
+                            <h3 class="box-title">Menu Permission</h3>
+                            <hr />
+                            <div id='jqxWidget'>
+                                <div style='float: left;'>
+                                    <div id='jqxTree' style='visibility: hidden; float: left; margin-left: 20px;'>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <button type="button" class="btn btn-sm btn-success" id="BtnUserPermission">Save <span>&nbsp;</span> <i class="fa fa-floppy-o"></i></button>
+                    </div>
+
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</section>

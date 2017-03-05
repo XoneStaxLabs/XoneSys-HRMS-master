@@ -1,0 +1,226 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+        
+    function ListEmp()
+    {
+        $.ajax({
+
+            type: "POST",
+            url: "/Employee/ListAllEmployees"
+
+        }).done(function (data) {
+
+            $("#EmployeeList").html(data);
+
+        });
+    }
+
+    $(document).ready(function () {
+
+        ListEmp();
+
+        $(document).on("click", '.BtnCV', function () {
+            var ID = $(this).attr('data-empid');
+
+            $.ajax({
+                url: "/Employee/CandidateCV",
+                data: { EmpID: ID }
+            }).done(function (data) {
+
+                $("#EmployeeCV").html(data)
+            })
+        });
+
+        //$(document).on("click", ".btnSalary", function () {   
+
+        //    var EmpId = $(this).attr("data-empid");            
+        //    $("#PaymentModal").modal("show");
+        //    $.ajax({
+
+        //        url: "/Employee/SalaryPayment",
+        //        data: { EmpId: EmpId }
+        //    }).done(function (data) {
+                
+        //        //$("#SalaryPayment").html(data);
+        //        //$("#EmpId").val(EmpId);
+        //    });         
+              
+        //});
+
+        $(document).on("click", '.tableNot', function () {
+
+            var CandID = $(this).attr('data-candID');
+
+            $.ajax({
+
+                url: "/Employee/ValidDocumentResults",
+                data: { CandID: CandID }
+            }).done(function (data) {
+
+                $("#ValidDocumentResults").html(data);
+                $("#DocumentModal").modal('show');
+            })
+        });
+       
+        $('#PayDate').change(function () {
+            $(this).blur();
+        })
+
+        $(document).on("click", ".BtnDelete", function () {
+
+            $("#HIdDelEmpID").val($(this).attr("data-empid"));
+            $("#HIdDelCandID").val($(this).attr("data-candid"));
+            $("#EmpNameDelete").text($(this).attr("data-name"));
+            $("#DeleteModal").modal("show");
+        });
+
+        $("#deletesave").click(function () {
+
+            $.ajax({
+                url: "/Employee/Delete",
+                data: { EmpID: $("#HIdDelEmpID").val(), CandId: $("#HIdDelCandID").val() }
+            }).done(function (data) {
+                if (data > 0) {
+                    $("#DeleteModal").modal("hide");
+                    ListEmp();
+                    $.toast({
+                        text: "Deleted Successfully",
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+
+                    })
+                }
+                else {
+                    $.toast({
+                        text: "Deleting Failed",
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+
+                    })
+                }
+            });
+        });
+
+        $(document).on("click", '.BtnOffBoard', function () {
+            // 1: Requested to offboarding(Approve), 2: Noticeperiod Start(After Approve request), 3:Resign
+            var EmpId = $(this).attr('data-empid');
+            var status = $(this).attr('data-offstatus');
+            if (status == 0)
+            {
+                $.ajax({
+                    url: "/OFFBoarding/OFFBoardingRequest",
+                    data: { EmpId: EmpId }
+                }).done(function (data) {
+                    $("#OFFBoardingModal").html(data);
+
+                });
+                $("#OFFBoardingModal").modal('show');
+            }
+            else if (status == 1)
+            {
+                $.ajax({
+                    url: "/OFFBoarding/OffBoardingStatus",
+                    data: { EmpId: EmpId, status: 2 },
+                    async:false
+                }).done(function () {
+                });
+                window.location.href = "/Employee/Index";
+            }
+            else if (status == 2)
+            {
+                $.ajax({
+                    url: "/OFFBoarding/OffBoardingStatus",
+                    data: { EmpId: EmpId, status: 3 },
+                    async: false
+                }).done(function () {
+                });
+                window.location.href = "/Employee/Index";
+            }
+            else{}
+        });
+
+        //$("#StatusFilterID").change(function () {
+        //    ListEmployeeresult($(this).val());
+        //});
+
+    });
+
+</script>
+
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-users"></i>&nbsp;
+        Employees
+    </h1>
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
+    <ol class="breadcrumb">
+        <li><a href="/Candidate/Create?id=1"><i class="fa fa-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+}    
+</section>
+
+@*<div class="p-l-15 p-r-15 p-t-15">
+    <select aria-controls="example1" class="form-control" id="StatusFilterID">
+        <option value="0">All</option>
+        <option value="2">Employee Type User</option>
+        <option value="3">Organization Type User</option>
+    </select>
+</div>*@
+
+<div id="EmployeeList"></div>
+
+<div id="EmployeeCV"></div>
+
+<div class="modal fade" id="DocumentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Pending Documents</h4>
+        </div>
+
+        <div class="modal-content">
+            <div class="modal-body" id="ValidDocumentResults">
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!-- Modal Delete -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="hidden" id="HIdDelEmpID" />
+                <input type="hidden" id="HIdDelCandID" />
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <p class="deleteconfirm">Are you sure want to delete <span class="text-primary" id="EmpNameDelete"></span>?</p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="deletesave">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Offboarding request-->
+<div class="modal fade" id="OFFBoardingModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+</div>

@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "AddNew";
+    Layout = null;
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var select = $("#DepID");
+        select.empty();
+        select.prepend('<option value=0>--Select--</option>');
+        $.getJSON("/Grade/GetDepartment",
+            function (response) {
+                $.each(response, function (index, itemData) {
+                    select.append($('<option/>', {
+                        value: itemData.DepID,
+                        text: itemData.DepName
+                    }));
+                });
+            });
+
+
+
+        $("#DepID").change(function () {
+            var select1 = $("#DesigID");
+            select1.empty();
+            select1.prepend('<option value=0>Designation</option>');
+            $.getJSON("/Grade/GetDesignation", { depid: $("#DepID").val() },
+                function (response) {
+                    $.each(response, function (index, itemData) {
+                        select1.append($('<option/>', {
+                            value: itemData.DesigID,
+                            text: itemData.DesigName
+                        }));
+                    });
+                });
+        });
+
+        
+
+
+        $("#createsave").click(function () {
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            $('#addnewform').validate({
+
+                rules: {
+                    DesigID: {
+                        required: true,
+                        check_item_dropdown : true
+                    }
+                }
+                });
+                
+
+            if ($('#addnewform').valid()) {
+                $.ajax({
+                    type:"POST",
+                    url: "/Grade/Create",
+                    data: $("#addnewform").serialize()
+                }).done(function (data) {
+
+                    if (data.Result > 0) {
+                        $("#AddnewModal").modal("hide");
+                        List();
+                    }
+                        $.toast({
+                            text:data.Message,
+                            position: 'top-right',
+                            hideAfter: 2000,
+                            showHideTransition: 'slide',
+                            loader: false,
+
+                      })
+
+                });
+            }
+        });
+
+    })
+
+</script>
+
+<div class="modal-dialog" role="document">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add New Grade</h4>
+    </div>
+    <div class="modal-content">
+        <div class="modal-body">
+            <form class="projectadding form-horizontal col-sm-12" id="addnewform" novalidate>
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-3 control-label">Department</label>
+                    <div class="col-sm-8">
+                        <select class="form-control required" name="DepID" id="DepID"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                        <label for="Designation" class="col-sm-3 control-label">Designation</label>
+                        <div class="col-sm-8">
+                            <select class="form-control required" id="DesigID" name="DesigID"></select>
+                        </div>
+                    </div>
+                <div class="form-group">
+                    <label for="Gradename" class="col-sm-3 control-label">Grade</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control required" autocomplete="off" id="Gradename" name="Gradename">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer text-right">
+            <button type="button" class="btn btn-default" id="createsave">Save</button>
+            <button type="button" class="btn btn-default greybtn" data-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+</div>

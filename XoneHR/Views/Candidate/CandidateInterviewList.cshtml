@@ -1,0 +1,60 @@
+﻿@model IEnumerable<XoneHR.Models.CandidateDetails>
+
+@{
+    ViewBag.Title = "CandidateInterviewList";
+    Layout = null;
+}
+
+
+<section class="newforms">
+    <div class="row">
+        <div class="col-sm-6 searchDiv">
+            <div class="dataTables_length" id="example1_length">
+                <label>
+                    Show
+                    <select name="example1_length" aria-controls="example1" class="form-control input-sm">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    entries
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-6 searchFiler">
+            <div id="example1_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="example1"></label></div>
+        </div>
+    </div>
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Mobile No</th>
+                <th>Join Date</th>
+                <th>Nationality</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.CandName</td>
+                    <td>@item.DesigName</td>
+                    <td>@item.CandMobile</td>
+                    <td>@item.CandRegDate</td>
+                    <td>@item.Citizen</td>
+                    <td><a href="/Candidate/Candidateprofile?CandID=@item.CandID">Interview <i class="fa fa-arrow-right" ></i></a></td>
+                </tr>
+
+            }
+
+
+        </tbody>
+    </table>
+</section>

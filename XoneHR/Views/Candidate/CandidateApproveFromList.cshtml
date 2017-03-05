@@ -1,0 +1,391 @@
+﻿@model XoneHR.Models.CandidateDetails
+@{
+    ViewBag.Title = "CandidateApproveFromList";
+}
+<script src="~/XoneScripts/Pages/Layout.js"></script>
+
+<script>
+    function GetEmptype() {
+        var ddlBox = $("#EmpTypID");
+        $.ajax({
+            url: "/Candidate/GetEmployeeType",
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.EmpTypID + '>' + item.EmpTypName + '</option>').selectpicker('refresh');;
+            });
+        });
+    }
+
+    function GetFundTypes() {
+        var ddlBox = $("#FundType");
+        $.ajax({
+            url: "/Candidate/GetFundTypes",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.FundTypeID + '>' + item.FundType + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+    
+    function GetDay() {
+        $("#Emp_SetFixOffDay").empty();
+        $("#Emp_SetFixOffDay").append('<option value="-1">--Select--</option>').selectpicker('refresh');
+        $("#Emp_SetFixOffDay").append('<option value=' + 0 + '>' + "Sunday" + '</option>').selectpicker('refresh');
+        $("#Emp_SetFixOffDay").append('<option value=' + 6 + '>' + "Saturday" + '</option>').selectpicker('refresh');
+    }
+
+    function GetDayFixed() {
+        $("#RestDay_Fixed").empty();
+        $("#RestDay_Fixed").append('<option value="-1">--Select--</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="0">Sunday</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="1">Monday</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="2">Tuesday</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="3">Wenesday</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="4">Thursday</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="5">Friday</option>').selectpicker('refresh');
+        $("#RestDay_Fixed").append('<option value="6">Saturday</option>').selectpicker('refresh');
+    }
+
+    function LoadAllowanceLeave_Details() {
+        $.ajax({
+            url: "/Candidate/GetDesigAllowances",
+            data: { DesigID: $("#HidDesigID").val(), Empid: 0, CandID: $("#HidCandID").val() }
+        }).done(function (data) {
+            $("#AllowanceTab").html(data);
+        });
+
+        $.ajax({
+            url: "/Candidate/GetDesignationLeaves",
+            data: { DesigID: $("#HidDesigID").val(), Empid: 0, CandID: $("#HidCandID").val() }
+        }).done(function (data) {
+            $("#LeaveTab").html(data);
+        });
+    }
+</script>
+
+<script type="text/javascript" >
+    $(document).ready(function () {
+        GetEmptype();
+        GetFundTypes();
+
+        $('#EmpTypID').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='EmpTypID']").text('');
+            }
+            else {
+                $("label[for='EmpTypID']").text('Please select an item from the dropdown list.');
+            }
+        });
+        $('#StartDate').change(function () {
+            $(this).blur();
+        });
+        $("#div_funds").hide();
+        $("#div_levy").hide();
+        if ($("#Resident_Id").val() == 1 || $("#Resident_Id").val() == 2) {
+            GetFundTypes();
+            $("#div_funds").show();
+            $("#div_levy").hide();
+        }
+        else {
+            $("#div_funds").hide();
+            $("#div_levy").show();
+        }
+
+        $("#EmpEndDateDiv").hide();
+        $("#BSal_label").html("Basic Salary");
+        $("#div_Emp_PermenanentType").hide();
+
+        $("#EmpTypID").change(function () {
+
+            if ($("#EmpTypID").val() == 1) {
+                $("#EmpEndDateDiv").hide();
+                $("#DivPartemp").hide();
+                $("#BSal_label").html("Basic Salary");
+                $("#div_Emp_PermenanentType").show();
+            }
+            else if ($(this).val() == 2) {
+                $("#DivPartemp").show();
+                $("#EmpEndDateDiv").hide();
+                $("#div_Emp_PermenanentType").hide();
+                $("#Emp_PermenanentType").val(0);
+            }
+            else {
+                $("#EmpEndDateDiv").show();
+                $("#DivPartemp").hide();
+                $("#BSal_label").html("Basic Salary");
+                $("#div_Emp_PermenanentType").hide();
+                $("#Emp_PermenanentType").val(0);
+            }
+        });
+
+        $(".rd_PayStruct").change(function () {
+
+            if ($("#rd_PayStruct1").is(':checked') == 1) {
+
+                $("#BSal_label").html("Hourly Base Salary");
+            }
+            else if ($("#rd_PayStruct2").is(':checked') == 1) {
+
+                $("#BSal_label").html("Daily Base Salary");
+            }
+            else {
+                $("#EmpEndDateDiv").show();
+                $("#DivPartemp").hide();
+                $("#BSal_label").html("Basic Salary");
+            }
+        });
+
+        LoadAllowanceLeave_Details();
+
+        $("#BtnAddEmpDetails").click(function () {
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+            $.validator.addMethod("check_offday_dropdown", function (value, element) {
+                return this.optional(element) || value != -1;
+            }, "Please select an item from the dropdown list.");
+
+            $("#CandConfirmationForm").validate({
+                rules: {
+                    StartDate: {
+                        required: true,
+                        //date: true
+                    },
+                    Employeetyp: {
+                        required: true,
+                        check_item_dropdown: true
+                    },
+                    BasicSalary: {
+                        required: true,
+                        number: true
+                    },
+                    EmpPartTime_Pay: {
+                        required: true
+                    },
+                    EmpRegNo: {
+                        required: true
+                    },
+                    //Emp_SetOffDay: {
+                    //    required: true,
+                    //    check_offday_dropdown: true
+                    //}
+                    //RestDay_Optional: {
+                    //    required: true,
+                    //    check_offday_dropdown: true
+                    //},
+                    RestDay_Fixed: {
+                        required: true,
+                        check_offday_dropdown: true
+                    }
+                }
+            });
+            if ($("#CandConfirmationForm").valid()) {
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Candidate/AddNewEmployee",
+                    data: $("#CandConfirmationForm").serialize(),
+                    async:false
+                }).done(function (data) {
+
+                    if (data.Id==1) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Candidate/ApproveCandidate",
+                            data: { appStatus: 2,CandID: $("#HidCandID").val() }
+                        }).done(function (data) { });
+
+                        LoadAllowanceLeave_Details();
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        $('.nav-tabs > .active').next('li').find('a').trigger('click');
+                    }
+                    else if(data.Id==2)
+                    {
+                        $.toast({
+                            text: "Employee Code Already Registered",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                    else {
+                        $.toast({
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                });
+            }
+        });
+
+
+        $("#RestFix").hide(); //  $("#RestOp").show(); 
+        GetDayFixed();
+        $(".RestDayStatus").change(function () {
+            if ($(this).val() == 0) {
+              //  $("#RestOp").show();
+                $("#RestFix").hide();
+            }
+            else {
+               // $("#RestOp").hide();
+              //  GetDay();
+                $("#RestFix").show();
+            }
+        });
+
+    })
+</script>
+
+<input type="hidden" id="HidDesigID" value="@Model.DesigID" />
+
+<div class="modal-dialog" role="document">
+    <div class="modal-header">
+        <button type="button" class="close btnappmntformclose" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Candidate Approve</h4>
+    </div>
+    <div class="modal-content">
+        <div class="modal-body newforms">
+            <div class="tabsnew">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#EmpTab" aria-controls="home" role="tab" data-toggle="tab">Employee Details</a></li>
+                    <li role="presentation"><a href="#AllowanceTab" aria-controls="" role="tab" data-toggle="tab">Allowance Details</a></li>
+                    <li role="presentation"><a href="#LeaveTab" aria-controls="BasicSalary" role="tab" data-toggle="tab">Leave Details</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="EmpTab">
+                        <br />
+                        <form class="projectadding form-horizontal col-sm-12" action="#" id="CandConfirmationForm">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Employee Code</label>
+                                <div class="col-sm-4">
+                                    <span><input type="text" class="form-control required" name="EmpRegNo" id="EmpRegNo" autocomplete="off" /></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 text-left padding-0 control-label">Employment Type</label>
+                                <div class="col-sm-4">
+                                    <span><select class="form-control required" name="Employeetyp" id="EmpTypID"></select></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="div_Emp_PermenanentType">
+                                <label class="col-sm-3 control-label">Working Type</label>
+                                <div class="col-sm-4">
+                                    <span>
+                                        <select class="form-control required" name="Emp_PermenanentType" id="Emp_PermenanentType">
+                                            <option value="0">--Select--</option>
+                                            <option value="1">Permanent Day</option>
+                                            <option value="2">Permanent Night</option>
+                                        </select>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 text-left padding-0 control-label">Employment Start date</label>
+                                <div class="col-sm-4">
+                                    <span><input type="text" class="form-control daterangepicker-single required" id="StartDate" name="StartDate"></span> @*value="@Model.CandRegDate.ToString("dd/MM/yyyy")"*@
+                                    <input type="hidden" value="@Model.CandID" id="HidCandID" name="CandID" />
+                                </div>
+                            </div>
+                            <div class="form-group" id="EmpEndDateDiv">
+                                <label class="col-sm-3 text-left padding-0 control-label">Employment End date</label>
+                                <div class="col-sm-4">
+                                    <span><input type="text" class="form-control daterangepicker-single" name="EndDate"></span>
+                                </div>
+                            </div>
+                            <div class="form-group" id="DivPartemp">
+                                <label class="col-sm-3 control-label">Pay Structure</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group date">
+                                        <input type="radio" id="rd_PayStruct1" class="rd_PayStruct required" name="EmpPartTime_Pay" value=1 />Hourly Rate
+                                        <input type="radio" id="rd_PayStruct2" class="rd_PayStruct required" name="EmpPartTime_Pay" value=2 />Daily Rate
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 text-left padding-0 control-label" id="BSal_label"></label>
+                                <div class="col-sm-4">
+                                    <span><input type="text" class="form-control required" value="@Model.CandSalrexpted" name="BasicSalary" autocomplete="off"></span>
+                                </div>
+                            </div>
+                            <input type="hidden" value="@Model.Resident_Id" id="Resident_Id" />
+                            <div id="div_funds">
+                                <div class="form-group">
+                                    <label class="col-sm-3 text-left padding-0 control-label">CPF Contribution</label>
+                                    <div class="col-sm-4">
+                                        <label><input type="radio" name="CPF" value="1" checked="checked"> Yes</label>
+                                        <label><input type="radio" name="CPF" value="0"> No</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 text-left padding-0 control-label">Other Fund Types</label>
+                                    <div class="col-sm-4">
+                                        <span><select class="form-control required" name="FundType" id="FundType" @*multiple="multiple"*@></select></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" id="div_levy">
+                                <label class="col-sm-3 text-left padding-0 control-label">Levy</label>
+                                <div class="col-sm-4">
+                                    <input type="text" id="Levy" class="form-control required" name="Levy" placeholder="Levy" autocomplete="off" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Off Day Type</label>
+                                <div class="col-sm-4">
+                                    <label><input type="radio" name="RestDay_Type" class="RestDayStatus" value="0" checked="checked">Optional</label>
+                                    <label><input type="radio" name="RestDay_Type" class="RestDayStatus" value="1">Fixed</label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="RestFix">
+                                <label class="col-sm-3 control-label">Off Day</label>
+                                <div class="col-sm-4">
+                                    <select class="selectpicker required" name="RestDay_Fixed" id="RestDay_Fixed">                                       
+                                    </select>
+                                </div>
+                            </div>
+
+                            @*<div class="form-group" id="RestFix">
+                                <label class="col-sm-3 control-label">Off Day</label>
+                                <div class="col-sm-4">
+                                    <span>
+                                        <select class="selectpicker required" name="RestDay_Fixed" id="Emp_SetFixOffDay" multiple="multiple"></select>
+                                    </span>
+                                </div>
+                            </div>*@
+                            <input type="hidden" name="Emp_IsApproved" value="false" />
+                            <div class="form-group">
+                                <label class="col-sm-3">&nbsp;</label>
+                                <button type="button" class="btn btn-sm btn-success" id="BtnAddEmpDetails">Save<i class="fa fa-floppy-o"></i></button>
+                            </div>                            
+                        </form>
+                    </div>
+                    <div role="tabpanel" class="tab-pane fade" id="AllowanceTab"></div>
+                    <div role="tabpanel" class="tab-pane fade" id="LeaveTab"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer text-right">
+        </div>
+    </div>
+</div>

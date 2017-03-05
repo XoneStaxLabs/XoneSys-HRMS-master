@@ -1,0 +1,499 @@
+﻿@model XoneHR.Models.ProjectComponentList
+@{
+    ViewBag.Title = "ListProjectWiseEmp";
+    Layout = null;
+    var i = 0;
+    var Workstatus = "";
+    var Workstatusvalue = 0;
+    var flag = 0;
+    XoneHR.Models.BAL.ProjectBalLayer projectObj = new XoneHR.Models.BAL.ProjectBalLayer();
+    
+}
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#ConfirmReliefempsmall").modal('hide');
+        //Timepicker
+        $(".timepicker").timepicker({
+            showInputs: false
+        });
+
+        $(".Addattendance").each(function () {
+            if ($(".AttenCnt_cls" + $(this).attr('data-status')).val() > 0)
+            {
+                $("#Addattendance" + $(this).attr('data-status')).attr("checked", "checked");
+            }
+        });
+
+        $(".ReliefConfirmpopup").click(function () {
+
+            $("#ConfirmReliefempsmall").modal('show');
+
+            $("#HiddenReliefempname").html($(this).attr('data-name'));
+            $("#HiddenProjectID").val($(this).attr('data-projid'));
+            $("#Hiddenabsempid").val($(this).attr('data-absempid'));
+            $("#Hiddenabsallempid").val($(this).attr('data-absallempid'));
+            $("#HiddenEmpMobs").html($(this).attr('data-candmobile'));
+            $("#HiddenEmpTypes").html($(this).attr('data-emptypname'));
+
+            $("#HidAbsentEmp").val($(this).attr('data-absempid'));
+            $("#HidAllocateEmp").val($(this).attr('data-absallempid'));
+                     
+            if($(this).attr('data-reliefconfirmchk') == "1")
+            {                
+                $("#ReliefConfirmChk").attr("checked", "checked");
+            }           
+
+        });
+
+        $("#btnconfirm").click(function () {
+
+            var Chkvalue = 0;
+            if ($("#ReliefConfirmChk").is(':checked')) {
+
+                Chkvalue = 1;
+            }
+            
+            var date = $("#StartDate").val().toString("dd/MM/yyyy");
+
+            $.ajax({
+                type: "POST",
+                url: "/Project/UpdateManageAbsenceAllocation",
+                data: { ProjID: $("#HiddenProjectID").val(), AbsEmpID: $("#Hiddenabsempid").val(), AbsallEmpID: $("#Hiddenabsallempid").val(), AbsDateFrom: $("#StartDate").val(), ReliefConfirmation: Chkvalue }
+            }).done(function (data) {
+                if (data == 1)
+                {
+                    window.location.href = "/Project/ProjectAttendance?ProjID=" + $("#HiddenProjectID").val() + "&AbsDateFrom= " + $("#StartDate").val() + " ";
+
+                }
+                else if (data == -1)
+                {
+                    MsgAlert("Can't Allocate This Employee", 'warning');
+
+                }
+                   
+            });
+
+        });
+
+        function MsgAlert(data, icon) {
+            $.toast({
+                text: data,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: icon
+            })
+        }
+
+        $(".RemoveAllocationBtn").click(function () {           
+            $.ajax({
+                type: "POST",
+                url: "/Project/RemoveAbsenceAllocation",
+                data: { AbsentEmp: $("#HidAbsentEmp").val(), AllocateEmp: $("#HidAllocateEmp").val(), Date: $("#StartDate").val() }
+            }).done(function (data) {               
+                MsgAlert("Removed this allocation", 'success');
+                window.location.href = "/Project/ProjectAttendance?ProjID=" + $("#HiddenProjectID").val() + "&AbsDateFrom= " + $("#StartDate").val() + " ";
+            });
+        });
+        
+
+    });
+
+</script>
+
+ 
+<input type="hidden" id="HiddenProjectID" />
+<input type="hidden" id="Hiddenabsempid" />
+<input type="hidden" id="Hiddenabsallempid" />
+
+@foreach(var main in Model.ProjObj)
+{ 
+<div class="col-sm-12">
+    <div class="box-body  no-padding">@*table-responsive*@
+        <h4>Project Name :&nbsp; @main.ProjName &nbsp;&nbsp;&nbsp; Attendance Date :&nbsp; @ViewBag.Date</h4>
+        
+        <input type="hidden" value="@main.ProjID" name="ProjID" />
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>ID</th>
+                    <th>Name</th>                    
+                    <th>Grade</th>
+                    <th>Work Status</th>
+                    <th>shift</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>Relief</th>
+                    <th>Status</th>
+                </tr>
+               
+            </thead>   
+                   
+            <tbody>
+              @{var list = Model.ProjList.Where(p => p.ProjID == main.ProjID).ToList();}
+
+                    @foreach (var item in list)
+                    {
+                        i++;
+                        
+                        var Absenceallolist = Model.EmpAbsnceAllcateobj.Where(p => p.ProjID == main.ProjID && p.AbsEmpID == item.EmpID).FirstOrDefault();
+                        var allocatecount = Model.EmpAbsnceAllcateobj.Where(m => m.AbsEmpID == item.EmpID).Count();
+                        if (allocatecount == 0)
+                        {
+                            <tr class=@("tr_row"+i) >
+                                <td><input type="checkbox" class="Addattendance" id=@("Addattendance"+i) data-status="@i" data-EmpID="@item.EmpID"/></td>
+                                <td>@i</td>
+                                <td>
+                                    @item.CandName
+                                    <input type="hidden" name="EmpID" value="@item.EmpID" class=@("EmpId_cls"+i) />
+                                </td>
+                                <td>@item.Gradename</td>
+                                <td>
+                                    @{
+                                        var Leavecount = projectObj.GetEMployeeLeave(item.EmpID, ViewBag.LeaveDate);
+                                        var OffDaycount = projectObj.GetOffdayStatus1(item.EmpID, ViewBag.Date);
+                                     }
+                                                                       
+                                    @if (Leavecount > 0)
+                                    {
+                                        //Workstatus = "Not Working";
+                                        Workstatus = "Leave";
+                                        Workstatusvalue = 0;                                       
+                                    }
+                                    else if (OffDaycount == true)
+                                    {
+                                        Workstatus = "OFF";
+                                        Workstatusvalue = 0;
+                                    }
+                                    else //if (Leavecount == 0)
+                                    {
+                                        Workstatus = "Working";
+                                        Workstatusvalue = 1;
+                                    }
+                                    @Workstatus
+                                    <input type="hidden" value="@Workstatusvalue" name="Workstatusvalue" />
+                                </td>
+                                <td>@item.ShiftName</td>
+
+                                @{var AttenCnt = Model.GetAttendanceobj.Where(m => m.EmpID == item.EmpID).Count();
+
+                                    if (AttenCnt != 0)
+                                    {
+                                        var AttenEmpTime = Model.GetAttendanceobj.Where(m => m.EmpID == item.EmpID).First();
+
+                                        <td>
+                                            <input type="hidden" class=@("AttenCnt_cls"+i) value="@AttenCnt"/>
+                                            <div class="bootstrap-timepicker">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control timepicker @("ShiftFrom_cls"+i)" name="ShiftFrom" readonly="readonly" id="ShiftFrom" value="@AttenEmpTime.AttendtimeIN" required>
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="bootstrap-timepicker">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control timepicker @("ShiftTo_cls"+i)" name="ShiftTo" readonly="readonly" id="ShiftTo" value="@AttenEmpTime.AttendtimeOut" required>
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                </div><!-- /.input group -->
+                                            </div>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <input type="hidden" class=@("AttenCnt_cls"+i) value="@AttenCnt" />
+                                            <div class="bootstrap-timepicker">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control timepicker @("ShiftFrom_cls"+i)" name="ShiftFrom" readonly="readonly" id="ShiftFrom" value="@item.ShiftFrom" required>
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="bootstrap-timepicker">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control timepicker @("ShiftTo_cls"+i)" name="ShiftTo" readonly="readonly" id="ShiftTo" value="@item.ShiftTo" required>
+                                                    <div class="input-group-addon">
+                                                        <i class="fa fa-clock-o"></i>
+                                                    </div>
+                                                </div><!-- /.input group -->
+                                            </div>
+                                        </td>
+                                    }                                    
+                                   }
+
+                                <td>
+                                    <select class="form-control RelifEmp" name="RelifeEmpName">
+                                        <option value="0">--Select--</option>
+                                        @*<option value="Absenceallolist.AbsallEmpID" selected>Absenceallolist.CandName</option>
+                                            @{var Ilists = Model.EmpReliefConfirm.Where(p => p.EmpID != item.EmpID ).ToList();}*@
+                                        @foreach (var Relif in Model.EmpReliefConfirm)
+                                        {
+                                            if (Absenceallolist == null)
+                                            {
+                                                if (item.EmpID != Relif.EmpID)
+                                                {
+                                                    <option value="@Relif.EmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" data-typeid="@Relif.EmpTypID" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="False">@Relif.CandName</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (Absenceallolist.AbsEmpID == Relif.EmpID)
+                                                {
+                                                    <option value="@Absenceallolist.AbsallEmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" selected data-typeid="@Relif.EmpTypID" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="@Absenceallolist.ReliefConfirmation">@Absenceallolist.CandName</option>
+                                                    <option value="@Absenceallolist.AbsEmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="False">@item.CandName</option>
+                                                }
+                                                else if (Relif.EmpID != Absenceallolist.AbsallEmpID)
+                                                {
+                                                    <option value="@Relif.EmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" data-typeid="@Relif.EmpTypID" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="False">@Relif.CandName</option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                </td>
+
+                                <td>
+                                    @{var AttendFlag = Model.GetAttendanceobj.Where(m => m.EmpID == item.EmpID).Count();}
+
+                                    @if (AttendFlag == 0)
+                                    {
+                                        <span class="label label-sm label-success">Pending </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-sm label-info"> Added </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            var allocateList = Model.EmpAbsnceAllcateobj.Where(m => m.AbsEmpID == item.EmpID).ToList();
+                            foreach (var allocateitem in allocateList)
+                            {
+                            <tr>
+                                <td>
+                                @if (allocateitem.ReliefConfirmation == true)
+                                {
+                                    <input type="checkbox" class="Addattendance" id=@("Addattendance"+i) data-status="@i" data-EmpID="@allocateitem.AbsallEmpID"/>
+                                }
+                                else
+                                {
+                                    <input type="checkbox" class="Addattendance" disabled="disabled" id=@("Addattendance"+i) data-status="@i" data-empid="@allocateitem.AbsallEmpID" />
+                                }
+                                </td>
+                                <td>@i</td>
+                                <td>
+                                    @if (allocateitem.ReliefConfirmation == true)
+                                    {
+                                        @*<a style="color:green">@allocateitem.CandName</a>*@
+                                        <a href="#" style="color:green" class="ReliefConfirmpopup" data-name="@allocateitem.CandName" data-candmobile="@allocateitem.CandMobile" data-emptypname="@allocateitem.EmpTypName" data-projid="@allocateitem.ProjID" data-absempid="@allocateitem.AbsEmpID" data-absallempid="@allocateitem.AbsallEmpID" data-reliefconfirmchk="1">@allocateitem.CandName</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="#" class="ReliefConfirmpopup" data-name="@allocateitem.CandName" data-candmobile="@allocateitem.CandMobile" data-emptypname="@allocateitem.EmpTypName" data-projid="@allocateitem.ProjID" data-absempid="@allocateitem.AbsEmpID" data-absallempid="@allocateitem.AbsallEmpID" style="color:red" data-reliefconfirmchk="0">@allocateitem.CandName</a>
+                                    }
+                                    (@item.CandName)
+                                    
+                                    <input type="hidden" name="EmpID" value="@allocateitem.AbsallEmpID" class=@("EmpId_cls"+i) />
+                                </td>
+                                <td>@allocateitem.Gradename</td>
+                                <td>
+                                   @{var LeavesCounts = projectObj.GetEMployeeLeave(allocateitem.AbsallEmpID, ViewBag.LeaveDate);}
+                                    @if (LeavesCounts == 0)
+                                    {
+                                        Workstatus = "Working";
+                                        Workstatusvalue = 1;
+                                    }
+                                    else
+                                    {
+                                        //Workstatus = "Not Working";
+                                        Workstatus = "Leave";
+                                        Workstatusvalue = 0;
+                                    }
+                                    @Workstatus
+                                    <input type="hidden" value="@Workstatusvalue" name="Workstatusvalue" />
+                                </td>
+                                <td>@item.ShiftName</td>
+
+                                @{
+                                var AttCnt = Model.GetAttendanceobj.Where(m => m.EmpID == allocateitem.AbsallEmpID).Count();
+
+                                if (AttCnt != 0)
+                                {
+                                    var AttendTime = Model.GetAttendanceobj.Where(m => m.EmpID == allocateitem.AbsallEmpID).First();
+                                    
+                                    <td>
+                                        <input type="hidden" class=@("AttenCnt_cls"+i) value="@AttCnt" />
+                                        <div class="bootstrap-timepicker">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control timepicker @("ShiftFrom_cls"+i)" name="ShiftFrom" readonly="readonly" id="ShiftFrom" value="@AttendTime.AttendtimeIN" required>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bootstrap-timepicker">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control timepicker @("ShiftTo_cls"+i)" name="ShiftTo" readonly="readonly" id="ShiftTo" value="@AttendTime.AttendtimeOut" required>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                            </div><!-- /.input group -->
+                                        </div>
+                                    </td>
+
+                                }
+                                else
+                                {
+                                    <td>
+                                        <input type="hidden" class=@("AttenCnt_cls"+i) value="@AttCnt" />
+                                        <div class="bootstrap-timepicker">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control timepicker @("ShiftFrom_cls"+i)" name="ShiftFrom" readonly="readonly" id="ShiftFrom" value="@item.ShiftFrom" required>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="bootstrap-timepicker">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control timepicker @("ShiftTo_cls"+i)" name="ShiftTo" readonly="readonly" id="ShiftTo" value="@item.ShiftTo" required>
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                </div>
+                                            </div><!-- /.input group -->
+                                        </div>
+                                    </td>
+                                }
+                               }
+
+                                <td>
+                                    <select class="form-control RelifEmp" name="RelifeEmpName">
+                                        <option value="0">--Select--</option>
+
+                                        @*<option value="Absenceallolist.AbsallEmpID" selected>Absenceallolist.CandName</option>
+                                        @{var Ilists = Model.EmpReliefConfirm.Where(p => p.EmpID != item.EmpID ).ToList();}*@
+                                        @foreach (var Relif in Model.EmpReliefConfirm)
+                                        {
+                                            if (Absenceallolist == null)
+                                            {
+                                                if (item.EmpID != Relif.EmpID)
+                                                {
+                                                    <option value="@Relif.EmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" data-typeid="@Relif.EmpTypID" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="False">@Relif.CandName</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                if (Absenceallolist.AbsEmpID == Relif.EmpID)
+                                                {
+                                                    <option value="@Absenceallolist.AbsallEmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" selected data-typeid="@Relif.EmpTypID" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="@Absenceallolist.ReliefConfirmation">@Absenceallolist.CandName</option>
+                                                    <option value="@Absenceallolist.AbsEmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="False">@item.CandName</option>
+                                                }
+                                                else if (Relif.EmpID != Absenceallolist.AbsallEmpID)
+                                                {
+                                                    <option value="@Relif.EmpID" data-projectid="@main.ProjID" data-oldempid="@item.EmpID" data-oldempname="@item.CandName" data-typeid="@Relif.EmpTypID" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile" data-workstatus="@Workstatus" data-reliefconfirmation="False">@Relif.CandName</option>
+                                                }
+                                            }
+                                        }
+
+                                    </select>
+                                </td>
+
+                                <td>
+
+                                    @{var AttendFlag = Model.GetAttendanceobj.Where(m => m.EmpID == allocateitem.AbsallEmpID).Count();}
+
+                                    @if (AttendFlag == 0)
+                                    {
+                                        <span class="label label-sm label-success">Pending </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-sm label-info"> Added </span>
+
+                                    }
+                                </td>
+                            </tr>                        
+                            }
+                        }
+                    }                        
+            </tbody>            
+        </table>
+        <hr />
+    </div><!-- /.box-body -->
+</div>
+}
+
+
+<div id="ConfirmReliefempsmall" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Relief Employee Confirmation :</h4><h4 id="LeaveDateLabel"> </h4> 
+                <button type="button" class="RemoveAllocationBtn">Remove Allocation</button>              
+            </div>
+            <div class="modal-body">                
+                <form class="form-horizontal" name="RelefEmpConfirmationfrm" id="RelefEmpConfirmationfrm">
+
+                    <div class="row">
+                        <div class="col-xs-12">
+
+                            <table>
+                                <tr>
+                                    <td>Relief Employee :</td>
+                                    <td><label id="HiddenReliefempname"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>Employee Type:</td>
+                                    <td><label id="HiddenEmpTypes"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>Mobile:</td>
+                                    <td><label id="HiddenEmpMobs"></label></td>
+                                </tr>
+                                <tr>
+                                    <td>Is Confirmed: </td>
+                                    <td><input type="checkbox" id="ReliefConfirmChk" /></td>
+                                </tr>
+                            </table>
+
+                            <input type="hidden" id="Hidreliefempid" />
+                            <input type="hidden" id="HIdleavedate" />
+                            <input type="hidden" id="HIdProjectID" />
+                            <input type="hidden" id="OldEmpOD" />
+
+                            <input type="hidden" id="HidAbsentEmp" />
+                            <input type="hidden" id="HidAllocateEmp" />
+                        </div>   <br />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer"> 
+                <button type="button" class="btn green" id="btnconfirm">Confirm</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div>
+</div>
+
+
+
+ 

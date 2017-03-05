@@ -1,0 +1,157 @@
+﻿@model XoneHR.Models.ProjectDetails
+@{
+    ViewBag.Title = "Roster";
+}
+
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" /> 
+
+<script type="text/javascript">
+
+    function ComboListMonths() {
+
+        var ddlBox = $("#ddlMonths");
+
+        $.ajax({
+            url: "/Project/ComboListMonths"
+            
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.MonthID + '>' + item.MonthNames + '</option>').selectpicker('refresh');
+            });
+
+
+        });
+
+
+
+    }
+      
+    function Shiftlist(monthcode) {
+
+        $.ajax({
+
+            type: "GET",
+            url: "/Project/Shiftlist",
+            async: false,
+            data: { projectID: $("#ProjectsID").val(), monthcode: monthcode }
+
+
+        }).done(function (data) {
+
+           
+            $("#ShiftListDatas").html(data);
+           
+
+        });
+
+
+    }
+
+    $(document).ready(function () {
+
+        ComboListMonths();
+        
+       
+
+        $("#ddlMonths").change(function () {
+
+            Shiftlist($(this).val());
+
+        });      
+
+
+    })
+
+
+</script>
+
+
+
+
+<input type="hidden" id="ProjectsID" value="@ViewBag.ProjectID" />
+
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-clock-o"></i>&nbsp;Roster
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="/Project/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+
+
+</section>
+
+<section class="newforms">
+
+    <form id="RosterFormID">
+
+        <div class="row rosterTop">
+            <input type="hidden" id="FromDates" value="@Model.ProjFrom"/>
+            <input type="hidden" id="ToDates" value="@Model.ProjTo" />
+            <div class="projectRow">
+                <p><span class="proname">Project Name</span><span class="prodet">@Model.ProjName</span></p>
+            </div>
+            <div class="projectRow">
+                <p><span class="proname">No of Shift</span><span class="prodet">@Model.ProjNoofShift</span></p>
+            </div>
+            <div class="projectRow">
+                <p><span class="proname">Total No of Employees</span><span class="prodet">@Model.ProjEmpno</span></p>
+            </div>
+        </div>
+        <div class="row monthadd">
+            <div class="col-sm-12">
+                <h2>Work Schedule</h2>
+            </div>
+            <div class="col-sm-4 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-yellow"><i class="fa fa-calendar"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">For Month</span>
+                        <select class="selectpicker" id="ddlMonths"></select>
+
+                    </div>
+                </div>
+              
+            </div>
+          
+        </div>
+        <div class="row sheduleNew">
+            <div class="col-sm-12">
+
+
+
+                <div class="shift" id="ShiftListDatas">
+
+
+
+
+
+                </div>
+
+              
+
+            </div>
+
+
+
+
+        </div>
+
+    </form>
+
+    
+
+</section>
+
+
+
+

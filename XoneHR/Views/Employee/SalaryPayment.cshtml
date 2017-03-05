@@ -1,0 +1,691 @@
+﻿@{
+    ViewBag.Title = "SalaryPayment";
+}
+
+<script src="~/XoneScripts/Files/Angular.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#txtStartdate').datetimepicker();
+        
+        getSalary();
+
+        $("#BtnAddnewSalary").click(function () {
+
+            getSalaryDates();
+            $("#AddNewSalarymodal").modal('show');
+
+        });
+
+        $("#BtnAddNewSalary").click(function () {
+
+            $.ajax({
+
+                type: "POST",
+                url: "/Employee/AddNewSalary",
+                data: $("#AddSalaryForm").serialize()
+
+            }).done(function (data) {
+
+                if (data) {
+
+                    $.toast({
+
+                        text: "Saved Successfully",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                    getSalary();
+
+                    $("#AddNewSalarymodal").modal('hide');
+                    $("#txtBasicsalary").val("");
+                    $("#txtStartdate").val("");
+
+
+                }
+                else {
+                    $.toast({
+
+                        text: "Saved Failed",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+
+                }
+
+
+            })
+
+        })
+
+        var year = $("#year");
+        year.empty();
+        $('<option>', { value: 0, text: "Year" }).appendTo(year);
+        for (i = 2015; i <= 2035; i++) {
+            $('<option>', { value: i, text: i }).appendTo(year);
+        }
+
+        GetYear_Deduction();
+
+        $('.daterangepicker-single').daterangepicker({
+            "singleDatePicker": true,
+            format: "DD/MM/YYYY"
+        });
+
+        $.ajax({
+            url: "/Employee/AllowancePayment",
+            data: { EmpId: $("#EmpId").val() }
+        }).done(function (data) {
+           
+            $("#AllowanceTab").html("");
+            $("#AllowanceTab").html(data);           
+        });
+
+        //$("#BtnPayment").click(function () {
+        $(document).on("click", ".BtnPayment", function () {
+            
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            $("#salarypay").validate({
+                rules: {
+                    SalYear: {
+                        required: true,
+                        check_item_dropdown: true
+                    },
+                    SalMonth: {
+                        required: true,
+                        check_item_dropdown: true
+                    },
+                    PayDate: {
+                        required: true,
+                       // date: true
+                    },
+                    PayAmount: {
+                        required: true
+                    },
+                    PayType: {
+                        required: true,
+                        check_item_dropdown: true
+                    },
+                    PayMode: {
+                        required: true,
+                        check_item_dropdown: true
+                    }
+                }
+            });
+
+            if ($("#salarypay").valid()) {
+
+                $.ajax({
+                    url: "/Employee/SaveSalaryDetails",
+                    data: $("#salarypay").serialize()
+                }).done(function (data) {
+                    if (data == 1) {
+
+                        $.toast({
+
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        window.location.href = "/Payroll/Index";
+
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                });
+            }
+
+        });
+
+        $(document).on("click", ".addnewAllw", function (){
+          
+            $.ajax({
+                // url: "/Employee/AllowanceListing",
+                url:"/Employee/AllowancePayment_ShowDetails",
+                data: { EmpId: $("#EmpId").val(), year: $("#year").val(), month: $("#month").val() }
+            }).done(function (data) {
+                $("#AllowanceTab").html("");
+                $("#AllowanceTab").html(data);
+                //$("#AllowanceList").html(data);
+                //$("#Allowancemodal").modal('show');
+            });
+                       
+        });               
+      
+    });
+
+    //Angular*************
+    var app = angular.module("MyDeductTabApp", []);
+    app.controller("MyDeductTabCntrl", function ($scope, $http) {
+        function MsgAlert(data, icon) {
+            $.toast({
+                text: data,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: icon
+            })
+        }
+
+        $scope.DeductItems = new Array();
+        $scope.DeductItems = [];
+        $scope.DeductTypeArray = new Array();
+        $scope.DeductTypeArray = [];
+        GetDeductionTypes();
+    
+        function GetDeductionTypes() {            
+            $http({
+                method: "GET",
+                url: "/Employee/GetDeductionTypes"
+            }).success(function (data) {
+
+                $scope.DeductTypeArray = data; //alert(JSON.stringify(data));
+                //  $scope.DeductTypeArray = $filter('orderBy')($scope.DeductTypeArray, 'key', false)  
+            });
+        }        
+
+        $scope.BtnAddDeduct = function () {
+            var flag=0;
+            if ($("#Deduct_year").val() == 0)
+            { flag = 1; MsgAlert("Please select Year", "error") }
+            if ($("#Deduct_month").val() == 0)
+            { flag = 1; MsgAlert("Please select Month", "error") }
+            if ($("#DeductType").val() == "" || $("#DeductType").val() == 0 || $("#DeductType").val() == null)
+            { flag = 1; MsgAlert("Please select Deduction Type", "error") }
+            if ($("#Deduct_Amount").val() == "")
+            { flag = 1; MsgAlert("Please Enter Deduction Amount", "error") }
+            if (flag == 0)
+            {
+                for (var i = 0; i < $scope.DeductItems.length; i++)
+                {
+                    if($scope.DeductItems[i].DeductType_Id == $scope.DeductType.DeductType_Id)
+                    {
+                        flag = 1;
+                        MsgAlert('Data will be already Added', 'error');
+                    }                   
+                }                  
+            }
+            if(flag == 0)
+            {
+                $scope.DeductItems.push({ 'DeductType_Id': $scope.DeductType.DeductType_Id, 'Deduction': $scope.DeductType.DeductionType, 'Amount': $scope.Deduct_Amount, 'DeductYear': $("#Deduct_year").val(), 'MonthName': $("#Deduct_month option:selected").text(), 'DeductMonth': $("#Deduct_month").val(), 'Remarks': $scope.Deduct_Remark });
+                $("#DeductType").val("");
+                $("#Deduct_Amount").val("");
+                $("#Deduct_Remark").val(""); $scope.Deduct_Remark = "";
+                //$("#Deduct_year").val(0);
+                //$("#Deduct_month").val(0);
+            }
+        };
+
+        $scope.DeductTypeChange = function () {
+            if ($scope.DeductType.DeductType_Id == 0)
+            {
+                $("#AddnewModal").modal("show");
+            }           
+        };
+
+        $scope.submit = function () {
+            $('#addnewform').validate();
+            if ($('#addnewform').valid()) {
+
+                $http({
+                    method: "GET",
+                    url: "/Employee/DeductionTypeSave",
+                    params: { DeductionType: $scope.DeductionType }
+                }).success(function (data) {
+                    if (data == 1) {
+                        $.toast({
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 2000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        $("#AddnewModal").modal("hide");
+                        GetDeductionTypes();
+                    }
+                });
+            }
+        }
+
+        $scope.BtnFinalSave = function () {
+            $http({
+                method: "POST",
+                url: "/Employee/SaveDeductions",
+                params: { List: angular.toJson($scope.DeductItems),EmpId: $("#Deduct_EmpId").val() }
+            }).success(function (data) {
+                MsgAlert('Deductions Saved Successfully', 'success');
+            });
+        };
+
+        $scope.removeItem = function (item) {            
+            if (item.DeductionID != 0) {
+                $http({
+                    method: "POST",
+                    url: "/Employee/DeleteDeductionType",
+                    params: { DeductType_Id: item.DeductType_Id }
+                }).success(function (data) {
+                    MsgAlert('Row is Deleted', 'success');
+                });
+            }
+            var index = $scope.DeductItems.indexOf(item)
+            $scope.DeductItems.splice(index, 1);
+        }
+
+        $scope.editItemS = function (item) {
+            if (item.DeductionID != 0) {
+                var index = $scope.DeductItems.indexOf(item)               
+                $("#Deduct_year").val(item.DeductYear);
+                $("#Deduct_month").val(item.DeductMonth);
+                $("#DeductType").val(item.DeductionID);
+                $("#Deduct_Amount").val(item.Amount);
+                $("#Deduct_Remark").val(item.Remarks);
+            }
+        }
+
+        $scope.MonthChange = function () {
+            $http({
+                method: "GET",
+                url: "/Employee/ListDeductions",
+                params: { Year: $("#Deduct_year").val(), Month: $("#Deduct_month").val(), EmpID:$("#Deduct_EmpId").val() }
+            }).success(function (data) {
+                $scope.DeductItems = data;   
+            });
+        }
+
+        $scope.YearChange = function () {
+            $http({
+                method: "GET",
+                url: "/Employee/ListDeductions",
+                params: { Year: $("#Deduct_year").val(), Month: $("#Deduct_month").val(), EmpID: $("#Deduct_EmpId").val() }
+            }).success(function (data) {
+                $scope.DeductItems = data;
+            });
+        }
+                       
+                
+    });
+    //********************
+</script>
+
+<script>
+    function getSalary() {
+        $.ajax({
+
+            type: "get",
+            url: "/Employee/ListEmployeeSalary",
+            data: { EmpID: $("#EmpId").val() }
+        }).done(function (data) {
+
+            $("#ListSalary").html(data);
+
+        });
+    }
+    
+    function getSalaryDates() {
+
+        $.ajax({
+
+            type: "get",
+            url: "/Employee/GetEmployeeDates",
+            data: { EmpID: $("#EmpId").val() }
+        }).done(function (data) {
+
+            var between = [];
+            var start = new Date(parseInt(data.SalStartDate.substr(6)));
+            var end = new Date(parseInt(data.SalEndDate.substr(6)));
+            var currentDate = new Date(start);
+            
+            while (currentDate <= end) {
+
+                between.push(new Date(currentDate));
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+
+
+            $('#txtStartdate').data('DateTimePicker').destroy();
+
+            $('.leavepicker').datetimepicker({
+                format: "DD/MM/YYYY",
+                disabledDates: between
+            });
+
+
+        });
+    }
+
+    function GetYear_Deduction() {        
+        var Deduct_year = $("#Deduct_year");
+        $('<option>', { value: 0, text: "Year" }).appendTo(Deduct_year);
+       // $("select[name='Year'] option:gt(0)").attr("disabled", "disabled");
+        for (i = 2015; i <= 2035; i++) {
+            $('<option>', { value: i, text: i }).appendTo(Deduct_year);
+        }
+    }
+</script>
+
+<style>
+    .DeductionForm {
+        padding-top: 45px;
+        padding-bottom: 30px;
+    }
+    .table {
+        width: 60%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+</style>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+        Payment Details
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/Payroll/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+
+<section class="newforms">
+    
+    <div class="tabsnew">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">           
+            <li role="presentation" class="active"><a href="#BasicSalary" aria-controls="BasicSalary" role="tab" data-toggle="tab">Edit Basic Salary</a></li>
+            <li role="presentation"><a href="#AllowanceTab" aria-controls="home" role="tab" data-toggle="tab">Allowance Details</a></li>
+            <li role="presentation"><a href="#SalaryPaymentTab" aria-controls="DesigAssignment" role="tab" data-toggle="tab">Advance Payment Details</a></li>
+            <li role="presentation"><a href="#DeductionTab" aria-controls="Deduction" role="tab" data-toggle="tab">Deduction Details</a></li>
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <div role="tabpanel" class="tab-pane fade" id="AllowanceTab">
+                <div class="col-sm-3">
+                   
+                </div>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="SalaryPaymentTab">
+                <form class="salpay" id="salarypay" action="#">
+                    <div class="form-group">
+                        <input type="hidden" name="EmpId" id="EmpId" value="@ViewBag.empid" />
+                        <label class="col-sm-3 control-label">Year</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="year" name="SalYear"></select>
+                        </div>
+                        <label class="col-sm-3 control-label">Salary Month</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="month" name="SalMonth">
+                                <option value='0'>Month</option>
+                                <option value='1'>Janaury</option>
+                                <option value='2'>February</option>
+                                <option value='3'>March</option>
+                                <option value='4'>April</option>
+                                <option value='5'>May</option>
+                                <option value='6'>June</option>
+                                <option value='7'>July</option>
+                                <option value='8'>August</option>
+                                <option value='9'>September</option>
+                                <option value='10'>October</option>
+                                <option value='11'>November</option>
+                                <option value='12'>December</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Payment Date</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control daterangepicker-single required" id="PayDate" name="PayDate" placeholder="Date">
+                        </div>
+                        <label class="col-sm-3 control-label">Amount</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control required" name="PayAmount" placeholder="Salary Amount" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Salary Type</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="SalType" name="PayType">                           
+                               
+                                <option value="2">Advance Payment</option>
+
+                            </select>
+                        </div>
+                        <label class="col-sm-3 control-label">Payment Mode</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" id="PayMode" name="PayMode">
+                                <option value="0">Payment Mode</option>
+                                <option value="1">Bank</option>
+                                <option value="2">On hand</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-sm btn-info BtnPayment" id="BtnPayment">Save<i class="fa fa-floppy-o"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <div role="tabpanel" class="tab-pane active" id="BasicSalary">                
+                <div class="table-responsive">
+                   
+                    <a href="#" class="btn btn-danger" id="BtnAddnewSalary">Add New</a>
+
+                    <table class="table no-margin">
+                        <thead>
+                            <tr>
+                                <th style="width:15%;">Basic Salary</th>
+                                <th>Start</th>
+                                <th>End</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ListSalary">
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            
+            <div role="tabpanel" class="tab-pane fade" id="DeductionTab" ng-app="MyDeductTabApp" ng-controller="MyDeductTabCntrl">
+                <div form-group>
+                    <div class="col-sm-12">
+                        <input type="hidden" name="EmpID" id="Deduct_EmpId" value="@ViewBag.empid" />
+                        <label class="col-sm-5 control-label">Year</label>
+                        <label class="col-sm-5 control-label">Salary Month</label>
+                        <label class="col-sm-2 control-label"></label>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="col-sm-5">
+                            <select class="form-control" id="Deduct_year" name="Year" ng-model="Deduct_year" ng-change="YearChange()"></select>
+                        </div>
+                        <div class="col-sm-5">
+                            <select class="form-control" id="Deduct_month" name="Month" ng-model="Deduct_month" ng-change="MonthChange()">
+                                <option value='0' disabled selected="selected">Month</option>
+                                <option value='1'>Janaury</option>
+                                <option value='2'>February</option>
+                                <option value='3'>March</option>
+                                <option value='4'>April</option>
+                                <option value='5'>May</option>
+                                <option value='6'>June</option>
+                                <option value='7'>July</option>
+                                <option value='8'>August</option>
+                                <option value='9'>September</option>
+                                <option value='10'>October</option>
+                                <option value='11'>November</option>
+                                <option value='12'>December</option>
+                            </select>
+                        </div>
+                        @*<div class="col-sm-2"><input type="button" value="Show Details" id="BtnDeductShow" class="form-control fil"></div>*@
+                    </div>
+                </div>
+                <div class="form-group">
+                    <form id="Deductions" class="DeductionForm" action="#">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <label for="inputEmail3" class="col-sm-3 control-label">Deduction</label>
+                                <label for="inputEmail3" class="col-sm-3 control-label">Amount</label>
+                                <label for="inputEmail3" class="col-sm-3 control-label">Remarks</label>
+                                <label for="inputEmail3" class="col-sm-3 control-label"></label>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="col-sm-3" style=" margin-left: -15px !important;">
+                                    <select class="form-control" id="DeductType" name="DeductType" ng-model="DeductType" ng-change="DeductTypeChange()" ng-options="obj.DeductionType for obj in DeductTypeArray | orderBy:'DeductType_Id'" required>
+                                        <option value="" label="-- Select option --" disabled selected="selected"></option>
+                                        @*<option value="0">ADD NEW</option>*@
+                                        @*<option data-ng-repeat="t in DeductTypeArray" value="{{t.DeductType_Id}}">{{t.DeductionType}}</option>*@
+                                    </select> 
+                                    @*<select class="table-group-action-input form-control input-large selectpicker" data-hide-disabled="true" data-live-search="true" required></select>*@                                  
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control required" name="Amount" id="Deduct_Amount" ng-model="Deduct_Amount" placeholder="Amount" autocomplete="off">
+                                </div>
+                                <div class="col-sm-3">
+                                    <textarea class="form-control required" name="Remarks" id="Deduct_Remark" ng-model="Deduct_Remark" placeholder="Remarks" autocomplete="off"></textarea>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="bootstrap-timepicker">
+                                        <div class="input-group">
+                                            <a class="btn-default" ng-click="BtnAddDeduct()"><i class="fa fa-plus"></i></a>
+                                        </div><!-- /.input group -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div > @*class="box-body table-responsive no-padding"*@
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Amount</th>
+                                        <th>Remarks</th>
+                                        <th>Month</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="list in DeductItems">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{list.Deduction}}</td>
+                                        <td>{{list.Amount}}</td>
+                                        <td>{{list.Remarks}}</td>
+                                        <td>{{list.MonthName}}</td>
+                                        <td>
+                                            <a ng-click="editItemS(list)"><i class="fa fa-fw fa-edit" aria-hidden="true"></i></a>&nbsp;
+                                            <a ng-click="removeItem(list)"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="6" align="right"><button type="button" class="btn btn-success" ng-click="BtnFinalSave()">Save &nbsp;<i class="fa fa-floppy-o"></i></button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+                <!-- Add new deduction -->
+                <div class="modal fade" id="AddnewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Add New Deduction Type</h4>
+                        </div>
+                        <div class="modal-content">
+                            <form class="projectadding form-horizontal DeductTypeForm" id="addnewform" novalidate ng-submit="submit()">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="Racename" class="col-sm-3 control-label">Name</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control required" ng-model="DeductionType">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer text-right">
+                                    <input type="submit" class="btn btn-default" id="createsave" value="Save" />
+                                    <button type="button" class="btn btn-default greybtn" data-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>                            
+                        </div>
+                    </div>
+                </div>
+                <!---->
+            </div>
+
+        </div>
+    </div>   
+
+    <div class="modal fade" id="AddNewSalarymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <form class="projectadding form-horizontal col-sm-8" id="AddSalaryForm">
+                        <input type="hidden" name="EmpID" value="@ViewBag.empid" />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Basic Salary</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control required" placeholder="Basic Salary" name="BasicSalary" id="txtBasicsalary" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Start</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control leavepicker required" placeholder="Start Date" name="SalStartDate" id="txtStartdate" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="BtnAddNewSalary">OK</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="Allowancemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Empolyee Name: @ViewBag.empname</h4>
+            </div>
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form class="projectadding form-horizontal col-sm-8" id="AllowanceList"></form>
+                </div>
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+
+
+
+
+

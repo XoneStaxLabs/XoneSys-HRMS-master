@@ -1,0 +1,66 @@
+﻿@model IEnumerable<XoneHR.Models.TblCityZenship>
+@{
+    ViewBag.Title = "List";
+    string status = "";
+    var i = 0;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#example2").DataTable();
+    });
+</script>
+
+<table id="example2" class="table table-bordered table-hover masterlist">
+
+    <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Citizen</th>
+            @*<th>Citizen Code</th>*@
+            <th>Citizen Number Name</th>
+            <th data-sortable="false">Status</th>
+            <th data-sortable="false">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            i += 1;
+            <tr>
+                <td>@i</td>
+                <td>@item.Citizen</td>
+                @*<td>@item.CitiZenCode</td>*@
+                <td>@item.CitiZenNoname</td>
+                @if (item.IsStatus.ToString() == "True")
+                {
+                    status = "Active";
+
+                }
+                else
+                {
+                    status = "InActive";
+
+                }
+                <td>@status</td>
+                <td style="width:15%;">
+                    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {
+                        <a href="" class="btn btn-success btnedit" data-toggle="modal" data-id="@item.CizenID" data-code="@item.CitiZenCode" data-name="@item.Citizen" data-noname="@item.CitiZenNoname" data-status="@item.IsStatus"><i class="fa fa-fw fa-edit"></i></a>
+                    }
+                    @if (item.CizenID != 2)
+                    {
+                        if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        {
+                            <a href="" class="btn btn-danger btndelete" data-toggle="modal" data-id="@item.CizenID" data-name="@item.Citizen"><i class="fa fa-fw fa-trash-o"></i></a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>

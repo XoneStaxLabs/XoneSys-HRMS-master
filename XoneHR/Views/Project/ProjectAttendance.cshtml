@@ -1,0 +1,454 @@
+﻿@{
+    ViewBag.Title = "ProjectAttendance";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script type="text/javascript">
+    function GetProject() {
+
+        var ddlBox = $("#ProjID");
+
+        $.ajax({
+            url: "/Project/GetProject",
+            async: false
+        }).done(function (data) {
+
+            ddlBox.empty();
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.ProjID + '>' + item.ProjName + '</option>').selectpicker('refresh');
+            });
+
+        });
+    }
+
+    function GetAllProjectdetails(ID,ShiftID)
+    {
+        $.ajax({
+            url: "/Project/ListProjectWiseEmp",
+            data: { ProjID: ID, TodayDate: $("#StartDate").val(), ShiftID: ShiftID },
+            async: false
+        }).done(function (data) {
+
+            $("#ProjectAttandaceList").html(data);
+        });
+        //GetShifts(ID);
+    }
+
+    function GetDayType() {      
+        var ddlBox = $("#ddldayType");
+        $.ajax({
+            url: "/Leave/GetDayType",
+            async: false
+
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.DayTypID + '>' + item.DayType + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+
+    function GetLeaveType(EmpID) {
+
+        var ddlBox = $("#ddlLeaveType");
+        $.ajax({
+            url: "/Leave/GetLeaveType",
+            data: { EmpID: EmpID },
+            async: false,
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.LeavetypID + '>' + item.LeaveType + '</option>').selectpicker('refresh');
+            });
+            //ddlBox.append('<option value=' + 9 + '>' + "OFF Day" + '</option>').selectpicker('refresh');
+        });
+    }
+
+    function GetShifts(ProjID) {
+        var ddlBox = $("#ddlShift");
+        $.ajax({
+            url: "/Project/GetShifts",
+            data: { ProjID: ProjID },
+            async: false,
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">-- Select Shift Wise Projects --</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.ShiftID + '>' + item.ShiftName + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+
+    $(document).ready(function () {
+
+        GetProject();
+        GetAllProjectdetails($("#HidProjID").val(),0);
+        GetShifts($("#HidProjID").val());
+        //$("#ddlShift").change(function () {
+        $(document).on('change','#ddlShift', function(){
+            if($(this).val()!=0)
+                GetAllProjectdetails($("#ProjID").val(), $(this).val());
+            else
+                GetAllProjectdetails($("#ProjID").val(), 0);
+        });
+        
+        $("#StartDate").change(function () {
+            GetAllProjectdetails($("#HidProjID").val(),$("#ddlShift").val());
+        });
+        $("#EmpLeaveDate").val($("#StartDate").val());
+        $("#EmpLeavetodate").val($("#StartDate").val());
+
+        $('select[name=ProjID]').val($("#HidProjID").val());
+        $('select[name=ProjID]').selectpicker('refresh');
+
+        function MsgAlert(data, icon) {
+            $.toast({
+                text: data,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: icon
+            })
+        }
+
+        $("#ProjID").change(function () {
+
+            $.ajax({
+                url: "/Project/ListProjectWiseEmp",
+                data: { ProjID: $(this).val() },
+                async: false
+            }).done(function (data) {
+
+                $("#ProjectAttandaceList").html(data);
+            });
+            
+            $("#HidProjID").val($(this).val());
+        });
+
+        $(document).on('click', '#btnAttandanceSubmit', function () {
+
+            var status = 0,i=0;
+            var removeAttndEmpID = [];
+
+            $(".Addattendance").each(function () {
+                if ($(this).prop("checked") == false) {
+                    $(".EmpId_cls" + $(this).attr('data-status')).prop("disabled", true);
+                    $(".ShiftFrom_cls" + $(this).attr('data-status')).prop("disabled", true);
+                    $(".ShiftTo_cls" + $(this).attr('data-status')).prop("disabled", true);
+                    removeAttndEmpID[i] = $(this).attr('data-EmpID'); i++; 
+                }
+                else {
+                    $(".EmpId_cls" + $(this).attr('data-status')).prop("disabled", false);
+                    $(".ShiftFrom_cls" + $(this).attr('data-status')).prop("disabled", false);
+                    $(".ShiftTo_cls" + $(this).attr('data-status')).prop("disabled", false);
+                    status++;
+                }
+            });
+
+            if (removeAttndEmpID.length > 0)
+            {
+                $.ajax({
+                    url: "/Project/RemoveAttandance",
+                    data: { Empid: JSON.stringify(removeAttndEmpID), StartDate:$("#StartDate").val() },
+                    async: false
+                }).done(function () { });
+            }
+            
+            if (status > 0) {
+                $.ajax({
+                    url: "/Project/SaveProjectAttandance",
+                    data: $("#Projectattandancefrm").serialize(),
+                    async: false
+                }).done(function (data) {
+                    if (data == 1) {
+                        MsgAlert('Data Saved Successfully', 'success');
+                        $("#LeaveRelifEmp").modal('hide');
+                        location.reload();
+
+                    } else if (data == 0) {
+                        MsgAlert('Attendance Already Assigned', 'warning');
+                        $("#LeaveRelifEmp").modal('hide');
+                    }
+                    else {
+                        MsgAlert('Empty List', 'warning');
+                    }
+                });
+            }
+            else
+                MsgAlert('Please Select Employees For Add Attendance', 'warning');
+
+        })
+
+        $(document).on('change', '.RelifEmp', function () {
+            if ($(this).val() != 0) {
+                
+
+                $("#htmloff").hide();
+                var Oldempidss = $(this).find('option:selected').attr("data-oldempid");
+                var offss = $(this).find('option:selected').attr("data-Workstatus"); 
+                $.ajax({
+                    url: "/Project/GetLeaveTypeName",
+                    data: { EmpID: $(this).find('option:selected').attr("data-oldempid"), Date: $("#StartDate").val() }
+                }).done(function (data) {
+                    
+                    $("#LeaveTypeLabel").html(data);
+                
+                    if (data != "") {
+                        //if ($(this).find('option:selected').attr("data-Workstatus") == "Leave")//Allready leave applied, so no need to apply leave
+                        //{
+                        $("#leave_Div").hide(); $("#leavetype_Div").show(); $("#htmloff").hide();
+                        $("#Leaveform_confirm").val(1);
+                        //$.ajax({
+                        //    url: "/Project/GetLeaveTypeName",
+                        //    data: { EmpID: $(this).find('option:selected').attr("data-oldempid"), Date: $("#StartDate").val() }
+                        //}).done(function (data) {
+                        //    $("#LeaveTypeLabel").html(data);
+                        //})
+                    }
+                    else if (offss == "OFF") {
+                        $("#leave_Div").hide(); $("#leavetype_Div").hide(); $("#htmloff").show();
+                        $("#Leaveform_confirm").val(1);
+                    }
+                    else {
+                        
+                        $("#leave_Div").show(); $("#leavetype_Div").hide(); $("#htmloff").hide();
+                        GetDayType(); GetLeaveType(Oldempidss);
+                        $("#Leaveform_confirm").val(2);
+                    }
+                 })
+
+                $("#LeaveDateLabel").html(($("#StartDate").val().toString("dd/MM/yyyy")));
+                $("#Hidreliefempid").val($(this).val());
+                $("#AbsEmpLabel").html($(this).find('option:selected').attr("data-oldempname"));
+                $("#ReliefEmpLabel").html($(this).find('option:selected').text());
+                $("#Empnames").text($(this).find('option:selected').text());
+                $("#EmpTypes").text($(this).find('option:selected').attr("data-typeNam"));
+                $("#EmpMobs").text($(this).find('option:selected').attr("data-mobile"));
+                $("#OldEmpOD").val($(this).find('option:selected').attr("data-oldempid"));
+                $("#EmpID").val($(this).find('option:selected').attr("data-oldempid"));
+                $("#HIdProjectID").val($(this).find('option:selected').attr("data-projectid"));
+               
+
+                $.ajax({
+                    url: "/Project/GetLeaveStat",
+                    data: { EmpID: $(this).val(), Date: $("#StartDate").val() },
+                    async: false
+                }).done(function (data) {
+                    if (data == 0) {
+                        $("#small").modal({ backdrop: 'static' });
+                        $("#small").modal('show');
+                    }
+                    else {
+                        MsgAlert("This Employee Not Avilable For This Date", 'warning');
+                        $(".RelifEmp").val(0);
+                    }
+                });
+            }
+        })
+
+        $(document).on('click', '#EmpIDNO', function () {
+
+            window.location.href = "/Project/ProjectAttendance?ProjID=" + $("#HidProjID").val() + "&AbsDateFrom= " + $("#StartDate").val() + " ";
+            $("#small").modal('hide');
+        });
+
+        $(document).on('click', '#EmpIDYES', function () {
+            //Get emp list
+            var EmpIDArray = [], i = 0;
+            $(".Addattendance").each(function () {
+                EmpIDArray[i] = $(this).attr('data-EmpID'); i++; 
+            });
+
+            var Chkvalue = 0;
+            if ($("#ReliefConfChk").is(':checked')) {
+
+                Chkvalue = 1;
+            }
+
+            if ($("#Leaveform_confirm").val() == 1) //Allready leave applied, so no need to apply leave
+            {
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/Project/ManageAbsenceAllocation",
+                    data: { ProjID: $("#HIdProjectID").val(), AbsEmpID: $("#OldEmpOD").val(), AbsallEmpID: $("#Hidreliefempid").val(), AbsDateFrom: $("#StartDate").val(), EmpIDArray: JSON.stringify(EmpIDArray), ReliefConfirmation: Chkvalue }
+                }).done(function (data) {
+                    if (data == 1)
+                        window.location.href = "/Project/ProjectAttendance?ProjID=" + $("#HidProjID").val() + "&AbsDateFrom= " + $("#StartDate").val() + " ";
+                    else if (data == -1)
+                        MsgAlert("Can't Allocate This Employee", 'warning');
+                });
+            }
+            else {
+                
+                //---Leave Application
+                $.ajax({
+                    type: "POST",
+                    url: "/Leave/AddnewleaveApplication",
+                    data: $('#LeaveAppForm').serialize(),
+                    async: false
+                }).done(function (data) {
+                    if (data.OutputID == 1) {
+                                           
+                        if (data.PendingDays == 0) {
+                            MsgAlert("Leave Applied Successfully", 'success')
+                        }
+                        else
+                            MsgAlert("" + data.PendingDays + "more leaves applied than eligibility", 'warning');
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/Project/ManageAbsenceAllocation",
+                            data: { ProjID: $("#HIdProjectID").val(), AbsEmpID: $("#OldEmpOD").val(), AbsallEmpID: $("#Hidreliefempid").val(), AbsDateFrom: $("#StartDate").val(), EmpIDArray: JSON.stringify(EmpIDArray), ReliefConfirmation: Chkvalue }
+                        }).done(function (data) {
+                            if (data == 1)
+                                window.location.href = "/Project/ProjectAttendance?ProjID=" + $("#HidProjID").val() + "&AbsDateFrom= " + $("#StartDate").val() + " ";
+                            else if (data == -1)
+                                MsgAlert("Can't Allocate This Employee", 'warning');
+                        });
+                    }
+                    else {
+                        $.toast({
+                            text: "Leave not allowed",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+                });
+            }
+                       
+        });
+
+    });
+</script>
+<input type="hidden" id="HIdDatetime" value="@ViewBag.CurrentDate"/>
+<input type="hidden" value="@ViewBag.ProjID" id="HidProjID">
+<section class="content-header">
+    <h1>
+        <i class="fa fa-book"></i>&nbsp;Attendance
+    </h1>  
+    <ol class="breadcrumb">
+        <li><a href="/Project/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol> 
+</section>
+
+ <div class="row">
+    <div class="col-xs-12">
+        <div class="box">            
+            <form class="form-horizontal" id="Projectattandancefrm">
+                <div class="box-header">
+                    <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-sm-3 control-label">Project</label>
+                                <div class="col-sm-8">
+                                    <select type="text" class="table-group-action-input form-control selectpicker" name="ProjID" id="ProjID" data-hide-disabled="true" data-live-search="true"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="col-sm-10" style="margin-left: -15px !important;">
+                                <label for="inputEmail3" class="col-sm-3 control-label">Date</label>
+                                <div class="bootstrap-timepicker col-sm-8">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control daterangepicker-single" readonly="readonly" id="StartDate" required name="StartDate" value="@ViewBag.CurrentDate.ToString("dd/MM/yyyy")" placeholder="From">
+                                    </div><!-- /.input group -->
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-success pull-right" id="btnAttandanceSubmit">Save &nbsp;<i class="fa fa-floppy-o"></i></button>
+
+                            </div>
+                        </div>
+                    </div>   
+                    <div class="p-l-15 p-r-15 p-t-15">
+                        <select aria-controls="example1" class="form-control" id="ddlShift"></select>
+                    </div>                       
+                    <div id="ProjectAttandaceList"></div>
+                    <!-- /.box -->
+                </div>
+            </form>
+        </div>
+    </div>
+ </div>
+ 
+<div id="small" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="width: 900px !Important">
+        <div class="modal-content">
+            
+            <div class="modal-header">               
+                <h4 class="modal-title">Relief Employee Confirmation :</h4><h4 id="LeaveDateLabel"> </h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="#"  id="LeaveAppForm">
+                    <input type="hidden" id="Leaveform_confirm" />
+                    <input type="hidden" id="EmpID" name="EmpID" />
+                   
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-6">
+                                <h4 class="box-title">Absent Employee : <label id="AbsEmpLabel"></label><span style="color:red" id="htmloff">&nbsp;(OFF)</span></h4>
+                                <div class="col-xs-12" id="leavetype_Div">
+                                    <h4 class="box-title">Leave Type: <label id="LeaveTypeLabel"></label></h4>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <h4 class="box-title">Relief Employee : <label id="ReliefEmpLabel"></label></h4>
+                                <h4 class="box-title">Employee Type: <label id="EmpTypes"></label></h4>
+                                <h4 class="box-title">Mobile: <label id="EmpMobs"></label></h4>
+                               <h4 class="box-title">Is Confirmed: <input type="checkbox" id="ReliefConfChk" name="ReliefConfChk" /></h4>
+
+                            </div>
+                            <input type="hidden" id="Hidreliefempid" />
+                            <input type="hidden" id="HIdleavedate" />
+                            <input type="hidden" id="HIdProjectID" />
+                            <input type="hidden" id="OldEmpOD" />
+                        </div>   <br />
+                        <div class="col-xs-8" id="leave_Div">
+                            <div class="form-group">
+                                <div class="col-xs-8">
+                                    <label for="inputEmail3" class="col-xs-4 control-label">Leave type</label>
+                                    <select class="selectpicker col-xs-8 required" name="LeavetypID" id="ddlLeaveType"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-8"></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-8">
+                                    <label for="inputEmail3" class="col-xs-4 control-label">DayType</label>
+                                    <select class="selectpicker col-xs-8 required" name="DayTypID" id="ddldayType"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-8">
+                                    <input type="hidden" name="EmpLeaveDate" id="EmpLeaveDate" />
+                                    <input type="hidden" name="EmpLeavetodate" id="EmpLeavetodate" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-8">
+                                    <label for="inputEmail3" style="margin-right:14px !important" class="col-xs-4 control-label">Remarks</label>
+                                    <textarea class="col-xs-7" name="EmpappRemks"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn dark" id="EmpIDNO">Cancel</button>
+                <button type="button" class="btn green" id="EmpIDYES">Confirm</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div>
+</div>

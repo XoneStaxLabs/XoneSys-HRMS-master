@@ -1,0 +1,577 @@
+﻿@{
+    ViewBag.Title = "Create";
+    var itm = 0;
+   
+}
+
+ 
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script src="~/XoneScripts/XoneJS/ProjectCreate.js"></script>
+
+<script src="~/XoneScripts/Files/Angular.js"></script>
+
+<script type="text/javascript">
+
+    var app = angular.module("PrjctCreate", []);
+    app.controller("PrjctCreateCntrl", function ($scope, $http) {
+
+        function MsgAlert(data, icon) {
+            $.toast({
+                text: data,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: icon
+            })
+        }
+
+        $scope.GradeArray = new Array();
+        $scope.ShiftArray = new Array();
+
+        $scope.Indexval = 0;
+        
+
+        $scope.GradeArray = [];
+        $scope.ShiftArray = [];
+        $.validator.addMethod("check_item_dropdown", function (value, element) {
+            return this.optional(element) || value != 0;
+        }, "This field is required.");
+
+        $scope.BtnAddNewGrade = function () {
+            var addToArray = 0;
+          
+            if ($("#DesigID").val() == 0) {
+                addToArray = 1;
+                MsgAlert('Designation Field is Required', 'error');
+            } if ($("#GradeID").val() == 0) {
+                addToArray = 1;
+                MsgAlert('Grade Field is Required', 'error');
+            }
+            else if ($("#ShiftEmpNo").val() == "" || $("#ShiftEmpNo").val() <= 0) {
+                addToArray = 1;
+                MsgAlert('Employee Field is Required', 'error');
+            }
+            else {
+                //  var addToArray = 0;
+            }
+               
+            if (addToArray == 0) {
+                for (var i = 0; i < $scope.GradeArray.length; i++) {
+
+                    if ($scope.GradeArray[i].DesigID == $("#DesigID").val() && $scope.GradeArray[i].GradeID == $("#GradeID").val() && $scope.GradeArray[i].ShiftID == $scope.ShID) {
+
+                        addToArray = 1;
+                        MsgAlert('Data will be already Added', 'error');
+
+                    }
+                }
+            }
+            if (addToArray == 0) {
+               
+                if ($scope.ShID > 0) {
+                    $scope.GradeArray.push({ 'DesigName': $("#DesigID option:selected").text(), 'DesigID': $("#DesigID").val(), 'Gradename': $("#GradeID option:selected").text(), 'GradeID': $("#GradeID").val(), 'PrjGradeEmpNO': $("#ShiftEmpNo").val(), 'PrjGrdAssignID': 0, 'ShiftID': $scope.ShID, 'Shiftname': $scope.shftname });
+                    ClearParams();
+                }
+                else {
+                    MsgAlert('Please select shift for manage grade ', 'error');
+                }
+
+            }
+            
+             
+        };
+
+        $scope.removeItem = function (index) {
+            $scope.GradeArray.splice(index, 1);
+        } 
+
+        function ClearParams()
+        {
+            $('select[name=DesigID]').val(0);
+            $('select[name=DesigID]').selectpicker('refresh');
+
+            $('select[name=GradeID]').val(0);
+            $('select[name=GradeID]').selectpicker('refresh');
+
+            $("#ShiftEmpNo").val("");
+
+        }
+
+        
+        $scope.BtnAddNewShift = function () {
+            var addToArray1 = 0;
+
+            if ($("#ShiftName").val() == "" || $("#ShiftName").val() == null) {
+                addToArray1 = 1;
+                MsgAlert('Shift Field is Required', 'error');
+            } if ($("#ShiftFrom").val() == "") {
+                addToArray1 = 1;
+                MsgAlert('Shift from Time Field is Required', 'error');
+            }
+            else if ($("#ShiftTo").val() == "") {
+                addToArray1 = 1;
+                MsgAlert('Shift To Time Field is Required', 'error');
+            }
+            else {
+                //  var addToArray = 0;
+            }
+
+
+            if (addToArray1 == 0) {
+                for (var i = 0; i < $scope.ShiftArray.length; i++) {
+
+                    if ($scope.ShiftArray[i].ShiftName == $("#ShiftName").val()) {
+
+                        addToArray1 = 1;
+                        MsgAlert('Data will be already Added', 'error');
+
+                    }
+
+                }
+            }
+            if (addToArray1 == 0) {
+
+                $scope.Indexval++;
+                //--- Shift Time validation
+                var s, e, min, hour_carry, hour;
+                var start = $("#ShiftFrom").val().replace(/ AM/g, "");
+                var end = $("#ShiftTo").val().replace(/ AM/g, "");
+                var Start_stat = 0, End_stat = 0;
+                if (start.indexOf("PM") >= 0)
+                {
+                    start = start.replace(/ PM/g, "");
+                    Start_stat = 1;                  
+
+                }
+                if (end.indexOf("PM") >= 0)
+                {
+                    end = end.replace(/ PM/g, "");
+                    End_stat = 1;                    
+                }
+                s = start.split(':');
+                e = end.split(':');
+               
+                min = parseInt(e[1]) - parseInt(s[1]);
+                hour_carry = 0;
+                if (min < 0) {
+                    min += 60;
+                    hour_carry += 1;
+                }
+                
+                if (Start_stat == 1)
+                    s[0] = parseInt(s[0]) + parseInt(12);
+                if (End_stat == 1)
+                    e[0] = parseInt(e[0]) + parseInt(12);
+
+                if (parseInt(s[0]) > parseInt(e[0]))
+                {
+                    
+                }
+
+                hour = parseInt(e[0]) - parseInt(s[0]) - hour_carry;
+                //-------------------                
+               // alert(hour); alert(min);
+                $scope.ShiftArray.push({ 'ShiftName': $("#ShiftName").val(), 'ShiftFrom': $("#ShiftFrom").val(), 'ShiftTo': $("#ShiftTo").val(), 'ShiftID': 0, 'Indexval': $scope.Indexval });
+
+                ClearParams1();
+
+            }
+
+
+        };
+
+        $scope.removeItemshift = function (index) {            
+            $scope.ShiftArray.splice(index, 1);
+        }
+
+
+
+        function ClearParams1() {
+
+            $("#ShiftName").val("");
+        }
+
+        $scope.BtnProjectSubmit =  function () {
+
+            $("#ProjectForm").validate({
+                rules: {
+                    ProjFrom: {
+                        required: true, 
+                    },
+                    ProjTo: {
+                        required: true, 
+                    },
+                    projTypID: {
+                        check_item_dropdown: true,
+                        required: true
+                    },
+                    ProjCompAmount: {
+                        required: true,
+                        number: true
+                    },
+                    ProcompTypID: {
+                        check_item_dropdown: true,
+                        required: true
+                    }
+                }
+
+            });
+            if ($("#ProjectForm").valid()) {
+
+                var temp = 0;
+
+                var ProjFrom = $("#ProjFrom").val();
+                var ProjTo = $("#ProjTo").val();
+                if (ProjFrom <= ProjTo) {
+                     
+                    
+                    if(Object.keys($scope.GradeArray).length == 0)
+                    {
+                        temp = 1;
+                        MsgAlert('Please Assign a atleast One Grade', 'error');
+                    }
+                    else if (Object.keys($scope.ShiftArray).length == 0) {
+                        temp = 1;
+                        MsgAlert('Please Assign a atleast One Shift', 'error');
+                    }
+                    else{
+
+                    }
+                    if (temp == 0) {
+
+
+                        var Projectlist = {
+                            ProjName: $("#ProjName").val(),
+                            projTypID: $("#ddlProjectTypeID").val(),
+                            ProcompTypID: $("#ddlProcompTypID").val(),
+                            ProjCompAmount: $("#ProjCompAmount").val(),
+                            ProjFrom: $("#ProjFrom").val(),
+                            ProjTo: $("#ProjTo").val(),
+                            ProjLocation: $("#ProjLocation").val()
+
+
+                        }
+
+                        $http({
+                            url: "/Project/AddNewProject",
+                            dataType: 'json',
+                            method: "POST",                        
+                            data: { projObj: Projectlist, ProjFrom: $("#ProjFrom").val(), ProjTo: $("#ProjTo").val(), ShiftList: angular.toJson($scope.ShiftArray), GradeList: angular.toJson($scope.GradeArray) },
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        }).success(function (data) {
+                            if (data) {
+                                $.toast({
+
+                                    text: "Saved Successfully",
+                                    position: 'top-right',
+                                    hideAfter: 3000,
+                                    showHideTransition: 'slide',
+                                    loader: false,
+                                    icon:'success'
+                                })
+
+                                window.location.href = "/Project/Index";
+
+                            }
+                            else {
+                                $.toast({
+
+                                    text: "Application Error Please Contact Administrator!",
+                                    position: 'top-right',
+                                    hideAfter: 3000,
+                                    showHideTransition: 'slide',
+                                    loader: false,
+                                })
+                            }
+
+                        })
+                    }
+                }
+                else {
+                    $.toast({
+
+                        text: "Please select a valid From & To Date ",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                        icon:'error'
+                    })
+                }
+            }
+        };
+
+
+        $scope.ShiftAssign = function (index, ShiftName) {           
+            
+            $scope.ShID = index;
+            $scope.shftname = ShiftName;
+        }
+
+    });
+
+</script>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-building"></i>&nbsp; Project Management
+    </h1>
+
+    <ol class="breadcrumb">
+        <li><a href="/Project/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+
+
+</section>
+
+
+<section class="newforms" ng-app="PrjctCreate" ng-controller="PrjctCreateCntrl">
+    <form class="projectadding form-horizontal col-sm-8" id="ProjectForm">
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">Project Name</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control required" id="ProjName" name="ProjName" autocomplete="off" placeholder="Project Name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-3 control-label">Project Type</label>
+            <div class="col-sm-8 selectCat">
+                <select class="selectpicker" name="projTypID" id="ddlProjectTypeID">                 
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputPassword3" class="col-sm-3 control-label">Compensation Type</label>
+            <div class="col-sm-8 selectCat">
+                <select class="selectpicker" name="ProcompTypID" id="ddlProcompTypID"></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">Compensation Amount</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control required" id="ProjCompAmount" name="ProjCompAmount" autocomplete="off" placeholder="Amount">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">From</label>
+            <div class="col-sm-3">
+
+                <div class="input-group date">
+                    <input type="text" class="form-control daterangepicker-single" readonly="readonly" id="ProjFrom" name="ProjFrom" placeholder="From">
+                   
+                </div> 
+ 
+            </div>
+            <label for="inputEmail3" class="col-sm-2 control-label">To</label>
+            <div class="col-sm-3">
+
+                <div class="input-group date">
+                    <input type="text" class="form-control daterangepicker-single" readonly="readonly" id="ProjTo" name="ProjTo" placeholder="To">
+                    
+                </div> 
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">Location</label>
+            <div class="col-sm-8 input-group">
+                <input type="text" class="form-control required" id="ProjLocation" name="ProjLocation" autocomplete="off" placeholder="Location"> 
+            </div>
+        </div>
+
+        @* New Modification *@
+
+        <div class="box-header with-border">
+            <h3 class="box-title">Manage Shift</h3>
+        </div>
+         
+        <div class="form-group shiftCreate">
+              
+            <div class="col-sm-3" style="margin-left:11px !important">
+                <div class="form-group">
+                    <label for="inputEmail3" class="control-label">Shift</label>
+                    <div class="">
+                        <input type="text" class="form-control " name="ShiftName" id="ShiftName" autocomplete="off" placeholder="Shift Name">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">Shift From</label>
+                <label for="inputEmail3" class="col-sm-3 control-label">Shift To</label>
+                <label for="inputEmail3" class="col-sm-1 control-label"></label>
+                <div class="col-sm-8">
+                    <div class="col-sm-5" style="margin-left: -15px !important;">
+                        <div class="bootstrap-timepicker">
+                            <div class="input-group">
+                                <input type="text" class="form-control timepicker" name="ShiftFrom" readonly="readonly" id="ShiftFrom" required>
+                                <div class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                            </div><!-- /.input group -->
+                        </div>
+                    </div>
+                        
+                    <div class="col-sm-5">
+                        <div class="bootstrap-timepicker">
+                            <div class="input-group">
+                                <input type="text" class="form-control timepicker" name="ShiftTo" readonly="readonly" id="ShiftTo" required>
+                                <div class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                            </div><!-- /.input group -->
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="bootstrap-timepicker">
+                            <div class="input-group">
+                                <a class="btn-default" ng-click="BtnAddNewShift()"><i class="fa fa-plus"></i></a>
+                            </div><!-- /.input group -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+                
+        </div> 
+         
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="">Shift List</h3>
+                        </div><!-- /.box-header -->
+                        <div class="box-body table-responsive no-padding">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Shift From</th>
+                                        <th>Shift To</th>
+                                        <th>Action</th>
+                                       
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="shift in ShiftArray">
+                                        <td><input type="radio" name="ShiftBox" ng-click="ShiftAssign(shift.Indexval,shift.ShiftName)" data-sid="{{shift.Indexval}}"  /></td>
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{shift.ShiftName}}</td>
+                                        <td>{{shift.ShiftFrom}}</td>
+                                        <td>{{shift.ShiftTo}}</td>
+                                        <td>
+                                            <a ng-click="removeItemshift($index)"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                        </td> 
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box -->
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="form-group shiftCreate">
+            <h3 style="margin-left: 27px !important;font-size: 18px !important">Manage Grade</h3>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="inputEmail3" class="control-label">Designation</label>
+                    <div class="">
+                        <select type="text" class="selectpicker" name="DesigID" id="DesigID"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="inputEmail3" class="control-label">Grade</label>
+                    <div class="">
+                        <select type="text" class="selectpicker" name="GradeID" id="GradeID"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="inputEmail3" class="control-label">No of Employees</label>
+                    <div class="">
+                        <input type="number" class="form-control " id="ShiftEmpNo" name="ShiftEmpNo" autocomplete="off" min="0" placeholder="No of Employees">
+                    </div>
+                    <div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="form-group">
+                    <label for="inputEmail3" class="control-label"></label>
+                    <div style="margin-top:15px !important">
+                        <a class="btn-default" ng-click="BtnAddNewGrade()"><i class="fa fa-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Grade Assign List</h3>
+                        </div><!-- /.box-header -->
+                        <div class="box-body table-responsive no-padding">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Designation</th>
+                                        <th>Shift</th>
+                                        <th>Grade</th>
+                                        <th>No Of Employee</th>                                         
+                                        <th>Action</th>
+                                       
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="EmpList in GradeArray">
+                                        <td>{{$index + 1}}</td>
+                                        <td>{{EmpList.DesigName}}</td>
+                                        <td>{{EmpList.Shiftname}}</td>
+                                        <td>{{EmpList.Gradename}}</td>
+                                        <td>{{EmpList.PrjGradeEmpNO}}</td>                                         
+                                        <td>
+                                            <a ng-click="removeItem($index)"><i class="fa fa-close" aria-hidden="true"></i></a>
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div><!-- /.box --> 
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-9 control-label">&nbsp;</label>
+            <div class="col-sm-3 ">
+                <button type="button" class="btn btn-success" ng-click="BtnProjectSubmit()">Save &nbsp;<i class="fa fa-floppy-o"></i></button>
+                
+            </div>
+        </div>
+
+    </form>
+</section>

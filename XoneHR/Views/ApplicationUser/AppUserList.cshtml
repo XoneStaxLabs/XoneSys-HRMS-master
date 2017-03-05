@@ -1,0 +1,68 @@
+﻿@model IEnumerable<XoneHR.Models.TblAppUser>
+@{    
+    Layout = null;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script>
+    $(function () {
+
+        $('#example2').DataTable();
+    });
+</script>
+<section class="newforms">
+
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+
+                <th style="width:15% !important;">Name</th>
+                <th>Nationality</th>
+                <th>Designation</th>
+                <th>Address</th>
+                <th>Mobile</th>
+                <th>Username</th>
+                @*<th>Email</th>*@
+                <th>Gender</th>
+                <th>Photo</th>
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+
+                    <td>@item.AppFirstName</td>
+                    <td>@item.Citizen</td>
+                    <td>@item.DesigName</td>
+                    <td>@item.AppAddress</td>
+                    <td>@item.AppMobile</td>
+                    <td>@item.AppUserName</td>
+                    @*<td>@item.AppEmail</td>*@
+                    <td>@item.AppGender</td>
+                    <td><img src="@item.AppPhoto" alt="" height="42" width="42"></td>
+                    <td>
+                        @*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        {*@
+                            <a href="/ApplicationUser/Edit?ID=@item.AppUID" class="btn btn-success btnedit"><i class="fa fa-fw fa-edit"></i></a>
+                        @*}*@
+                        @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        {
+                            <a href="" class="btn btn-danger btndelete" data-toggle="modal" data-id="@item.AppUID" data-name="@item.AppFirstName"><i class="fa fa-fw fa-trash-o"></i></a>
+                        }
+                    </td>
+
+                </tr>
+
+            }
+
+
+        </tbody>
+    </table>
+</section>

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<XoneHR.Models.ScheduleWiseEmp>
+@{
+    ViewBag.Title = "ListEmployees";
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+              
+
+    });
+</script>
+
+<div class="modal-dialog" role="document">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><b>Schedule :</b>@ViewBag.Schedule</h4>
+        <input type="hidden" value="@ViewBag.SchID" id="SchID"/>
+    </div>
+    <div class="modal-content">
+        <div class="modal-body">
+            <section class="newforms">
+                <table id="example2" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Employeee</th>
+                            <th>Designation</th>
+                            <th>OFF Days</th>
+                            <th>Leaves</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      @if(Model != null)
+                      {
+                          foreach(var item in Model)
+                          {
+                              <tr>
+                                  <td>@item.EmpName</td>
+                                  <td>@item.Desig</td>
+                                  <td>
+                                      <a href="#" class="text-green bio btnshowoffs" data-Empid="@item.EmpID"><b>@item.OFFs</b></a>                                    
+                                  </td> 
+                                  <td>
+                                      <a href="#" class="text-green bio btnshowleaves" data-empid="@item.EmpID"><b>@item.Leaves</b></a>                                    
+                                  </td>
+                              </tr>
+                          }
+                          
+                      }
+                    </tbody>
+                </table>
+            </section>
+        </div>
+        <div class="modal-footer text-right">           
+            
+        </div>
+    </div>
+</div>

@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+    function ListEmp() {
+        $.ajax({
+
+            type: "POST",
+            url: "/OFFBoarding/ListAllEmployees"
+            
+        }).done(function (data) {
+
+            $("#EmployeeList").html(data);
+        });
+    }
+
+    function ListEmployees() {
+        $("#employee").empty();
+        $("#employee").append('<option value=0>--Search Employee--</option>');
+        $.ajax({
+            type: "POST",
+            url: "/OFFBoarding/ListEmployee"
+        }).done(function (data) {
+            $.each(data, function (i, item) {                
+                $("#employee").append('<option value=' + item.EmpID + '>' + item.CandName + '</option>');
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/OFFBoarding/ListEmpDetails"
+            }).done(function (data) {
+                $("#EmployeeList").html(data);
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        
+        ListEmployees();
+        $("#OffboardBtn").click(function () {
+            
+            if ($("#employee").val() != 0) {
+                               
+                $.ajax({
+                    url: "/OFFBoarding/UpdateOffBoardStatus",
+                    data: { EmpId: $("#employee").val(), status: 0 }
+                }).done(function () {
+                    ListEmployees();
+                });
+            }            
+        });
+        
+                        
+    });
+</script>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-users"></i>&nbsp;
+        Employees Off Boarding
+    </h1>   
+</section>
+
+<section class="newforms">
+    <div class="col-lg-12">
+        <div class="col-lg-4">
+            <select id="employee" class="form-control">  @*js-example-basic-single js-states*@ </select>
+        </div>
+        <div class="col-lg-4">
+            <button id="OffboardBtn">Off Board</button>
+        </div>
+    </div>
+    <hr />
+    <div id="EmployeeList"></div>
+
+    <div class="modal fade" id="OffBoardModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    </div>    
+</section>
+
+
+

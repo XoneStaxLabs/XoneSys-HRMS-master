@@ -1,0 +1,44 @@
+﻿@model IEnumerable<XoneHR.Models.TblHolidayList>
+@{
+    ViewBag.Title = "List";
+    Layout = null;
+    string status = "";
+    Int32 i = 0;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#example2").DataTable();
+    });
+</script>
+
+<table id="example2" class="table table-bordered table-hover masterlist">
+    <thead>
+        <tr>
+            <th style="width:110px !important">Serial Number</th>
+            <th>Holiday</th>
+            <th data-sortable="false">Date</th>
+            <th data-sortable="false">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            i++;
+            <tr>
+                <td>@i</td>
+                <td>@item.HoliText</td>              
+                <td>@item.HoliDate.ToString("dd-MM-yyyy")</td>
+                <td>
+                    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {
+                        <a href="#" class="btn btn-danger btndelete" data-toggle="modal" data-id="@item.HolidayID" data-name="@item.HoliText"><i class="fa fa-fw fa-trash-o"></i></a>                        
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

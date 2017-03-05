@@ -1,0 +1,79 @@
+﻿@model IEnumerable<XoneHR.Models.SalaryslipContent>
+@{
+    ViewBag.Title = "ListEmployee";
+}
+
+<h2>ListEmployee</h2>
+
+<script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js" async> </script>
+<script src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js" async> </script>
+<script src="https://cdn.datatables.net/buttons/1.2.2/js/buttons.flash.min.js" async> </script>
+<script src="https:cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js" async> </script>
+<script src="https:cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/pdfmake.min.js" async> </script>
+<script src="https:cdn.rawgit.com/bpampuch/pdfmake/0.1.18/build/vfs_fonts.js" async> </script>
+<script src="https:cdn.datatables.net/buttons/1.2.2/js/buttons.html5.min.js" async> </script>
+<script src="https:cdn.datatables.net/buttons/1.2.2/js/buttons.print.min.js" async> </script>
+
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css">
+
+<script type="text/javascript" >
+    $(document).ready(function () {
+
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [ 
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>
+
+<table id="example" class="display nowrap" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Employee Name</th>
+            <th>NRIC Number</th>
+            <th>DOB</th>
+            <th>Age</th>
+            <th>Basic Salary</th>
+            <th>Public Holiday  Salary</th>
+            <th>Overtime Salary</th>
+            <th>Gross Salary</th>
+            <th>CPF Employer</th>
+            <th>CPF Employee</th>
+            <th>Levy</th>
+            <th>Fund</th>
+            <th>Net Salary</th>
+            <th>Advance</th>
+            <th>Final Pay</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            foreach(var item in Model)
+            {
+            <tr>
+                <td>@item.EmpName</td>
+                <td>@item.NRICno</td>
+                <td>@item.DOB</td>
+                <td>@item.Age</td>
+                <td>@item.BasicPay</td>
+                <td>@item.PH_payment</td>
+                <td>@item.OT_payment</td>
+                <td>@item.GrossPay</td>
+                <td>@item.CPF_employer</td>
+                <td>@item.CPF_employee</td>
+                <td>@item.Emp_levy</td>
+                <td>@item.FundType</td>
+                <td>@item.NettPay</td>
+                <td>@item.Advance</td>
+                <td>@item.FinalPay</td>                
+            </tr>
+            }  
+        }              
+    </tbody>
+</table>
+

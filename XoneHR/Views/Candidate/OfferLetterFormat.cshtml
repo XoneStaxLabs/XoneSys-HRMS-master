@@ -1,0 +1,31 @@
+﻿@model XoneHR.Models.CandidateOfferLetterData
+@{
+    ViewBag.Title = "OfferLetterFormat";
+}
+ 
+<script src="~/plugins/jQuery/jQuery-2.1.4.min.js"></script> 
+ 
+    <div id="lettercontent" class="offerpop">
+        <h5 class="offerletter"><span id="date">@Model.CandAppDate.ToShortDateString()</span></h5>
+        <h1 class ="offerletter">Strictly Private And Confidential</h1>
+        <p class="empname">@Model.CandName</p>
+        <p>@Model.CandAddress</p><br>
+        <p>Dear <span>@Model.CandName</span>,</p>
+        <p>I am pleased to offer you a position of @Model.DesigName In @Model.DepName department at our company. Your initial monthly salary would be INR  @Model.CandOfferSalary.<span>The detailed appoinment letter will be given to you at the time of joining. You have to join on before @Model.CandJoinDate.ToShortDateString() otherwise this offer will stand withdrawn automatically.</span> </p>
+        <p><span>If you accept this offer, I would appreciate your signing and returning at your earliest convenience a copy of this letter with a copy of your duly signed resume and credentials. If you have any questions regarding employment policies and procedures, please do not hesitate to contact me.</span></p>
+        <p>Yours sincerely,</p><br>        
+        <h4>@XoneHR.Models.SessionManage.Current.AppUname</h4>
+        <h4>@XoneHR.Models.SessionManage.Current.Designame</h4>
+        <br>        
+        <h4 align="center"><u>Acknowledgement</u></h4>  
+        <p class="discl">I have read, understood and agree with the foregoing.  I accept employment on the above terms and conditions.</p>        
+        <br>
+        <p class="fullname">Full Name:@Model.CandName</p>
+        <p>Signature:</p>
+        <p>Date:@DateTime.Now.ToShortDateString()</p>
+    </div>
+  
+
+
+
+

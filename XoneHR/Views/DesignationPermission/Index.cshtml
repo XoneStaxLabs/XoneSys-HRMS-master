@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        List();//List Data
+
+        $(".addnew").click(function () {
+            window.location.href = "/DesignationPermission/Create";
+        });
+        $(document).on("click", ".btndelete", function () {
+
+            $("#HIdDesigID").val($(this).attr("data-id"));
+            $("#DesigNameDelete").text($(this).attr("data-name"));
+            $("#DeleteModal").modal("show");
+        });
+        $("#deletesave").click(function () {
+
+            $.ajax({
+                type:"POST",
+                url: "/DesignationPermission/Delete",
+                data: { AppDesigID: $("#HIdDesigID").val() }
+
+            }).done(function (data) {
+                if (data > 0) {
+                    
+                    $.toast({
+                        text: "Designation Deleted Successfully",
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+
+                    })
+                    window.location.href = "/DesignationPermission/Index";
+                }
+                else {
+                    $.toast({
+                        text: "Designation Deleting Failed",
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+
+                    })
+                }
+            });
+        });
+    })
+
+</script>
+
+<script>
+
+    function List() {
+        $.ajax({
+            url: "/DesignationPermission/List"
+        }).done(function (data) {
+            $("#Designationlist").html(data);
+        });
+    }
+
+</script>
+
+@* Heading Part *@
+<section class="content-header">
+    <h1>
+        Designation
+    </h1>
+@*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
+{*@
+    <ol class="breadcrumb">
+        @*Add New buttonazd*@
+        <li><a href="#a" class="addnew" data-toggle="modal"><i class="fa fa-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+@*}*@    
+</section>
+<section class="newforms">
+
+    @*<div class="row">
+        <div class="col-sm-6 searchDiv">
+            <div class="dataTables_length" id="example1_length">
+                <label>
+                    Show
+                    <select name="example1_length" aria-controls="example1" class="form-control input-sm">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    entries
+                </label>
+            </div>
+        </div>
+        <div class="col-sm-6 searchFiler">
+            <div id="example1_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="example1"></label></div>
+        </div>
+    </div>*@
+
+    <div id="Designationlist"></div>
+
+</section>
+
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <input type="hidden" id="HIdDesigID" />
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <p class="deleteconfirm">Are you sure want to delete <span class="text-primary" id="DesigNameDelete"></span>?</p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="deletesave">OK</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

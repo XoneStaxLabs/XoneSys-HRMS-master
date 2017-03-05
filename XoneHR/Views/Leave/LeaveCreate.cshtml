@@ -1,0 +1,421 @@
+﻿@{
+    ViewBag.Title = "LeaveCreate";
+}
+
+
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+
+<script type="text/javascript">
+
+    //function GetEmployees() {
+
+    //    var ddlBox = $("#ddlEmployeeList");
+
+    //    $.ajax({
+
+    //        url: "/Leave/GetEmployees",
+    //        async: false
+
+    //    }).done(function (data) {
+
+    //        ddlBox.empty();
+    //        ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+    //        $.each(data, function (i, item) {
+
+    //            ddlBox.append('<option value=' + item.EmpID + '>' + item.CandName + '</option>').selectpicker('refresh');
+
+    //        });
+
+
+    //    });
+
+
+
+    //}
+
+    function GetDayType() {
+
+        var ddlBox = $("#ddldayType");
+
+        $.ajax({
+
+            url: "/Leave/GetDayType",
+            async: false
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.DayTypID + '>' + item.DayType + '</option>').selectpicker('refresh');
+
+            });
+
+
+        });
+
+
+
+    }
+
+    function GetLeaveType() {
+
+        var ddlBox = $("#ddlLeaveType");
+
+        $.ajax({
+
+            url: "/Leave/GetLeaveType",
+            async: false
+
+        }).done(function (data) {
+
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+                var text;
+                text = item.LeaveType + " (" + item.LeavesText + "  remaining)";
+                ddlBox.append('<option value=' + item.LeavetypID + '>' + text + '</option>').selectpicker('refresh');
+            });
+            ddlBox.append('<option value=' + 9 + '>' + "OFF Day" + '</option>').selectpicker('refresh');
+
+        });
+
+
+
+    }
+
+    function GetProject() {
+
+        var ddlBox = $("#ddlProject");
+        $.ajax({
+            url: "/Leave/GetProjectList",
+            async: false,
+            data:{ flag : 1 }
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Not Assigned Any Projects</option>').selectpicker('refresh');
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.ProjID + '>' + item.ProjName + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+        
+
+    $(document).ready(function () {                  
+               
+        $('#EmpLeaveDate').datetimepicker();
+        $('#EmpLeavetodate').datetimepicker();
+        
+       var between = [];
+      
+        GetDayType();
+        GetLeaveType();
+        GetProject();
+       
+        $("#btnleaveapp").click(function () {
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            $("#LeaveAppForm").validate({
+                rules: {
+                    LeavetypID: {
+                        check_item_dropdown: true,
+                        required: true,                        
+                    },
+                    DayTypID: {
+                        check_item_dropdown: true,
+                        required: true,                        
+                    },
+                    empStartenddate: {
+                        required:true
+                    }
+
+                }
+            });
+
+            if ($("#LeaveAppForm").valid()) {
+
+                $.ajax({
+
+                    type: "POST",
+                    url: "/Leave/AddnewleaveApplication",
+                    data: $("#LeaveAppForm").serialize()
+
+                }).done(function (data) {
+                  
+                    if (data == 1) {
+                        $.toast({
+                            text: "Saved Successfully",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        $('select[name=LeavetypID]').val(0);
+                        $('select[name=LeavetypID]').selectpicker('refresh');
+                        $("#EmpLeaveDate").val("");
+                        $("#EmpLeavetodate").val("");
+                        $('select[name=DayTypID]').val(0);
+                        $('select[name=DayTypID]').selectpicker('refresh');
+                        $("#empStartenddate").val("");
+                        window.location.href = "/Leave/LeaveRequestMain";
+                    }
+                    else if (data == 2) {
+                        $.toast({
+                            text: "Leave not allowed",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                        $('select[name=LeavetypID]').val(0);
+                        $('select[name=LeavetypID]').selectpicker('refresh');
+                        $("#EmpLeaveDate").val("");
+                        $("#EmpLeavetodate").val("");
+                        $('select[name=DayTypID]').val(0);
+                        $('select[name=DayTypID]').selectpicker('refresh');
+
+                        $('select[name=ProjectID]').val(0);
+                        $('select[name=ProjectID]').selectpicker('refresh');
+                        $("#empStartenddate").val("");
+                    }
+                    else {
+                        $.toast({
+
+                            text: "Application Error Please Contact Administrator!",
+                            position: 'top-right',
+                            hideAfter: 3000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                        })
+                    }
+
+                });
+
+            }
+            
+
+        });
+        
+        $('#ddlLeaveType').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='ddlLeaveType']").text('');
+            }
+            else {
+                $("label[for='ddlLeaveType']").text('Please select an item from the dropdown list.');
+            }
+        })
+
+        $('#ddldayType').change(function () {
+            if ($(this).val() != 0) {
+                $("label[for='ddldayType']").text('');
+            }
+            else {
+                $("label[for='ddldayType']").text('Please select an item from the dropdown list.');
+            }
+        })
+
+        $('#empStartenddate').change(function () {
+            $("label[for='empStartenddate']").text('');
+        })
+
+        $("#ddlLeaveType").change(function () {
+            $("#EmpLeaveDate").val("");
+            $("#EmpLeavetodate").val("");
+            $('select[name=DayTypID]').val(0);
+            $('select[name=DayTypID]').selectpicker('refresh');
+        });
+
+        $("#shedule").hide();
+
+        $("#ddlProject").change(function () {
+            if ($(this).val() != 0)
+                $("#shedule").show();
+            else
+                $("#shedule").hide();
+
+            var ddlBox = $("#ddlShedules");
+            $.ajax({
+                url: "/Leave/GetScheduleList",
+                data: { ProjID: $(this).val() }
+            }).done(function (data) {
+                ddlBox.empty();
+                ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
+                $.each(data, function (i, item) {
+                    ddlBox.append('<option value=' + item.SchID + '>' + item.Schedule + '</option>').selectpicker('refresh'); 
+                });
+            });
+        });
+
+        $("#ddlShedules").change(function () {
+
+            $.ajax({
+                url: "/Leave/GetScheduleDates",
+                data: { SchID: $(this).val() }
+            }).done(function (data) {
+                
+                //$("#empStartenddate").data('daterangepicker').setStartDate(new Date(parseInt(data.StartDate.substr(6))));
+                //$("#empStartenddate").data('daterangepicker').setEndDate(new Date(parseInt(data.EndDate.substr(6))));
+
+
+
+
+                var start = new Date(parseInt(data.StartDate.substr(6)));
+                var end = new Date(parseInt(data.EndDate.substr(6)));
+                var currentDate = new Date(start);
+
+             
+               
+
+                while (currentDate <= end) {
+
+                    between.push(new Date(currentDate));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+               
+               
+                $('#EmpLeaveDate').data('DateTimePicker').destroy();
+                $('#EmpLeavetodate').data('DateTimePicker').destroy();
+
+                $('.leavepicker').datetimepicker({
+                    
+                    enabledDates: between,
+                    format: $("#HidDateFormat").val()
+
+                });
+               
+
+                $('.leavepickertwo').datetimepicker({
+                    
+                    enabledDates: between,
+                    format: $("#HidDateFormat").val()
+
+                });
+
+
+                
+
+                
+
+                
+
+
+            });
+
+        });
+                        
+    })
+
+
+</script>
+
+
+
+<section class="content-header">
+    <h1>
+       Leave Request
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/DashBoard/DashBoard"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+
+<section class="newforms">
+    <form class="projectadding form-horizontal col-sm-8" id="LeaveAppForm" action="#">
+
+
+        @*<div class="form-group">
+                <label for="inputEmail3" class="col-sm-3 control-label">Employee</label>
+                <div class="col-sm-8">
+
+                    <select class="selectpicker" name="EmpID" id="ddlEmployeeList"></select>
+
+                </div>
+            </div>*@
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">Leave type</label>
+            <div class="col-sm-8">
+
+                <select class="selectpicker required" name="LeavetypID" id="ddlLeaveType"></select>
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">Project</label>
+            <div class="col-sm-8">
+                <select class="selectpicker" name="ProjectID" id="ddlProject"></select>
+            </div>
+        </div>
+
+        <div class="form-group" id="shedule">
+            <label for="inputEmail3" class="col-sm-3 control-label">Shedule</label>
+            <div class="col-sm-8">
+                <select class="selectpicker" name="SchID" id="ddlShedules"></select>
+            </div>
+        </div>
+
+        @*<div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">Leave Duration</label>
+            <div class="col-sm-4 input-group">
+                <input type="text" class="form-control datetimepicker5 required" id="empStartenddate" name="empStartenddate" placeholder="Duration">
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>*@
+
+        <div class="form-group">
+                <label for="inputEmail3" class="col-sm-3 control-label">From</label>
+                <div class="col-sm-4 input-group">
+
+                    <input type="text" class="form-control leavepicker" name="EmpLeaveDate" id="EmpLeaveDate" placeholder="From">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputEmail3" class="col-sm-3 control-label">To</label>
+                <div class="col-sm-4 input-group">
+
+                    <input type="text" class="form-control leavepickertwo" name="EmpLeavetodate" id="EmpLeavetodate" placeholder="To">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+
+                </div>
+            </div>
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">DayType</label>
+            <div class="col-sm-8">
+
+                <select class="selectpicker required" name="DayTypID" id="ddldayType"></select>
+
+            </div>
+        </div>
+
+
+
+        <div class="form-group">
+            <label for="inputEmail3" class="col-sm-3 control-label">&nbsp;</label>
+            <div class="col-sm-8">
+                <button type="button" class="btn btn-success" id="btnleaveapp">Save</button>
+            </div>
+        </div>
+    </form>
+</section>

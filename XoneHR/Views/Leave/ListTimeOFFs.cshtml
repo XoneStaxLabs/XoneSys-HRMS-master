@@ -1,0 +1,14 @@
+﻿@model List<XoneHR.Models.TblTimeOFF>
+@{
+    ViewBag.Title = "ListTimeOFFs";
+}
+
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@item.TimeOFFStart</td>
+        <td>@item.TimeOFFEnd</td>
+        <td><button type="button" class="btn btn-primary RemoveTimeOFF" data-id="@item.TimeOFFID" ><i class="fa fa-trash"></i></button></td>
+    </tr>
+}

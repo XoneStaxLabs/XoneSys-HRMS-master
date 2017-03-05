@@ -1,0 +1,492 @@
+﻿@model XoneHR.Models.DashBoardUsercount
+@{
+    ViewBag.Title = "DashBoard";
+}
+
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<link rel="stylesheet" href="~/plugins/fullcalendar/fullcalendar.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
+<script src="~/plugins/fullcalendar/fullcalendar.min.js"></script>
+
+<style>
+    .fc-time {
+        display: none;
+    }
+</style>
+  
+<script>
+
+    $(function () {
+
+        /* initialize the external events
+       -----------------------------------------------------------------*/
+        function ini_events(ele) {
+           
+            ele.each(function () {
+
+                // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
+                // it doesn't need to have a start or end
+                var eventObject = {
+                    title: $.trim($(this).title()) // use the element's text as the event title
+                };
+
+                // store the Event Object in the DOM element so we can get to it later
+                $(this).data('eventObject', eventObject);
+
+                // make the event draggable using jQuery UI
+                $(this).draggable({
+                    zIndex: 1070,
+                    revert: true, // will cause the event to go back to its
+                    revertDuration: 0  //  original position after the drag
+                });
+
+            });
+        }
+        ini_events($('#external-events div.external-event'));
+
+        /* initialize the calendar
+         -----------------------------------------------------------------*/
+        //Date for the calendar events (dummy data)
+        var date = new Date();
+        var d = date.getDate(),
+                m = date.getMonth(),
+                y = date.getFullYear();
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            buttonText: {
+                today: 'today',
+                month: 'month'
+                //week: 'week',
+                //day: 'day'
+            },
+            //Random default events
+            events: "/DashBoard/GetCalendarEvents",
+            editable: false,
+            droppable: false, // this allows things to be dropped onto the calendar !!!
+            //eventClick: function (calEvent, jsEvent, view) {
+            
+            //    var formatted = $.datepicker.formatDate("dd/mm/yy", new Date(calEvent.HoliDate));
+               
+            //    $("#txtDate").val(formatted);
+            //    $("#HoliText").val(calEvent.Htext);
+            //    $("#ShowHolidays").modal({ backdrop: 'static' });
+            //    $("#ShowHolidays").modal('show');
+            //}
+        });
+        /* ADDING EVENTS */
+        var currColor = "#3c8dbc"; //Red by default
+        //Color chooser button
+        var colorChooser = $("#color-chooser-btn");
+        $("#color-chooser > li > a").click(function (e) {
+            e.preventDefault();
+            //Save color
+            currColor = $(this).css("color");
+            //Add color effect to button
+            $('#add-new-event').css({ "background-color": currColor, "border-color": currColor });
+        });
+        $("#add-new-event").click(function (e) {
+            e.preventDefault();
+            //Get value and make sure it is not null
+            var val = $("#new-event").val();
+            if (val.length == 0) {
+                return;
+            }
+
+            //Create events
+            var event = $("<div />");
+            event.css({ "background-color": currColor, "border-color": currColor, "color": "#fff" }).addClass("external-event");
+            event.html(val);
+            $('#external-events').prepend(event);
+
+            //Add draggable funtionality
+            ini_events(event);
+
+            //Remove event from text input
+            $("#new-event").val("");
+        });
+
+    });  
+
+</script>
+
+<script type="text/javascript">
+    
+    function DashBoardusers() {
+
+        $.ajax({
+
+            type: "get",
+            url: "/DashBoard/DashBoardusers",
+            async:false
+
+        }).done(function (data) {
+
+            $("#DashBoardusers").html(data);
+
+        })
+    }
+    
+    function Listallmemos() {
+
+        $.ajax({
+
+            type: "get",
+            url: "/DashBoard/Listallmemos",
+            async: false
+
+        }).done(function (data) {
+
+            $("#chat-box").html(data);
+
+        })
+    }
+    
+    function AbsenceAllocation() {
+        $.ajax({
+
+            type: "get",
+            url: "/DashBoard/AbsenceAllocation",
+            async: false
+
+        }).done(function (data) {
+
+            $("#AbsenceAllocation").html(data);
+
+        })
+    }
+    
+    function LeaveDetails() {
+        $.ajax({
+
+            type: "get",
+            url: "/DashBoard/LeaveDetails",
+            async: false
+
+        }).done(function (data) {
+
+            $("#LeaveDetails").html(data);
+
+        })
+    }
+    
+    $(document).ready(function () {
+                
+        $('#chat-box').slimScroll({
+            height: '330px'
+        });
+        
+        $("#memoreply").hide();
+               
+        DashBoardusers();
+        Listallmemos();
+        AbsenceAllocation();
+        LeaveDetails();
+
+        $(document).on("click", ".relpymemos", function () {
+
+            var subject = $(this).attr("data-Subject");
+            var senduid = $(this).attr("data-reply");
+            var memoid = $(this).attr("data-memoid");
+
+            $("#memoreply").show();
+            $("#memoreplytext").attr("data-Subject", subject);
+            $("#memoreplytext").attr("data-reply", senduid);
+            $("#memoreplytext").attr("data-memoid", memoid);
+
+        });
+
+        $("#btnReplyMemo").click(function () {
+            
+            var subject = $("#memoreplytext").attr("data-Subject");
+            var senduid = $("#memoreplytext").attr("data-reply");
+            var memotext = $("#memoreplytext").val();
+            var memoid = $("#memoreplytext").attr("data-memoid");
+
+            $.ajax({
+
+                type: "POST",
+                url: "/DashBoard/AddReplyMemo",
+                data: { subject: subject, senduid: senduid, memotext: memotext, memorepid: memoid }
+
+            }).done(function (data) {
+
+                if (data)
+                {
+                    $("#memoreplytext").val("");
+
+                    $.toast({
+                        text: "Send Successfully",
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+                else
+                {
+                    $.toast({
+                        text: "Failed",
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                }
+
+            })
+        })
+
+    });
+    
+</script>
+
+
+
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Control panel</small>
+        </h1>
+       
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+       
+        <div class="row" id="DashBoardCount">
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-aqua">
+                    <div class="inner">
+                        <h3>@Model.CandidateCount</h3>
+                        <p>Candidates</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="/Candidate/Index" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-green">
+                    <div class="inner">
+                        <h3>@Model.EmployeeCount</h3>
+                        <p>Employees</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="/Employee/Index" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-yellow">
+                    <div class="inner">
+                        <h3>@Model.AppUsersCount</h3>
+                        <p>Application Users</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="/ApplicationUser/Index" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box bg-red">
+                    <div class="inner">
+                        <h3>@Model.Projectcount</h3>
+                        <p>Projects</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                    <a href="/Project/Index" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+
+        </div>
+       
+        <div class="row">
+          
+            <section class="col-lg-7 connectedSortable">
+                <!-- Chat box -->
+                <div class="box box-success">
+                    <div class="box-header">
+                        <i class="fa fa-comments-o"></i>
+                        <h3 class="box-title">Memo</h3>
+                        <div class="box-tools pull-right" data-toggle="tooltip" title="Status">
+                            @*<div class="btn-group" data-toggle="btn-toggle">
+                                <button type="button" class="btn btn-default btn-sm active"><i class="fa fa-square text-green"></i></button>
+                                <button type="button" class="btn btn-default btn-sm"><i class="fa fa-square text-red"></i></button>
+                            </div>*@
+                        </div>
+                    </div>
+                   
+                    <div  class="box-body chat" id="chat-box">
+
+                      
+
+                    </div>
+
+
+                        <div class="box-footer" id="memoreply">
+                            <div class="input-group">
+                                <input class="form-control" id="memoreplytext" placeholder="Type message...">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-success" type="button" id="btnReplyMemo"><i class="fa fa-plus-circle"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </section>
+            
+            <section class="col-lg-5 connectedSortable ui-sortable">
+                <div class="box box-danger">
+                  <div class="box-header with-border">
+                        <h3 class="box-title">Latest Members</h3>
+                       @* <div class="box-tools pull-right">
+    <span class="label label-danger">8 New Members</span>
+    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                        </div>*@
+                    </div>
+                    <div class="box-body no-padding">
+                        <ul class="users-list clearfix" id="DashBoardusers">
+
+                        </ul><!-- /.users-list -->
+                    </div><!-- /.box-body -->
+                    <div class="box-footer text-center">
+                        <a href="/Employee/Index" class="uppercase">View All Users</a>
+                    </div><!-- /.box-footer -->
+                </div>
+            </section>
+                        
+            <section class="col-lg-7 connectedSortable ui-sortable">
+                <div class="box box-danger">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Employee Allocation</h3>
+                       
+                    </div>
+                    <div class="box-body no-padding">
+
+                        <div class="table-responsive">
+                            <table class="table no-margin">
+                                <thead>
+                                    <tr>
+
+
+                                        <th style="width:15%;">Project</th>
+                                        @*<th>Schedule</th>*@
+                                        <th>Date</th>
+                                        @*<th>To</th>*@
+                                        @*<th>Shift</th>*@
+                                        <th>Absent</th>
+                                        <th>Allocate</th>                                       
+
+                                    </tr>
+                                </thead>
+                                <tbody id="AbsenceAllocation"></tbody>
+
+                            </table>
+
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </section>
+            
+            <section class="col-lg-5 connectedSortable ui-sortable">
+                <div class="box box-danger">
+                   
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Employee Leaves</h3>
+
+                        <div class="box-tools pull-right">
+                            <span class="label label-danger">@Model.LeaveCount New Leaves</span>
+                            </div>
+                            
+
+
+
+                        </div>
+
+                    <div class="table-responsive">
+                        <table class="table no-margin">
+                            <thead>
+                                <tr>
+
+
+                                    <th style="width:15%;">Employee</th>
+                                    <th>Leave Type</th>
+                                    <th>Status</th>
+                                   
+
+                                </tr>
+                            </thead>
+                            <tbody id="LeaveDetails">
+                                <tr>
+                                    <td style="width:15%;">Employee</td>
+                                    <td>Leave Type</td>
+                                    <td>Status</td>
+                                </tr>
+
+                            </tbody>
+
+
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="box-footer text-center">
+                        <a href="/Leave/Index" class="uppercase">View All </a>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="col-lg-7 connectedSortable ui-sortable">
+                <div class="box box-danger">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Holiday List</h3>
+                    </div>
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                            <!-- /.col -->
+                            <div class="col-md-14"> <!--- class="col-md-9" -->
+                                <div class="box box-primary">
+                                    <div class="box-body no-padding">
+                                        <!-- THE CALENDAR -->
+                                        <div id="calendar"></div>
+                                    </div><!-- /.box-body -->
+                                </div><!-- /. box -->
+                            </div>
+                            <!-- /.col -->
+                        
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+
+     
+
+</section>

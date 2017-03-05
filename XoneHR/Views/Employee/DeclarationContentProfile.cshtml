@@ -1,0 +1,97 @@
+﻿@model  IEnumerable<XoneHR.Models.DeclarationDetails>
+@{
+    ViewBag.Title = "DeclarationtabContentList";
+    var j = 0;
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+
+    });
+</script>
+@*<input type="hidden" id="CandDeclAns" name="CandDeclAns" />*@
+<form id="Declarationtabform">
+
+    @if (ViewBag.DeclarationContent != null)
+    {
+        foreach (var cntnt in ViewBag.DeclarationContent)
+        {
+            var i = 0;
+            <h3 class="box-title">@cntnt.DeclName</h3>
+            foreach (var item in Model)
+            {
+
+                if (item.DeclTypeID == cntnt.DeclTypeID)
+                {
+                    i++; j++;
+                    <hr class="divider">
+                    <div class="ques">
+                        <div class="form-group">
+                            <div class="form-group col-sm-12">
+                                <h5>@i. @item.DeclContent</h5>
+                                <div class="col-sm-4 sex">
+
+                                    @if (item.CandDeclAns == true)
+                                    {
+                                        <label class="sexlabel">Yes</label>
+                                        @*<input type="radio" name=@("CandDeclAnswer"+j) class="flat-red chkradio" checked="checked"  disabled="disabled">*@
+                                    }
+                                    else
+                                    {
+                                        <label class="sexlabel">No</label>
+                                        @*<input type="radio" name=@("CandDeclAnswer"+j) class="flat-red chkradio" readonly="readonly">*@
+                                    }
+
+                                    @*@if (item.CandDeclAns == false)
+                                        {
+                                             <label class="sexlabel"></label>
+                                            <input type="radio" name=@("CandDeclAnswer"+j) class="flat-red chkradio" checked="checked" disabled="disabled">
+                                        }
+                                        else
+                                        {
+                                         <input type="radio" name=@("CandDeclAnswer"+j) class="flat-red chkradio" disabled='disabled'>
+                                        }
+                                        No*@
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                                <h6>@item.CandDeclAnsDetail</h6>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    }
+
+    @*<hr class="divider">
+        @if (ViewBag.DeclarationContent != null)
+        {
+           <div class="form-group">
+            <div class="col-sm-10">
+                <div class="form-control answer" rows="3"> I hereby certify that the above information as provided by me is true, complete and accurate to the best of my knowledge. I further understand that any wilful act on my part in withholding information or making any false statement in this employment application is in itself sufficient ground for dismissal from the company.</div>
+            </div>
+            <div class="col-sm-6">
+                <label>
+                    <input type="checkbox" class="flat-red" id="Agreeid" checked="checked" readonly="readonly">
+                    I Agree
+                </label>
+            </div>
+        </div>
+
+        }
+        else
+        {
+            <div><h3 class="box-title">No Declaration</h3></div>
+        }*@
+    else
+    {
+        <h3 class="box-title">No Declaration</h3>
+    }
+
+</form>

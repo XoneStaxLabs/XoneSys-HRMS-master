@@ -1,0 +1,198 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript" >
+    $(document).ready(function () {
+
+     //   LoadEmployees();
+
+        $("#btnshow").click(function () { 
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+           
+            var d = new Date();
+      
+            if (($("#month").val() <= d.getMonth() + 1 && $("#year").val() == d.getFullYear()) || ($("#year").val() <= d.getFullYear())) {
+              
+                $("#SalSlip").validate({
+                    rules: {
+                        //employees: {
+                        //    required: true,
+                        //    check_item_dropdown: true
+                        //},
+                        year: {
+                            required: true,
+                            check_item_dropdown: true
+                        },
+                        month: {
+                            required: true,
+                            check_item_dropdown: true
+                        }
+
+                    }
+                });
+
+                if ($("#SalSlip").valid()) {
+                     
+
+                    $.ajax({
+                        url: "/EmployeeSalarySlip/CheckLeaveStatus",
+                        data: { year: $("#year").val(), month: $("#month").val(), EmpID: $("#employees").val() }
+                    }).done(function (data) {
+                        
+                        if (data == 0) {
+                            $.ajax({
+                                url: "/EmployeeSalarySlip/ListSlip",
+                                data: { year: $("#year").val(), month: $("#month").val(), emp: $("#employees").val(), monthName: $("#month option:selected").text() },
+                            }).done(function (data) {                               
+                                if (data != 1)
+                                    $("#SalarySlipContent").html(data);
+                                else
+                                {                                    
+                                    $.toast({
+
+                                        text: "No Data Avilable for this employee!",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.toast({
+
+                                text: "Un Authorized Leaves Existed.. Authorize First",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            });
+                        }
+                    });
+                }
+               
+            }
+            else
+            {
+                $("#SalarySlipContent").html("");
+
+                $.toast({
+
+                    text: "No Data Avilable!",
+                    position: 'top-right',
+                    hideAfter: 3000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                });
+            }           
+                     
+        });
+
+        var year = $("#year");
+        $('<option>', { value: 0, text: "Year" }).appendTo(year);
+        for (i = 2015; i <= 2035; i++) {
+            $('<option>', { value: i, text: i }).appendTo(year);           
+        }
+
+        //$("#btnGenerateXL").click(function () {
+        $(document).on("click", ".btnGenerateXL", function () {
+         
+            $.ajax({
+                url: "/EmployeesList/Index",
+                //url: "/EmployeeSalarySlip/ExportDetails",
+
+            }).done(function (data) {
+
+            });
+
+        });
+
+        //$("#employees").change(function () {
+        //    $("#SalarySlipContent").html("");
+        //});
+
+        $("#year").change(function () {
+            $("#SalarySlipContent").html("");
+        });
+
+        $("#month").change(function () {
+            $("#SalarySlipContent").html("");
+        });
+
+                
+    });
+</script>
+
+<script>
+    function LoadEmployees() {
+        var ddlBox=$("#employees");
+        $.ajax({
+            url: "/EmployeeSalarySlip/ListEmployees"
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Employees</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+
+                ddlBox.append('<option value=' + item.EmpID + '>' + item.CandName + '</option>').selectpicker('refresh');;
+            });
+        });
+    }
+</script>
+
+<div class="modal-body offerpop">
+    @*<section class="content-header">        
+    </section>*@
+    <ol class="breadcrumb" style="float:right;">
+        <li><a href="/Payroll/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+    <div class="offerLetter">
+        <form action="#" id="SalSlip">
+            <div class="col-sm-12">
+                @*<img src="~/dist/img/gragnet.jpg" alt="" />
+                <h1>Dragnet Private Investigation and Security Consultants PTE LTE</h1>*@
+                <a href="/EmployeesList/Index" class="btnGenerateXL" id="btnGenerateXL">Export All employees data to excel</a>
+                <div class="salman">
+                    @*<select class="form-control fil required" id="employees" name="employees"></select>*@
+                    <label class="form-control fil" id="lblempname">@ViewBag.EmpName</label>
+                    <input type="hidden" id="employees" value="@ViewBag.EmpID"/>
+                    <select class="form-control fil required year" id="year" name="year">                    
+                    </select>
+                    <select class="form-control fil required" id="month" name="month">
+                        <option value='0'>MONTH</option>
+                        <option value='1'>JANAURY</option>
+                        <option value='2'>FEBRUARY</option>
+                        <option value='3'>MARCH</option>
+                        <option value='4'>APRIL</option>
+                        <option value='5'>MAY</option>
+                        <option value='6'>JUNE</option>
+                        <option value='7'>JULY</option>
+                        <option value='8'>AUGUST</option>
+                        <option value='9'>SEPTEMBER</option>
+                        <option value='10'>OCTOBER</option>
+                        <option value='11'>NOVEMBER</option>
+                        <option value='12'>DECEMBER</option>
+                    </select>
+                    <input type="button" value="Show Salary Slip" id="btnshow" class="form-control fil" />
+                    
+                </div>
+                <h6>Salary Slip</h6>
+            </div>
+        </form>       
+        
+        <div id="SalarySlipContent">
+
+        </div>
+    </div>    
+</div>
+
+
+

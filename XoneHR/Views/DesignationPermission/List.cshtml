@@ -1,0 +1,42 @@
+﻿@model IEnumerable<XoneHR.Models.DesignationList>
+@{
+    ViewBag.Title = "List";
+    Layout = null;
+    var i = 0;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#example2").DataTable();
+    });
+</script>
+
+<table id="example2" class="table table-bordered">  @*table-hover masterlist*@
+    <thead>
+        <tr>
+            <th>Sl No.</th>
+            <th>Designation</th> 
+            <th>Department</th>            
+            <th width="12%">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            i++;
+            <tr>
+                <td>@i</td>
+                <td>@item.DesigName</td>
+                <td>@item.DepName</td>                                 
+                <td>
+                    <a href="/DesignationPermission/Edit?ID=@item.DesigID" class="btn btn-warning"><i class="fa fa-fw fa-edit"></i></a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

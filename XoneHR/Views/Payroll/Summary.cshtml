@@ -1,0 +1,243 @@
+﻿@{
+    ViewBag.Title = "Summary";
+}
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var year = $("#year");
+        $('<option>', { value: 0, text: "Year" }).appendTo(year);
+        for (i = 2015; i <= 2035; i++) {
+            $('<option>', { value: i, text: i }).appendTo(year);
+        }
+
+        if ($("#yr").val() != 0 && $("#mh").val() != 0) {
+
+            $("#year").val($("#yr").val());
+            $("#month").val($("#mh").val());
+
+            $.ajax({
+                url: "/Payroll/CheckLeaveStatus",
+                data: { year: $("#year").val(), month: $("#month").val(), EmpID: $("#employees").val() }
+            }).done(function (data) {
+
+                if (data == 0) {
+                    $.ajax({
+                        url: "/Payroll/SummaryDetails",
+                        data: { year: $("#year").val(), month: $("#month").val(), emp: $("#employees").val() },
+                    }).done(function (data) {
+                        if (data != 1)
+                            $("#Employeesummarydetails").html(data);
+                        else {
+                            $.toast({
+
+                                text: "No Data Avilable for this employee!",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            });
+                        }
+                    });
+                }
+                else {
+                    $.toast({
+
+                        text: "Un Authorized Leaves Existed.. Authorize First",
+                        position: 'top-right',
+                        hideAfter: 3000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    });
+                }
+            });
+
+        }
+
+        $("#btncalender").click(function () {
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            var d = new Date();
+
+            if (($("#month").val() <= d.getMonth() + 1 && $("#year").val() == d.getFullYear()) || ($("#year").val() <= d.getFullYear())) {
+
+                $("#EmpSummary").validate({
+                    rules: {
+                        //employees: {
+                        //    required: true,
+                        //    check_item_dropdown: true
+                        //},
+                        year: {
+                            required: true,
+                            check_item_dropdown: true
+                        },
+                        month: {
+                            required: true,
+                            check_item_dropdown: true
+                        }
+
+                    }
+                });
+
+                if ($("#EmpSummary").valid()) {
+                    var year = $("#year").val(); var month = $("#month").val(); var EmpID = $("#employees").val();
+                    window.location.href = '/Payroll/Calendersummary?year=' + year + "&month=" + month + "&EmpID=" + EmpID;
+
+                }
+
+            }
+            else {
+
+                $.toast({
+
+                    text: "No Data Avilable!",
+                    position: 'top-right',
+                    hideAfter: 3000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                });
+            }
+
+        });
+
+        $("#btnshow").click(function () {
+
+            $.validator.addMethod("check_item_dropdown", function (value, element) {
+                return this.optional(element) || value != 0;
+            }, "Please select an item from the dropdown list.");
+
+            var d = new Date();
+
+            if (($("#month").val() <= d.getMonth() + 1 && $("#year").val() == d.getFullYear()) || ($("#year").val() <= d.getFullYear())) {
+
+                $("#EmpSummary").validate({
+                    rules: {
+                        //employees: {
+                        //    required: true,
+                        //    check_item_dropdown: true
+                        //},
+                        year: {
+                            required: true,
+                            check_item_dropdown: true
+                        },
+                        month: {
+                            required: true,
+                            check_item_dropdown: true
+                        }
+
+                    }
+                });
+
+                if ($("#EmpSummary").valid()) {
+
+                    $.ajax({
+                        url: "/Payroll/CheckLeaveStatus",
+                        data: { year: $("#year").val(), month: $("#month").val(), EmpID: $("#employees").val() }
+                    }).done(function (data) {
+
+                        if (data == 0) {
+                            $.ajax({
+                                url: "/Payroll/SummaryDetails",
+                                data: { year: $("#year").val(), month: $("#month").val(), emp: $("#employees").val() },
+                            }).done(function (data) {
+                                if (data != 1)
+                                { $("#Employeesummarydetails").html(data); }
+                                else {
+                                    $.toast({
+
+                                        text: "No Data Avilable for this employee!",
+                                        position: 'top-right',
+                                        hideAfter: 3000,
+                                        showHideTransition: 'slide',
+                                        loader: false,
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            $.toast({
+
+                                text: "Un Authorized Leaves Existed.. Authorize First",
+                                position: 'top-right',
+                                hideAfter: 3000,
+                                showHideTransition: 'slide',
+                                loader: false,
+                            });
+                        }
+                    });
+                }
+
+            }
+            else {
+                $("#Employeesummarydetails").html("");
+
+                $.toast({
+
+                    text: "No Data Avilable!",
+                    position: 'top-right',
+                    hideAfter: 3000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                });
+            }
+
+        });
+
+    });
+</script>
+
+<div class="modal-body offerpop">
+  
+        <ol class="breadcrumb" style="float:right !important;">
+            <li><a href="/Payroll/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+        </ol>
+ 
+   
+    <div class="offerLetter">
+        <form action="#" id="EmpSummary">
+            <div class="col-sm-12">
+
+                <div class="salman">
+                    @*<select class="form-control fil required" id="employees" name="employees"></select>*@
+                    <label class="form-control fil" id="lblempname">@ViewBag.EmpName</label>
+                    <input type="hidden" id="employees" value="@ViewBag.EmpID" />
+                    <input type="hidden" id="yr" value="@ViewBag.year" />
+                    <input type="hidden" id="mh" value="@ViewBag.month" />
+
+                    <select class="form-control fil required year" id="year" name="year">
+                        @*<option>Year</option>
+                            <option>2015</option>
+                            <option>2016</option>*@
+                    </select>
+                    <select class="form-control fil required" id="month" name="month">
+                        <option value='0'>Month</option>
+                        <option value='1'>Janaury</option>
+                        <option value='2'>February</option>
+                        <option value='3'>March</option>
+                        <option value='4'>April</option>
+                        <option value='5'>May</option>
+                        <option value='6'>June</option>
+                        <option value='7'>July</option>
+                        <option value='8'>August</option>
+                        <option value='9'>September</option>
+                        <option value='10'>October</option>
+                        <option value='11'>November</option>
+                        <option value='12'>December</option>
+                    </select>
+                    <input type="button" value="Show Summary" id="btnshow" class="form-control fil" />&nbsp;
+                    <input type="button" value="Show Details" id="btncalender" class="form-control fil">
+                </div>
+                @*<div>&nbsp;&nbsp;<a href="#" id="btncalender"><i class="btnGenerateXL">Show Daywise Details</i></a> </div>*@
+                <h6>Work Summary</h6>
+            </div>
+        </form>
+
+        <div id="Employeesummarydetails">
+        </div>
+    </div>
+</div>

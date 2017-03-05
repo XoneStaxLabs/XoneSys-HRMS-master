@@ -1,0 +1,59 @@
+﻿@model IEnumerable<XoneHR.Models.EmployeeDetails>
+@{
+    ViewBag.Title = "ListAllEmployees";
+    Layout = null;
+}
+
+
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+
+    function ListEmployeeresult() {
+        $.ajax({
+
+            url: "/Employee/ListEmployeeresult"
+            //data: { ListTypeId: ListTypeId }
+
+        }).done(function (data) {
+
+            $("#ListEmployeeresult").html(data);
+            $('#example2').DataTable();
+        })
+    }
+
+    $(document).ready(function () {
+
+      //  ListEmployeeresult($("#ListTypeId").val());
+        ListEmployeeresult();
+
+        
+
+    });
+
+</script>
+
+<input type="hidden" value="@ViewBag.Type" id="ListTypeId" />
+ 
+<section class="newforms">
+    <table id="example2" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+
+                @*<th style="width:15%;">Reg No</th>*@
+                <th width="12% !important">Emp Code</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Designation</th>
+                @*<th>department</th>*@
+                <th>Grade</th>
+                <th>Nationality</th>
+                <th>Join Date</th>                
+                <th>Action</th>
+
+            </tr>
+        </thead>
+        <tbody id="ListEmployeeresult"></tbody>
+    </table>
+</section>

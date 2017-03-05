@@ -1,0 +1,183 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<link href="~/jqwidgets/jqwidgets/styles/jqx.base.css" rel="stylesheet" />
+<link href="~/jqwidgets/jqwidgets/styles/jqx.metro.css" rel="stylesheet" />
+<script src="~/jqwidgets/jqwidgets/jqxcore.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxdata.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxdropdownbutton.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxscrollbar.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxbuttons.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxpanel.js"></script>
+<script src="~/jqwidgets/jqwidgets/jqxtree.js"></script> 
+
+<script src="~/plugins/Toast/src/jquery.toast.js"></script>
+<link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+
+        $.ajax({
+            type: "POST",
+            url: "/MenuMaster/GetMenuMasterParentList",
+        }).done(function (data) {
+
+            $('#jqxTree').jqxTree('clear');
+            var dataAdapter = new $.jqx.dataAdapter(data);
+            dataAdapter.dataBind();
+            var records = dataAdapter.getRecordsHierarchy('id', 'parentid', 'items', [{ name: 'text', map: 'label' }]);
+            $('#jqxTree').jqxTree({ source: records, width: '300px', theme: 'metro' });
+
+        });
+
+        //Combo tree
+        $("#dropDownButton").jqxDropDownButton({ theme: 'metro' });
+
+        $('#jqxTree').on('select', function (event) {
+
+            var args = event.args;
+            var item = $('#jqxTree').jqxTree('getItem', args.element);
+            var dropDownContent = '<div style="position: relative; margin-left: 3px; margin-top: 5px;">' + item.label + '</div>';
+            $("#dropDownButton").jqxDropDownButton('setContent', dropDownContent);
+            var items = $('#jqxTree').jqxTree('getSelectedItem');
+            $("#MenuParentID").val(items.id);
+            
+            $.ajax({
+                type: "GET",
+                url: "/MenuMaster/GetMenuMasterData",
+                data: { id: items.id }
+            }).done(function (data) {
+                $("#MenuController").val(data.MenuController);
+                $("#MenuAction").val(data.MenuAction);
+            });
+           
+        });
+
+        $("#IsParentID").prop('checked', false);
+        $("#CombotreeParent").hide();
+        $("#MenuParentID").val(0);
+        $("#MenuController").val("");
+        $("#MenuAction").val("");
+        $("#MenuIcons").val("");
+        $("#MenuName").val("");
+        $('#IsParentID').change(function () {
+             
+            if ($(this).prop("checked") == true) {
+
+                $("#CombotreeParent").show();
+                $("#MenuParentID").val("");
+            }
+            else if ($(this).prop("checked") == false) {
+
+                $("#CombotreeParent").hide();
+                $("#MenuParentID").val(0);
+                $("#MenuController").val("");
+                $("#MenuAction").val("");
+            }
+
+        });
+
+        $("#Btnsave").click(function () {
+            $("#frmMenuMaster").validate();
+            if($("#frmMenuMaster").valid())
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "/MenuMaster/ManageMenuMaster",
+                    data: $("#frmMenuMaster").serialize()
+                }).done(function (data) {
+                    $.toast({
+                        text: data.Message,
+                        position: 'top-right',
+                        hideAfter: 2000,
+                        showHideTransition: 'slide',
+                        loader: false,
+                    })
+                    if (data.Result == 1) {
+                        window.location.href = "/MenuMaster/Index"
+                    }
+
+                });
+            }
+        })
+    });
+
+</script>
+
+<section class="content-header">
+    <h1>
+        <i class="fa fa-user-plus"></i>&nbsp;
+        Menu Master 
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="/DesignationPermission/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </ol>
+</section>
+<section class="newforms">
+    <div class="tabsnew">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="profile">
+                <form class="" action="#" id="frmMenuMaster">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Name</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="MenuName" id="MenuName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">IsParent</label>
+                                    <div class="col-sm-8">
+                                        <input type="checkbox" id="IsParentID" name="IsParentID">
+                                    </div>
+                                </div>
+                                <div class="form-group" id="CombotreeParent">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Parent Menu</label>
+                                    <div class="col-sm-8">
+                                        <div class=" input-group inline-block">
+                                            <div id="dropDownButton">
+                                                <div id="jqxTree" style="border: none;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="MenuParentID" name="MenuParentID">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Controller</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="MenuController" id="MenuController">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Action</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="MenuAction" id="MenuAction">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-4 control-label">Icon</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control required" name="MenuIcons" id="MenuIcons">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                      
+                    </div>
+                    <div class="text-left">
+                        <button type="button" class="btn btn-sm btn-success" id="Btnsave">Save<span>&nbsp;</span> <i class="fa fa-floppy-o"></i></button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

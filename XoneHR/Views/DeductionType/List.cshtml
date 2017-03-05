@@ -1,0 +1,46 @@
+﻿@model IEnumerable<XoneHR.Models.TblDeductionType>
+@{
+    ViewBag.Title = "List";
+    Layout = null;   
+    var i = 0;
+    //var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#example2").DataTable();
+    });
+</script>
+
+<table id="example2" class="table table-bordered table-hover masterlist">
+    <thead>
+        <tr>
+            <th style="width:110px !important">Serial Number</th>
+            <th>Name</th>            
+            <th data-sortable="false">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            i += 1;
+            <tr>
+                <td>@i</td>
+                <td>@item.DeductionType</td>
+                <td>
+                    
+                    @*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {*@
+                        <a href="#" class="btn btn-success btnedit" data-toggle="modal" @*data-target="#myModal1"*@ data-id="@item.DeductType_Id" data-name="@item.DeductionType"><i class="fa fa-fw fa-edit"></i></a>
+                    @*}
+                    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
+                    {*@
+                        <a href="#" class="btn btn-danger btndelete" data-toggle="modal" @*data-target="#myModal"*@ data-id="@item.DeductType_Id" data-name="@item.DeductionType"><i class="fa fa-fw fa-trash-o"></i></a>
+                    @*}*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

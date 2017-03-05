@@ -1,0 +1,47 @@
+﻿@model IEnumerable<XoneHR.Models.TblCheckListTypes>
+@{
+    ViewBag.Title = "List";
+    Layout = null;      
+    Int32 i = 0;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+<script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="~/plugins/datatables/dataTables.bootstrap.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#example2").DataTable();
+    });
+</script>
+
+<table id="example2" class="table table-bordered table-hover masterlist">
+    <thead>
+        <tr>
+            <th width="80px">Sl No.</th>
+            <th>Checklist Items</th>  
+            <th>Price</th>          
+            <th data-sortable="false">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            i++;
+            <tr>
+                <td>@i</td>                
+                <td>@item.CheckListDetails</td>   
+                <td>@item.Price</td>
+                <td>
+                    @*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        {*@
+                    <a href="" class="btn btn-success btnedit" data-toggle="modal" data-id="@item.CheckListTypeID" data-name="@item.CheckListDetails" data-price="@item.Price"><i class="fa fa-fw fa-edit"></i></a>
+                    @*}
+                        @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        {*@
+                    <a href="" class="btn btn-danger btndelete" data-toggle="modal" data-id="@item.CheckListTypeID" data-name="@item.CheckListDetails"><i class="fa fa-fw fa-trash-o"></i></a>
+                    @*}*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
