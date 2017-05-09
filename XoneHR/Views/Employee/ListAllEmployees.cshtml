@@ -19,17 +19,16 @@
         }).done(function (data) {
 
             $("#ListEmployeeresult").html(data);
-            $('#example2').DataTable();
+           // $('#example2').DataTable();
+            $('#example2').DataTable({
+                "order": [[3, "asc"]]
+            });
         })
     }
 
     $(document).ready(function () {
 
-      //  ListEmployeeresult($("#ListTypeId").val());
-        ListEmployeeresult();
-
-        
-
+        ListEmployeeresult();  
     });
 
 </script>
@@ -45,7 +44,7 @@
                 <th width="12% !important">Emp Code</th>
                 <th>Name</th>
                 <th>Type</th>
-                <th>Designation</th>
+                <th>PLRD Grade</th> @*Designation*@
                 @*<th>department</th>*@
                 <th>Grade</th>
                 <th>Nationality</th>

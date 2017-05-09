@@ -1,15 +1,19 @@
 ﻿@{
     ViewBag.Title = "LeaveRequestMain";
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
 }
 
 <script src="~/plugins/Toast/src/jquery.toast.js"></script>
 <link href="~/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script src="~/plugins/Toaster/toastr.js"></script>
+<link href="~/plugins/Toaster/toastr.min.css" rel="stylesheet" />
+<script src="~/plugins/Toaster/ui-toastr.min.js"></script>
 
 <script>
     function GetSearchEmps() {
 
         $("#searchemp").empty();
-        $("#searchemp").append('<option value=0>SEARCH Employee</option>');
+        $("#searchemp").append('<option value=0>Search Employee</option>');
         $.ajax({
             type: "POST",
             url: "/Leave/GetEmployees"
@@ -107,10 +111,106 @@
 
             type: "GET",
             url: "/Leave/LeaveList",
-            data: { EmpappStatus: 0 }
+            async: false
         }).done(function (data) {
             $("#ListRequests").html(data);
         });
+    }
+
+    function LeaveList1(Ddl_Employee, Ddl_LeaveType, Ddl_Status) {
+
+        $.ajax({
+
+            type: "GET",
+            url: "/Leave/LeaveList",
+            data: { Empid: Ddl_Employee, LeaveType: Ddl_LeaveType, Status: Ddl_Status },
+            async: false
+        }).done(function (data) {
+            $("#ListRequests").html(data);
+        });
+    }
+
+    function LeaveRequestedEmployee()
+    {
+        var ddlBox = $("#Ddl_Employee");
+        $.ajax({
+
+            url: "/Leave/LeaveRequestedEmployee",
+            async: false
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select Employee</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+                ddlBox.append('<option value=' + item.EmpID + '>' + item.CandName + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+
+    function RequestedLeaveTypes(EmpID) {
+        var ddlBox = $("#Ddl_LeaveType");
+        $.ajax({
+
+            url: "/Leave/RequestedLeaveTypes",
+            data:{EmpID : EmpID},
+            async: false
+        }).done(function (data) {
+            ddlBox.empty();
+            ddlBox.append('<option value="0">Select Leave</option>').selectpicker('refresh');
+
+            $.each(data, function (i, item) {
+                if (item.LeavetypID != 9)
+                    ddlBox.append('<option value=' + item.LeavetypID + '>' + item.LeaveType + '</option>').selectpicker('refresh');
+            });
+        });
+    }
+
+    function RequestedStatus(LeaveType) {
+        if (LeaveType == 0) {
+
+            var ddlBox = $("#Ddl_Status");
+            ddlBox.empty();
+            ddlBox.append('<option value="-1">Select Status</option>').selectpicker('refresh');
+            ddlBox.append('<option value="0">Pending</option>').selectpicker('refresh');
+            ddlBox.append('<option value="1">Approved</option>').selectpicker('refresh');
+            ddlBox.append('<option value="2">Rejected</option>').selectpicker('refresh');
+            ddlBox.append('<option value="3">Authorized</option>').selectpicker('refresh');
+        }
+        else {
+            var ddlBox = $("#Ddl_Status");
+            ddlBox.empty(); ddlBox.append('<option value="-1">Select Status</option>').selectpicker('refresh');
+            $.ajax({
+
+                url: "/Leave/RequestedLeaves_Status",
+                data: { LeaveType: LeaveType, EmpID: $("#Ddl_Employee").val() },
+                async: false
+            }).done(function (data) {
+                $.each(data, function (i, item) {
+                    switch (item.EmpappStatus) {
+                        case 0:
+                            ddlBox.append('<option value="' + item.EmpappStatus + '">Pending</option>').selectpicker('refresh');
+                            break;
+                        case 1:
+                            ddlBox.append('<option value="' + item.EmpappStatus + '">Approved</option>').selectpicker('refresh');
+                            break;
+                        case 2:
+                            ddlBox.append('<option value="' + item.EmpappStatus + '">Rejected</option>').selectpicker('refresh');
+                            break;
+                        case 3:
+                            ddlBox.append('<option value="' + item.EmpappStatus + '">Authorized</option>').selectpicker('refresh');
+                            break;
+                        default:
+                            break;
+
+                    }
+
+                });
+
+            });
+
+        }
+        $("#Ddl_Status").val($("#Status").val());
+        $("#Ddl_Status").selectpicker('refresh');
     }
 
 </script>
@@ -120,12 +220,13 @@
 
         GetSearchEmps();
         LeaveList();
+        LeaveRequestedEmployee(); RequestedLeaveTypes(0); RequestedStatus(0); 
+        LeaveList1(0, 0, $("#Status").val()); 
         $('#EmpLeaveDate').datetimepicker();
         $('#EmpLeavetodate').datetimepicker();
         $("#LeaveReqBtn").click(function () {
             $("#shedule").hide();
             GetLeaveType($("#searchemp").val());
-          //  GetProject();
             GetDayType();            
             if ($("#searchemp").val() != 0)
             {
@@ -139,56 +240,6 @@
                 $("#LeaveReqModal").modal('show');
             }            
         });
-
-
-        //$("#ddlProject").change(function () {
-        //    if ($(this).val() != 0)
-        //        $("#shedule").show();
-        //    else
-        //        $("#shedule").hide();
-
-        //    var ddlBox = $("#ddlShedules");
-        //    $.ajax({
-        //        url: "/Leave/GetScheduleList",
-        //        data: { ProjID: $(this).val() }
-        //    }).done(function (data) {
-        //        ddlBox.empty();
-        //        ddlBox.append('<option value="0">--Select--</option>').selectpicker('refresh');
-        //        $.each(data, function (i, item) {
-        //            ddlBox.append('<option value=' + item.SchID + '>' + item.Schedule + '</option>').selectpicker('refresh');
-        //        });
-        //    });
-        //});
-        //$("#ddlShedules").change(function () {
-
-        //    $.ajax({
-        //        url: "/Leave/GetScheduleDates",
-        //        data: { SchID: $(this).val() }
-        //    }).done(function (data) {
-
-        //        var start = new Date(parseInt(data.StartDate.substr(6)));
-        //        var end = new Date(parseInt(data.EndDate.substr(6)));
-        //        var currentDate = new Date(start);
-        //        while (currentDate <= end) {
-        //            between.push(new Date(currentDate));
-        //            currentDate.setDate(currentDate.getDate() + 1);
-        //        }
-        //        $('#EmpLeaveDate').data('DateTimePicker').destroy();
-        //        $('#EmpLeavetodate').data('DateTimePicker').destroy();
-
-        //        $('.leavepicker').datetimepicker({
-
-        //            enabledDates: between,
-        //            format: $("#HidDateFormat").val()
-        //        });
-
-        //        $('.leavepickertwo').datetimepicker({
-
-        //            enabledDates: between,
-        //            format: $("#HidDateFormat").val()
-        //        });
-        //    });
-        //});
 
         $('#empStartenddate').change(function () {
             $("label[for='empStartenddate']").text('');
@@ -252,7 +303,6 @@
                 //    var file = document.getElementById("newdoc").files[0];
                 //    FileUpload = file;
                 //}
-
                 $.ajax({
                     type: "POST",
                     url: "/Leave/AddnewleaveApplication",
@@ -260,68 +310,87 @@
                 }).done(function (data) {
 
                     if (data.OutputID == 1) {
+                        $.toast({
 
-                        if (data.PendingDays == 0) {
-                            $.toast({
-
-                                text: "Leave Applied Successfully",
-                                position: 'top-right',
-                                hideAfter: 3000,
-                                showHideTransition: 'slide',
-                                loader: false,
-                            })
-
-                            $('select[name=LeavetypID]').val(0);
-                            $('select[name=LeavetypID]').selectpicker('refresh');
-                            $("#EmpLeaveDate").val("");
-                            $("#EmpLeavetodate").val("");
-                            $('select[name=DayTypID]').val(0);
-                            $('select[name=DayTypID]').selectpicker('refresh');
-                            $("#empStartenddate").val("");
-                            window.location.href = "/Leave/LeaveRequestMain";
-                        }
-                        else {
-                            $.toast({
-
-                                text: " " + data.PendingDays + "more leaves applied than eligibility",
-                                position: 'top-right',
-                                hideAfter: 4000,
-                                showHideTransition: 'slide',
-                                loader: false,
-                            })
-                            window.location.href = "/Leave/LeaveRequestMain";
-                        }
-
+                            text: "Leave Applied Successfully",
+                            position: 'top-center',
+                            hideAfter: 20000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                            icon: "success"
+                        })
+                        $('select[name=LeavetypID]').val(0);
+                        $('select[name=LeavetypID]').selectpicker('refresh');
+                        $("#EmpLeaveDate").val("");
+                        $("#EmpLeavetodate").val("");
+                        $('select[name=DayTypID]').val(0);
+                        $('select[name=DayTypID]').selectpicker('refresh');
+                        $("#empStartenddate").val("");
+                        // window.location.href = "/Leave/LeaveRequestMain";
+                        LeaveList();
+                        $("#LeaveReqModal").modal('hide');
+                        $("#searchemp").val(0);
                     }
                     else if (data.OutputID == 2) {
                         $.toast({
 
-                            text: "Leave not allowed",
-                            position: 'top-right',
-                            hideAfter: 3000,
+                            text: "Leave not available",
+                            position: 'top-center',
+                            hideAfter: 20000,
                             showHideTransition: 'slide',
                             loader: false,
+                            icon: "warning"
                         })
+                    }
+                    else if(data.OutputID == 3)
+                    {
+                        $.toast({
 
-                        //$('select[name=LeavetypID]').val(0);
-                        //$('select[name=LeavetypID]').selectpicker('refresh');
-                        //$("#EmpLeaveDate").val("");
-                        //$("#EmpLeavetodate").val("");
-                        //$('select[name=DayTypID]').val(0);
-                        //$('select[name=DayTypID]').selectpicker('refresh');
+                            text: " " + data.PendingDays + "more leaves applied than eligibility",
+                            position: 'top-center',
+                            hideAfter: 20000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                            icon: "info"
+                        })
+                        //window.location.href = "/Leave/LeaveRequestMain";
+                        LeaveList();
+                        $("#LeaveReqModal").modal('hide');
+                        $("#searchemp").val(0);
+                    }
+                    else if (data.OutputID == -1) {
+                        $.toast({
 
-                        //$('select[name=ProjectID]').val(0);
-                        //$('select[name=ProjectID]').selectpicker('refresh');
-                        //$("#empStartenddate").val("");
+                            text: "On probationary period! No paid leaves available",
+                            position: 'top-center',
+                            hideAfter: 20000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                            icon: "warning"
+                        })
+                      //  window.location.href = "/Leave/LeaveRequestMain";
+                    }
+                    else if(data.OutputID == -2){
+                        $.toast({
+
+                            text: "Already leave requested on this date..",
+                            position: 'top-center',
+                            hideAfter: 20000,
+                            showHideTransition: 'slide',
+                            loader: false,
+                            icon: "warning",
+                            preventDuplicates: true
+                        })
                     }
                     else {
                         $.toast({
 
                             text: "Application Error Please Contact Administrator!",
-                            position: 'top-right',
-                            hideAfter: 3000,
+                            position: 'top-center',
+                            hideAfter: 20000,
                             showHideTransition: 'slide',
                             loader: false,
+                            icon: "Error"
                         })
                     }
                 });
@@ -387,23 +456,20 @@
                 }).done(function (data) {
                     $.toast({
                         text: data.Message,
-                        position: 'top-right',
-                        hideAfter: 2000,
+                        position: 'top-center',
+                        hideAfter: 20000,
                         showHideTransition: 'slide',
                         loader: false,
+                        icon: data.Icon
                     })
                     if (data.Result == 1) {
-                        window.location.href = "/Leave/LeaveRequestMain"
+                        // window.location.href = "/Leave/LeaveRequestMain"
+                        LeaveList();
+                        $("#LeaveApprovalModal").modal('hide');
                     }                    
                 });
             }
 
-            //$.ajax({
-            //    type: "POST",
-            //    url: "Leave/ApproveLeaveStatus",
-            //}).done(function (data) {
-               
-            //});
         });
         $(document).on("click", "#RejectBtn1", function () {
             //$("#ApproveBtn").click(function () {           
@@ -423,13 +489,16 @@
                 }).done(function (data) {
                     $.toast({
                         text: data.Message,
-                        position: 'top-right',
-                        hideAfter: 2000,
+                        position: 'top-center',
+                        hideAfter: 20000,
                         showHideTransition: 'slide',
                         loader: false,
+                        icon: data.Icon
                     })
                     if (data.Result == 1) {
-                        window.location.href = "/Leave/LeaveRequestMain"
+                        // window.location.href = "/Leave/LeaveRequestMain"
+                        LeaveList();
+                        $("#LeaveApprovalModal").modal('hide');
                     }
                 });
             }
@@ -484,7 +553,17 @@
                 url: "/Leave/CancelLeave",
                 data: { EmpLeaveappID: $(".EmpLeaveappID").val(), LeavetypID: $(".Cancel_Leavetypeid").val(), EmpID: $(".Cancel_empid").val(), Date: $(".Cancel_Date").val() }
             }).done(function (data) {
-                window.location.href = "/Leave/LeaveRequestMain";
+                //window.location.href = "/Leave/LeaveRequestMain";
+                $.toast({
+                    text: "Leave Withdrawn Successfully",
+                    position: 'top-center',
+                    hideAfter: 20000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: "success"
+                })
+                LeaveList();
+                $("#CancelModal").modal('hide');
             });
         }); 
         $(document).on("click", "#ApproveBtn2", function () {           
@@ -497,20 +576,24 @@
                 {
                     $.toast({
                         text: "Leave Authorized",
-                        position: 'top-right',
-                        hideAfter: 2000,
+                        position: 'top-center',
+                        hideAfter: 20000,
                         showHideTransition: 'slide',
                         loader: false,
+                        icon: "success"
                     })
-                    window.location.href = "/Leave/LeaveRequestMain"
+                    //window.location.href = "/Leave/LeaveRequestMain"
+                    LeaveList();
+                    $("#LeaveAuthorizeModal").modal('hide');
                 }
                 else {
                     $.toast({
                         text: "This Leave Cannot Authorize",
-                        position: 'top-right',
-                        hideAfter: 2000,
+                        position: 'top-center',
+                        hideAfter: 20000,
                         showHideTransition: 'slide',
                         loader: false,
+                        icon: "warning"
                     })
                 } 
             });
@@ -523,9 +606,12 @@
                 url: "/Leave/UpdateAuthorizeStatus",
                 data: { EmpID: $(".empid").val(), LeavetypID: 7, ApprovdLeavetype: $(".leavetype").val(), status: 2, Date: $(".EmpDate_html").html(), DayTypID: $("#DayTypeId").val() }
             }).done(function () {
-                window.location.href = "/Leave/LeaveRequestMain";
+                //window.location.href = "/Leave/LeaveRequestMain";
+                LeaveList();
+                $("#LeaveAuthorizeModal").modal('hide');
+                $("#UnpaidCnfrmModal").modal('hide');
             })
-        })  ;
+        });
         $(".close").click(function () {
             window.location.href = "/Leave/LeaveRequestMain";
         });
@@ -548,21 +634,40 @@
                 }).done(function (data) {
                     $.toast({
                         text: data.Message,
-                        position: 'top-right',
-                        hideAfter: 2000,
+                        position: 'top-center',
+                        hideAfter: 20000,
                         showHideTransition: 'slide',
                         loader: false,
+                        icon: data.Icon
                     })
                     if (data.Result == 1) {
-                        window.location.href = "/Leave/LeaveRequestMain"
+                        //window.location.href = "/Leave/LeaveRequestMain"
+                        LeaveList();
+                        $("#UnpaidApproveModal").modal('hide');
                     }
                 });
             }
         });
-       
 
+        $(document).on("click", "#BtnFilterLeaves", function () {
+            //if($("#Ddl_Employee").val() != 0 || $("#Ddl_LeaveType").val() != 0 || $("#Ddl_Status").val() != -1)
+            //{                
+            //}
+            LeaveList1($("#Ddl_Employee").val(), $("#Ddl_LeaveType").val(), $("#Ddl_Status").val());
+        });
+
+        $(document).on("change", "#Ddl_Employee", function () {
+            RequestedLeaveTypes($(this).val());
+            RequestedStatus(0);
+        });
+        $(document).on("change", "#Ddl_LeaveType", function () {
+            RequestedStatus($(this).val());
+        });
+       
     });
 </script>
+
+<input type="hidden" value="@ViewBag.Status" id="Status">
 
 <style>
     .AvlilableLeaves {
@@ -570,6 +675,15 @@
     max-width: 200%;
     margin-bottom: 20px;
 }
+    .jq-toast-single {
+        margin:50% 0px 0px 0px;        
+        padding: 45px 60px;
+    }
+    .jq-has-icon {
+        background-position: 28px 47%;
+    }
+
+
 </style>
 
 <section class="content-header">
@@ -582,16 +696,19 @@
 </section>
 
 <section class="newforms">
-    <div class="col-lg-12">
-        <div class="col-lg-4">
-            <select id="searchemp" class="form-control"></select>
+    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.LeaveRequest).Select(m => m.UserPermiStatus).SingleOrDefault())
+    {
+        <div class="col-lg-12">
+            <div class="col-lg-4">
+                <select id="searchemp" class="form-control"></select>
+            </div>
+            <div class="col-lg-4">
+                <button id="LeaveReqBtn">REQUEST LEAVE...</button>
+            </div>
         </div>
-        <div class="col-lg-4">
-            <button id="LeaveReqBtn">REQUEST LEAVE...</button>
-        </div>
-    </div>
-    <hr />
-
+        <hr />
+    }
+    
     <div class="modal fade" id="LeaveReqModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document" id="LeaveRequest">
             <div class="modal-header">
@@ -664,7 +781,31 @@
         </div>
     </div> 
 
-    <div id="ListRequests"></div>
+    @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
+    {
+        <div>
+            <section class="content-header">
+                <div class="col-sm-12">
+                    <div class="col-sm-3"><h3>Leave Requests</h3></div>
+                    <div class="col-sm-9">
+                        <div class="col-lg-3">
+                            <select id="Ddl_Employee" class="form-control"></select>
+                        </div>
+                        <div class="col-lg-3">
+                            <select id="Ddl_LeaveType" class="form-control"></select>
+                        </div>
+                        <div class="col-lg-3">
+                            <select id="Ddl_Status" class="form-control"></select>
+                        </div>
+                        <div class="col-lg-3">
+                            <button type="button" id="BtnFilterLeaves">Filter Requests</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="newforms" id="ListRequests"></section>
+        </div>
+    }    
 
     <div class="modal fade" id="LeaveApprovalModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document" id="LeaveApproval">
@@ -745,7 +886,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h3 class="modal-title">Authorize Leave</h3><br />
                 <h4 class="modal-title">
-                    <b>Employe</b> &nbsp;: &nbsp;<span class="Employee_html"></span><br />
+                    <b>Employee</b> &nbsp;: &nbsp;<span class="Employee_html"></span><br />
                     @*<b>Leave type</b> &nbsp;: &nbsp;<span class="LeaveType_html"></span>*@
                     <b>Leave Date</b> &nbsp;: &nbsp;<span class="EmpDate_html"></span>
                     <input type="hidden" id="DayTypeId" />

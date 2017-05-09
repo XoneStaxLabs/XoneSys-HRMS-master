@@ -12,24 +12,18 @@
 <ul class="dropdown-menu">
     <li class="header">@Model.Count() Passport Expiry </li>
     <li>
-
         <ul class="menu">
-
             @foreach(var item in Model)
             { 
-
             <li>
                 <a href="#">
                     <i class="fa fa-users text-aqua"></i> @item.CandName
                 </a>
             </li>
             }
-
         </ul>
     </li>
-
     <li class="footer">
         <a href="/DashBoard/PassportExpiryList">View all</a>
     </li>
-
 </ul>

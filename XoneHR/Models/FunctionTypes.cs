@@ -17,8 +17,17 @@ namespace XoneHR.Models
         public static int EmpSalDetails = 8;
         public static int ProjectRoster = 9;
         public static int AttendanceDetails = 10;
-        public static int ApproveLeave = 11;
-        public static int LeaveRequest = 12;
+        public static int LeaveRequest = 11;
+        public static int ApproveLeave = 12;        
+        public static int RejectLeave = 13;        
+        public static int AuthorizeLeave = 14;
+        public static int WithdrawLeave = 15;
+        public static int CandidateApprove = 16;
+        public static int CandidateReject = 17;
+        public static int ConvertToWorkForce = 18;
+        public static int EditPayroll = 19;
+        public static int GeneratePayslip = 20;
+        public static int PayrollSummery = 21;
 
     }
 }

@@ -332,7 +332,8 @@
                         required: true,
                         number: true
                     },
-                    Emp_PermenanentType: {
+                    
+                    EmpPartTime_Pay: {
                         required: true
                     },
                     EmpRegNo: {
@@ -461,7 +462,7 @@
                                 <a href="#history" role="tab" data-toggle="tab">Employer History</a>
                             </li>
                             <li role="presentation" class="list-group-item">
-                                <a href="#emergencycontact" role="tab" data-toggle="tab">Emergency Contact Details</a>
+                                <a href="#emergencycontact" role="tab" data-toggle="tab">Next of Kin</a>
                             </li>
                             <li role="presentation" class="list-group-item">
                                 <a href="#declaration" role="tab" data-toggle="tab">Declaration</a>
@@ -469,11 +470,11 @@
                         </ul>
                         <div class="p-l-15 p-r-15">
                             <a href="#" name="2" class="btn btn-block btn-success BtnAppve" id="BtnLabel">Approve</a>
-                            <a href="#" name="3" class="btn btn-block btn-danger BtnAppve">Reject</a>
-                            <a href="#" name="4" class="btn btn-block btn-warning BtnAppve">Hold</a>
+                            @*<a href="#" name="3" class="btn btn-block btn-danger BtnAppve">Reject</a>
+                            <a href="#" name="4" class="btn btn-block btn-warning BtnAppve">Hold</a>*@
                             @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
                             {
-                                <a href="/Candidate/Edit?CandID=@Model.CandID" class="btn btn-block BtnAppveEmp btn-success"><i class="fa fa-fw fa-edit"></i></a>
+                                <a href="/Candidate/Edit?CandID=@Model.CandID" class="btn btn-block BtnAppveEmp btn-warning"><i class="fa fa-fw fa-edit"></i></a>
                             }
                         </div>
                     </div>
@@ -618,7 +619,7 @@
 
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-sm-4 padding-0 control-label">Designation Applied For</label>
+                                            <label class="col-sm-4 padding-0 control-label">PLRD Grade@*Designation Applied For*@</label>
                                             <div class="col-sm-8">
                                                 <span>@Model.DesigName</span>
                                             </div>
@@ -626,7 +627,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="col-sm-4 padding-0 control-label">Grade</label>
+                                            <label class="col-sm-4 padding-0 control-label">Employee Grade@*Grade*@</label>
                                             <div class="col-sm-8">
                                                 <span>@Model.Gradename</span>
                                             </div>
@@ -649,7 +650,7 @@
                                 </div>
 
                                 <div class="col-md-12">
-                                    <h4>Nationality & Licensing</h4><hr />
+                                    <h4>Nationality Details</h4><hr />
                                     <div>
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -850,7 +851,7 @@
                         </div>
 
                         <div role="tabpanel" class="tab-pane fade" id="emergencycontact">
-                            <h4>Emergency Contact</h4>
+                            <h4>Next of Kin</h4>
                             <hr class="divider" />
                             <div class="row">
                                 <div class="col-md-6">

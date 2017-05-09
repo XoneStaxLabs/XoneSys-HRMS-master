@@ -103,6 +103,7 @@ namespace XoneHR.Models.BAL
             DynamicParameters para = new DynamicParameters();
             para.Add("@EmpId", EmpId);
             db.DapperExecute("Delete from TblOffBoarding where EmpID=@EmpId", para);
+            db.DapperExecute("Delete from TblOffboardCheckList where CheckListID in(Select CheckListID from TblOnboardCheckList where EmpID=@EmpId)", para);
         }
 
         public void SaveChecklistDetails(Int64 EmpId)

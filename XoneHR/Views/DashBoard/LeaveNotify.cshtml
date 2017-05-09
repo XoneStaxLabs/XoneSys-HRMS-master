@@ -1,0 +1,41 @@
+﻿@model  IEnumerable<XoneHR.Models.LeaveApproveAuthorizeStatus>
+@{
+    ViewBag.Title = "LeaveNotify";
+    Layout = null;
+    var ApproveCount = 0; var AuthorizeCount = 0;
+    var Functionlist = XoneHR.Models.SessionManage.Current.PermitFunctions;
+}
+
+<style>
+    .hd{
+        color: #444;
+        font-size: 14px;
+    }
+</style>
+
+<a href="#" title="Leave Details" class="dropdown-toggle" data-toggle="dropdown">
+    <i class="fa fa-bell-o"></i>
+    <span class="label label-warning">  </span>
+</a>
+@{ 
+    ApproveCount = Model.Where(m => m.EmpappStatus == 0).Select(m => m.LeaveCount).SingleOrDefault();
+    AuthorizeCount = Model.Where(m => m.EmpappStatus == 1).Select(m => m.LeaveCount).SingleOrDefault();     
+ }
+<ul class="dropdown-menu">
+    @if (ApproveCount != 0 && ((Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.ApproveLeave).Select(m => m.UserPermiStatus).SingleOrDefault()) == true))
+    {
+        <li><a href="/Leave/LeaveRequestMain?Status=0" class="fa fa-users text-aqua">&nbsp;&nbsp; @ApproveCount <u>Leaves For Approve</u></a></li>
+    }
+    else
+    {
+        <li><a href="#" class="fa fa-users text-aqua">&nbsp;&nbsp; @ApproveCount <u>Leaves For Approve</u></a></li>
+    }
+    @if (AuthorizeCount != 0 && ((Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.AuthorizeLeave).Select(m => m.UserPermiStatus).SingleOrDefault()) == true))
+    {
+        <li><a href="/Leave/LeaveRequestMain?Status=1" class="fa fa-users text-aqua">&nbsp;&nbsp; @AuthorizeCount <u>Leaves For Authorize</u></a></li>
+    }
+    else
+    {
+        <li><a href="#" class="fa fa-users text-aqua">&nbsp;&nbsp; @AuthorizeCount <u>Leaves For Approve</u></a></li>
+    }    
+</ul>

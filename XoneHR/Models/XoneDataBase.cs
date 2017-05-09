@@ -345,9 +345,8 @@ namespace XoneHR.Models
     public class TblEmployeeType
     {
         //1:Permanent 2:Parttime 3:Adhoc
-        //Emp_PermenanentType : 1:Permanent Day,2.Permanent Night,3.Not Permanent Employee
+    
         public Int32 EmpTypID { get; set; }
-
         public string EmpTypName { get; set; }
         public bool EmpTypStatus { get; set; }
     }
@@ -645,7 +644,7 @@ namespace XoneHR.Models
         public Int64 CandID { get; set; }
         public DateTime IssueDate { get; set; }
         public DateTime ExpiryDate { get; set; }
-        public Int64 LicenseNum { get; set; }
+        public string LicenseNum { get; set; }
 
         public string dtissue { get; set; }
         public string dtexpiry { get; set; }
@@ -760,6 +759,14 @@ namespace XoneHR.Models
         public DateTime AddedDate { get; set; }
         //component
         public string MonthName { get; set; }
+    }
+
+    public class TblEmployeeSubType
+    {
+        public Int16 EmpSubTypeID { get; set; }
+        public Int16 EmpTypID { get; set; }
+        public string EmpSubType { get; set; }
+        public bool EmpStatus { get; set; }
     }
 
 }

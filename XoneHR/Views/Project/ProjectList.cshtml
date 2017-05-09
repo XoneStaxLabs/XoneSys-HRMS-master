@@ -87,7 +87,7 @@
                        @if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.ProjectRoster).Select(m => m.UserPermiStatus).SingleOrDefault())
                        {
                         @*<a href="/Leave/AttendanceMark?projectid=@item.ProjID&projectname=@item.ProjName"><i class="glyphicon glyphicon-calendar"></i></a>*@
-                        <a href="/Project/ProjectSchedule?projectid=@item.ProjID&projectname=@item.ProjName&ProjFromDate=@item.ProjFrom&ProjToDate=@item.ProjTo" ><i class=" glyphicon glyphicon-calendar"></i></a>
+                        <a href="/Project/ProjectSchedule?projectid=@item.ProjID&projectname=@item.ProjName&ProjFromDate=@item.ProjFrom.ToString("dd/MM/yyyy")&ProjToDate=@item.ProjTo.ToString("dd/MM/yyyy")" ><i class=" glyphicon glyphicon-calendar"></i></a>
                        }
                     </td>
 

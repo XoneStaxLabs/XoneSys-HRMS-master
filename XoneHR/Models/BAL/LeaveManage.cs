@@ -123,12 +123,15 @@ namespace XoneHR.Models.BAL
                 return null;
             }
         }
-        public List<LeaveApplication> ListEmployeesLeaves(int EmpappStatus)
+        public List<LeaveApplication> ListEmployeesLeaves(Int64 Empid = 0, int LeaveType = 0, Int16 Status = -1)
         {
             try
             {
                 DynamicParameters param = new DynamicParameters();
-                param.Add("@EmpappStatus", EmpappStatus);
+                param.Add("@Empid", Empid);
+                param.Add("@LeaveType", LeaveType);
+                param.Add("@Status", Status);
+
                 var leavelists = db.DapperToList<LeaveApplication>("USP_ListleaveEmployee",param, CommandType.StoredProcedure);
                 return leavelists;
             }
@@ -554,9 +557,12 @@ namespace XoneHR.Models.BAL
             para.Add("@EmpID", EmpID);
             para.Add("@LeavetypID", LeavetypID);
             para.Add("@Date",common.CommonDateConvertion(Date));
-            int result = db.DapperExecute("delete from TblEmployeeLeaveApp where EmpLeaveappID=@EmpLeaveappID", para);
-            int result1 = db.DapperExecute("Update TblLeaveEmpwise set LeavesText=LeavesText+1, LeavesTaken=LeavesTaken-1  where EmpID=@EmpID and LeavetypID=@LeavetypID", para);
-            int result2 = db.DapperExecute("Delete from TblAbscenceAllocate where AbsEmpID=@EmpID and convert(date,AbsDateFrom)=convert(date,'@Date')", para);
+            para.Add("@Out", 1, DbType.Int32, ParameterDirection.Output);
+
+            var rslt = db.DapperExecute("USP_LeaveCancel", para,CommandType.StoredProcedure);
+            //int result = db.DapperExecute("delete from TblEmployeeLeaveApp where EmpLeaveappID=@EmpLeaveappID", para);
+            //int result1 = db.DapperExecute("Update TblLeaveEmpwise set LeavesText=LeavesText+1, LeavesTaken=LeavesTaken-1  where EmpID=@EmpID and LeavetypID=@LeavetypID", para);
+            //int result2 = db.DapperExecute("Delete from TblAbscenceAllocate where AbsEmpID=@EmpID and convert(date,AbsDateFrom)=convert(date,'@Date')", para);
         }
         public int AuthorizeStatus(Int64 EmpID, Int16 LeavetypID,Int16 ApprovdLeavetype, int status, string Date,int flag)
         {
@@ -593,6 +599,49 @@ namespace XoneHR.Models.BAL
             string output = param[1].Value.ToString();
             int OutData = Convert.ToInt32(output);
             return OutData;
+        }
+
+        public List<Employees> LeaveRequestedEmployee()
+        {
+            try
+            {
+                DynamicParameters para=new DynamicParameters();
+                return db.DapperToList<Employees>("select distinct(empl.EmpID),cand.CandName from TblEmployeeLeaveApp empapp join TblEmployee empl on empl.EmpID = empapp.EmpID join TblCandidate cand on cand.CandID=empl.CandID where empl.EmpStatus=1",para);
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public List<TblLeaveType> RequestedLeaveTypes(Int64 EmpID)
+        {
+            try
+            {
+                DynamicParameters para = new DynamicParameters();
+                para.Add("@EmpID", EmpID);
+                if (EmpID == 0)
+                    return db.DapperToList<TblLeaveType>("Select LeavetypID,LeaveType from TblLeaveType", para);
+                else
+                    return db.DapperToList<TblLeaveType>("Select distinct(ltype.LeavetypID),LeaveType from TblEmployeeLeaveApp empapp join TblLeaveType ltype on ltype.LeavetypID=empapp.LeavetypID where empapp.EmpID=@EmpID", para);
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public List<TblEmployeeLeaveApp>RequestedLeaves_Status(int LeaveType,Int64 EmpID)
+        {
+            try
+            {
+                DynamicParameters para = new DynamicParameters();
+                para.Add("@EmpID", EmpID);
+                para.Add("@LeaveType", LeaveType);
+                return db.DapperToList<TblEmployeeLeaveApp>("select distinct(EmpappStatus) from TblEmployeeLeaveApp  where EmpID=@EmpID and LeavetypID=@LeaveType", para);
+            }
+            catch(Exception ex)
+            { return null; }
         }
 
     }

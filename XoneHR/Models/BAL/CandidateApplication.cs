@@ -21,7 +21,7 @@ namespace XoneHR.Models.BAL
             common = new CommonFunctions();
         }
 
-        public CandidateItems AddNewCandidateForm(TblCandidate tblCandobj, DataTable DT1, DataTable DT2, string IssueDate = null, string ExpiryDate = null, Int64 LicenseNum = 0)
+        public CandidateItems AddNewCandidateForm(TblCandidate tblCandobj, DataTable DT1, DataTable DT2, string IssueDate = null, string ExpiryDate = null, string LicenseNum = null)
         {
             try
             {
@@ -124,7 +124,6 @@ namespace XoneHR.Models.BAL
             Int32 output = param.Get<Int32>("OUT");
             return output;
         }
-
 
         public CandidateItems AddNewCitizendetails(TblCitizenDetails tblCitizenObj, int HidTab1 = 0)
         {
@@ -236,7 +235,7 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public CandidateItems AddDocuments(TblDocuments tblDocumObj)
+        public CandidateItems AddDocuments(TblDocuments tblDocumObj, Int32 HidTab2)
         {
             try
             {
@@ -244,6 +243,7 @@ namespace XoneHR.Models.BAL
                 paraObj.Add("@DocStypID", tblDocumObj.DocStypID);
                 paraObj.Add("@CandID", tblDocumObj.CandID);
                 paraObj.Add("@DocFiles", tblDocumObj.DocFiles);
+                paraObj.Add("@HidTab2", HidTab2);
 
                 paraObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
                 int Result = db.DapperExecute("USP_AddDocument", paraObj, CommandType.StoredProcedure);
@@ -259,13 +259,14 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public CandidateItems CandidateApproval(Int64 CandID, int AppStatus)
+        public CandidateItems CandidateApproval(Int64 CandID, int AppStatus, string Remarks=null)
         {
             try
             {
                 DynamicParameters ParaObj = new DynamicParameters();
                 ParaObj.Add("@CandID", CandID);
                 ParaObj.Add("@CandAppStatus", AppStatus);
+                ParaObj.Add("@CandRemark", Remarks);
 
                 ParaObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
                 int Result = db.DapperExecute("USP_ApprovalCandidate", ParaObj, CommandType.StoredProcedure);
@@ -304,11 +305,12 @@ namespace XoneHR.Models.BAL
                 paraObj.Add("@EmployeeID", null, DbType.Int64, ParameterDirection.Output);
                 paraObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
                 paraObj.Add("@DesignationID", null, DbType.Int32, ParameterDirection.Output);
-                paraObj.Add("@Emp_PermenanentType", CandAppoinObj.Emp_PermenanentType);
+                paraObj.Add("@EmpSubTypeID", CandAppoinObj.EmpSubTypeID);
                 paraObj.Add("@EmpRegNo", CandAppoinObj.EmpRegNo);
                 paraObj.Add("@RestDay_Type", CandAppoinObj.RestDay_Type);
                 if (CandAppoinObj.RestDay_Type == 1)
                     paraObj.Add("@RestDay_Fixed", CandAppoinObj.RestDay_Fixed);
+                paraObj.Add("@EmpPartTime_Pay", CandAppoinObj.EmpPartTime_Pay);
 
                 int Result = db.DapperExecute("USP_AddEmployee", paraObj, CommandType.StoredProcedure);
 
@@ -370,7 +372,7 @@ namespace XoneHR.Models.BAL
                 paraObj.Add("@EmpTypID", CandAppoinObj.Employeetyp);
                 paraObj.Add("@BasicSalary", CandAppoinObj.BasicSalary);
                 paraObj.Add("@Emp_IsApproved", CandAppoinObj.Emp_IsApproved);
-                paraObj.Add("@Emp_PermenanentType", CandAppoinObj.Emp_PermenanentType);
+                paraObj.Add("@EmpSubTypeID", CandAppoinObj.EmpSubTypeID);
                 paraObj.Add("@EmpPartTime_Pay", CandAppoinObj.EmpPartTime_Pay);
                 paraObj.Add("@CPF", CPF);
                 paraObj.Add("@EmpRegNo", CandAppoinObj.EmpRegNo);
@@ -386,7 +388,7 @@ namespace XoneHR.Models.BAL
                 string count = db.DapperSingle("Select count(*) from TblEmployee where EmpRegNo=@EmpRegNo and EmpID!=@EmpID", paraObj);
                 if (Convert.ToInt16(count) == 0)
                 {
-                    var iresult = db.DapperExecute("update TblEmployee set EmpStartDate=@Startdate,EmpEndDate=@Enddate,EmpTypID=@EmpTypID,Emp_IsApproved=@Emp_IsApproved,CPF_Status=@CPF,Emp_PermenanentType=@Emp_PermenanentType,EmpPartTime_Pay=@EmpPartTime_Pay,EmpRegNo=@EmpRegNo where CandID=@CandID", paraObj);
+                    var iresult = db.DapperExecute("update TblEmployee set EmpStartDate=@Startdate,EmpEndDate=@Enddate,EmpTypID=@EmpTypID,Emp_IsApproved=@Emp_IsApproved,CPF_Status=@CPF,EmpSubTypeID=@EmpSubTypeID,EmpPartTime_Pay=@EmpPartTime_Pay,EmpRegNo=@EmpRegNo where CandID=@CandID", paraObj);
                     var iresult1 = db.DapperExecute("update TblSalaryEmployeeWise set SalaEmpbasicSalary=@BasicSalary where EmpID=@EmpID", paraObj);
 
                     CandidateDesigItems CandObj = new CandidateDesigItems();
@@ -811,6 +813,13 @@ namespace XoneHR.Models.BAL
             }
         }
 
+        public List<TblCandidateAnswers> GetAnswers()
+        {
+            DynamicParameters param = new DynamicParameters();
+            param.Add("@CandID", SessionManage.Current.CandID);
+            return db.DapperToList<TblCandidateAnswers>("Select *from TblCandidateAnswers where CandID=@CandID", param);
+        }
+
         public TblCandidateAnswers AddInterviewData(TblCandidateAnswers tblCandidateAnsobj)
         {
             try
@@ -1017,6 +1026,47 @@ namespace XoneHR.Models.BAL
             }
         }
 
+        public int CheckNRIC_Unique(int flag, string NRIC, int create_edit, Int64 CandID)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@create_edit", create_edit);
+                param.Add("@flag", 4, DbType.Int32);
+                param.Add("@NRIC", NRIC);                
+                param.Add("@CandID", CandID);
+                param.Add("@Out", 1, DbType.Int32, ParameterDirection.Output);
+                var count = db.DapperExecute("USP_Unique_Mob_Email_Phone", param, CommandType.StoredProcedure);
+                int output = param.Get<Int32>("Out");
+                return output;
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+        }
+
+
+        public int CheckFin_Unique(int flag, string Fin, int create_edit, Int64 CandID)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@create_edit", create_edit);
+                param.Add("@flag", 5, DbType.Int32);
+                param.Add("@Fin", Fin);
+                param.Add("@CandID", CandID);
+                param.Add("@Out", 1, DbType.Int32, ParameterDirection.Output);
+                var count = db.DapperExecute("USP_Unique_Mob_Email_Phone", param, CommandType.StoredProcedure);
+                int output = param.Get<Int32>("Out");
+                return output;
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+        }
+
         public CandidateItems AddEmergencyContact(TblEmergencyContact EmergencyContact, int flag, int HidTab4)
         {
             try
@@ -1045,7 +1095,7 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public List<TblEmployeeType> GetEmployeeType()
+        public List<TblEmployeeType>GetEmployeeType()
         {
             var TblEmployeeType = db.DapperToList<TblEmployeeType>("Select EmpTypID,EmpTypName from TblEmployeeType");
             return TblEmployeeType;
@@ -1239,7 +1289,8 @@ namespace XoneHR.Models.BAL
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@CandID", CandID);
-                return db.DapperToList<TblCandidateTabMaster>("select * from TblCandidateTabMaster as a where a.CandTabID !=2 and a.CandTabID not in (select b.CandTabID from TblCandTabValidationStatus as b where b.CandID=@CandID)", param);
+                //return db.DapperToList<TblCandidateTabMaster>("select * from TblCandidateTabMaster as a where a.CandTabID !=2 and a.CandTabID not in (select b.CandTabID from TblCandTabValidationStatus as b where b.CandID=@CandID)", param);
+                return db.DapperToList<TblCandidateTabMaster>("select * from TblCandidateTabMaster as a where a.CandTabID not in (select b.CandTabID from TblCandTabValidationStatus as b where b.CandID=@CandID)", param);
             }
             catch
             {
@@ -1373,7 +1424,7 @@ namespace XoneHR.Models.BAL
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@EmpId", EmpId);
-                return db.DapperFirst<CandidateAppoinment>("Select EmpStartDate as StartDate,EmpEndDate as EndDate,EmpTypID as Employeetyp,FundType,b.BasicSalary,c.Resident_Id,Emp_PermenanentType,a.EmpRegNo from TblEmployee a join TblEmployeeSalary b on a.EmpID=b.EmpID join TblCandidate c on a.CandID=c.CandID where a.EmpID=@EmpId", param);
+                return db.DapperFirst<CandidateAppoinment>("Select EmpStartDate as StartDate,EmpEndDate as EndDate,EmpTypID as Employeetyp,FundType,b.BasicSalary,c.Resident_Id,EmpSubTypeID,a.EmpRegNo from TblEmployee a join TblEmployeeSalary b on a.EmpID=b.EmpID join TblCandidate c on a.CandID=c.CandID where a.EmpID=@EmpId", param);
             }
             catch (Exception ex)
             {
@@ -1396,7 +1447,7 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public void SaveLeaveDetails(LeaveDetails details)
+        public void SaveLeaveDetails(LeaveDetails details, Int32 HidTab9)
         {
             DynamicParameters para = new DynamicParameters();
             para.Add("@EligibleLeaves", details.EligibleLeaves);
@@ -1405,8 +1456,14 @@ namespace XoneHR.Models.BAL
             para.Add("@LeavesText", details.LeavesText);
             para.Add("@EmpID", details.EmployeeID);
             para.Add("@LeavetypID", details.LeavetypID);
+            para.Add("@HidTab9", HidTab9);
 
             db.DapperExecute("Update TblLeaveEmpwise set  LeavesText=@LeavesText,EligibleLeaves=@EligibleLeaves,EarnedLeaves=@EarnedLeaves,LeavesTaken=@LeavesTaken where EmpID=@EmpID and LeavetypID=@LeavetypID", para);
+            var CandID = db.DapperSingle("Select CandID from TblEmployee where EmpID=@EmpID", para);
+            para.Add("@CandID", Convert.ToInt64(CandID));
+            var count = db.DapperSingle("Select count(*) from TblCandTabValidationStatus where CandTabID=@HidTab9 and CandID=@CandID  and CandValidStatus=1", para);
+            if (Convert.ToInt32(count) == 0)
+                db.DapperExecute("insert into TblCandTabValidationStatus values (@HidTab9,@CandID,1)", para);
         }
 
         public List<TblCheckListTypes> GetOffboardCheckListType()
@@ -1423,6 +1480,20 @@ namespace XoneHR.Models.BAL
             }
         }
 
+        public List<TblCheckListTypesEdit> GetOffboardCheckListTypeEdit(Int64 Emp_ID)
+        {
+            try
+            {
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@Emp_ID", Emp_ID);
+                return db.DapperToList<TblCheckListTypesEdit>("select a.*,b.CheckListID,b.EmpID,b.Quantity,b.Size,b.CheckListStatus from TblCheckListTypes a Left join TblOnboardCheckList b on a.CheckListTypeID = b.CheckListTypeID and b.EmpID=@Emp_ID", param);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public Int64 Find(Int64 id)
         {
             DynamicParameters param = new DynamicParameters();
@@ -1432,7 +1503,7 @@ namespace XoneHR.Models.BAL
             return Emp_id;
         }
 
-        public Int64 OffboardCheckListSave(TblOnboardCheckList usergobj, Int64 Can_Id)
+        public Int64 OffboardCheckListSave(TblOnboardCheckList usergobj, Int64 Can_Id, Int32 HidTab8)
         {
             DynamicParameters param = new DynamicParameters();
             param.Add("@CheckListTypeID", usergobj.CheckListTypeID);
@@ -1442,7 +1513,23 @@ namespace XoneHR.Models.BAL
             param.Add("@CheckListStatus", usergobj.CheckListStatus);
             param.Add("@EmpID", usergobj.EmpID);
             param.Add("@CandID", Can_Id);
-            db.DapperExecute("insert into TblOnboardCheckList (CheckListTypeID,EmpID,Price,Quantity,Size,CheckListStatus) values (@CheckListTypeID,@EmpID,@Price,@Quantity,@Size,@CheckListStatus)", param);
+            param.Add("@HidTab8", HidTab8);
+            // var count = db.DapperExecute("SELECT COUNT(CheckListID) FROM TblOnboardCheckList where EmpID = @EmpID and CheckListTypeID =@CheckListTypeID and CheckListStatus = @CheckListStatus", param);
+
+            //if(count >0)
+            //{
+            //    db.DapperExecute("Update TblLeaveEmpwise set  LeavesText=@LeavesText,EligibleLeaves=@EligibleLeaves,EarnedLeaves=@EarnedLeaves,LeavesTaken=@LeavesTaken where EmpID=@EmpID and LeavetypID=@LeavetypID", para);
+            //}
+            //else
+            //{
+            db.DapperExecute("insert into TblOnboardCheckList (CheckListTypeID,EmpID,Price,Quantity,Size,CheckListStatus) values (@CheckListTypeID,@EmpID,@Price,@Quantity,@Size,@CheckListStatus)", param);           
+            // }
+            if(HidTab8 != 0)
+            {
+                var count = db.DapperSingle("Select count(*) from TblCandTabValidationStatus where CandTabID=@HidTab8 and CandID=@CandID  and CandValidStatus=1", param);
+                if (Convert.ToInt32(count) == 0)
+                    db.DapperExecute("insert into TblCandTabValidationStatus values (@HidTab8,@CandID,1)", param);
+            }
 
             db.DapperExecute("Update TblEmployee set Emp_IsApproved=1 where CandID=@CandID", param);
             db.DapperExecute("Update TblCandidateApproval set CandAppStatus=5 where CandID=@CandID", param);
@@ -1451,12 +1538,32 @@ namespace XoneHR.Models.BAL
             return usergobj.EmpID;
         }
 
+        public void CheckListSave(Int64 Can_Id,Int64 Empid)
+        {
+            DynamicParameters param = new DynamicParameters();
+            param.Add("@EmpID", Empid);
+            param.Add("@CandID", Can_Id);
+
+            db.DapperExecute("Update TblEmployee set Emp_IsApproved=1 where CandID=@CandID", param);
+            db.DapperExecute("Update TblCandidateApproval set CandAppStatus=5 where CandID=@CandID", param);
+            db.DapperExecute("Update TblAppUser set AppUserTypID=1 where EmpID=convert(bigint,@EmpID)", param);
+        }       
+
         public void OffboardCheckListDelete(Int64 Emp_Id)
         {
             DynamicParameters param = new DynamicParameters();
             param.Add("@Emp_Id", Emp_Id);
             db.DapperExecute("Delete from TblOnboardCheckList where EmpID =@Emp_Id", param);
         }
+
+        //public void OffboardCheckListEdit(Int64 Emp_Id, Int16 CheckListTypeID)
+        //{
+        //    DynamicParameters param = new DynamicParameters();
+        //    param.Add("@Emp_Id", Emp_Id);
+        //    param.Add("@CheckListTypeID", CheckListTypeID);
+
+        //    db.DapperExecute("Delete from TblOnboardCheckList where EmpID =@Emp_Id and CheckListTypeID=@CheckListTypeID", param);
+        //}
 
         public int CandBnkAcnoAlredyExists(string bankacc, string CandBnkID)
         {
@@ -1481,6 +1588,14 @@ namespace XoneHR.Models.BAL
             //    string count = db.DapperSingle("Select count(*) from TblCandidateBank where CandBnkAcno=@accnum and CandID!=@CandID CandBnkStatus = 1", param);
             //    return Convert.ToInt32(count);
             //}
+        }
+
+        public List<TblEmployeeSubType> GetEmpSubType(Int16 EmpTypID)
+        {
+            DynamicParameters para = new DynamicParameters();
+            para.Add("@EmpTypID", EmpTypID);
+            var EmpTypes = db.DapperToList<TblEmployeeSubType>("Select EmpSubTypeID,EmpSubType from TblEmployeeSubType where EmpTypID=@EmpTypID", para);
+            return EmpTypes;
         }
     }
 }

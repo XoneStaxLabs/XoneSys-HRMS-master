@@ -18,7 +18,7 @@ namespace XoneHR.Controllers
     public class CandidateController : Controller
     {
         private CandidateApplication candAppObj;
-        RaceBLayer Raceobj = new RaceBLayer();
+        private RaceBLayer Raceobj = new RaceBLayer();
         private CommonFunctions common;
 
         public CandidateController()
@@ -39,22 +39,32 @@ namespace XoneHR.Controllers
         {
             var CandidateList = (dynamic)null;
             SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Candidate");
-            if (statusID != 0)
+            if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
             {
-                CandidateList = candAppObj.ListCandidateDatatables(0, statusID, 2);
+                if (statusID != 0)
+                {
+                    CandidateList = candAppObj.ListCandidateDatatables(0, statusID, 2);
+                }
+                else
+                {
+                    CandidateList = candAppObj.ListCandidateDatatables(0, 1, 1);
+                }
+                return View(CandidateList);
             }
             else
-            {
-                CandidateList = candAppObj.ListCandidateDatatables(0, 1, 1);
-            }
-
-            return View(CandidateList);
+                return View();
         }
 
         public ActionResult Create(int id = 0)
         {
+            if (id == 0)
+            {
+                Int64 EmployeeId = SessionManage.Current.EmployeeId;
+            }
+
+            var GetOffboardCheckListType = candAppObj.GetOffboardCheckListType();
             ViewBag.value = id;
-            return View();
+            return View(GetOffboardCheckListType);
         }
 
         public ActionResult Edit(string CandID, int EditType = 0)
@@ -164,16 +174,19 @@ namespace XoneHR.Controllers
 
         public JsonResult AddNewCandidate(TblCandidate tblCandidateObj, string[] SkilID, string[] LangknID, string CandDob = null, string CandRegDate = null, string PassportExpiry = null, string IssueDate = null, string ExpiryDate = null, string LicenseNum = null, string FinExpiry = null)
         {
-
             Int16 race_id = Convert.ToInt16(Request["Race_name"]);
             Int32 relg_id = Convert.ToInt32(Request["Religion_name"]);
             tblCandidateObj.RaceID = race_id;
             tblCandidateObj.ReligID = relg_id;
 
             tblCandidateObj.CandPhoto = "../images/user.png";
+            int count = CandDob.Split('/').Length - 1;
+            if (count == 0)
+                CandDob = CandDob.Insert(2, "/").Insert(5,"/");
 
             tblCandidateObj.CandDob = common.CommonDateConvertion(CandDob);
-            tblCandidateObj.CandRegDate = common.CommonDateConvertion(CandRegDate);
+            //tblCandidateObj.CandRegDate = common.CommonDateConvertion(CandRegDate);
+            tblCandidateObj.CandRegDate = DateTime.Now.Date;
             if (PassportExpiry != "" && PassportExpiry != "01-01-0001")
                 tblCandidateObj.PassportExpiry = common.CommonDateConvertion(PassportExpiry);
             if (FinExpiry != "" && FinExpiry != "01-01-0001")
@@ -186,29 +199,36 @@ namespace XoneHR.Controllers
 
             dt2.Columns.Add("LangknID", typeof(Int16));
 
-            for (int i = 0; i < SkilID.Length; i++)
+            if (SkilID != null)
             {
-                var skillids = Convert.ToInt32(SkilID[i]);
-                DataRow dr = dt1.NewRow();
-                dr["SkilID"] = skillids;
-                dt1.Rows.Add(dr);
-            }
-            for (int i = 0; i < LangknID.Length; i++)
-            {
-                var langids = Convert.ToInt16(LangknID[i]);
-                DataRow dr = dt2.NewRow();
-                dr["LangknID"] = langids;
-                dt2.Rows.Add(dr);
+                for (int i = 0; i < SkilID.Length; i++)
+                {
+                    var skillids = Convert.ToInt32(SkilID[i]);
+                    DataRow dr = dt1.NewRow();
+                    dr["SkilID"] = skillids;
+                    dt1.Rows.Add(dr);
+                }
             }
 
-            Int64 LicenseNums;
+            if (LangknID != null)
+            {
+                for (int i = 0; i < LangknID.Length; i++)
+                {
+                    var langids = Convert.ToInt16(LangknID[i]);
+                    DataRow dr = dt2.NewRow();
+                    dr["LangknID"] = langids;
+                    dt2.Rows.Add(dr);
+                }
+            }
+            
+            //Int64 LicenseNums;
 
-            if (LicenseNum != "" && LicenseNum != null)
-                LicenseNums = Convert.ToInt64(LicenseNum);
-            else
-                LicenseNums = 0;
+            //if (LicenseNum != "" && LicenseNum != null)
+            //    LicenseNums = Convert.ToInt64(LicenseNum);
+            //else
+            //    LicenseNums = 0;
 
-            CandidateItems CandObj = candAppObj.AddNewCandidateForm(tblCandidateObj, dt1, dt2, IssueDate, ExpiryDate, LicenseNums);
+            CandidateItems CandObj = candAppObj.AddNewCandidateForm(tblCandidateObj, dt1, dt2, IssueDate, ExpiryDate, LicenseNum);
             if (CandObj.OutputID != 0)
             {
                 SessionManage.Current.CandID = CandObj.TableID;
@@ -220,31 +240,40 @@ namespace XoneHR.Controllers
             }
         }
 
-        public ActionResult RaceCreate(string RaceName)
+        public JsonResult RaceCreate(string RaceName)
         {
             try
             {
                 int result = Raceobj.ManageRace(1, RaceName, 1, 0);
-                return Json(result, JsonRequestBehavior.AllowGet);
+                if (result > 0)
+                    return Json(new { Message = "Race Added Successfully", Icon = "success", Result = result }, JsonRequestBehavior.AllowGet);
+                else if (result == -1)
+                    return Json(new { Message = "Race Name Already Exists", Icon = "warning", Result = result }, JsonRequestBehavior.AllowGet);
+                else
+                    return Json(new { Message = "Race Adding Failed", Icon = "error", Result = 0 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
-                return null;
+                return Json(0);
             }
         }
 
-        public ActionResult ReligionCreate(string ReligionName)
+        public JsonResult ReligionCreate(string ReligionName)
         {
             try
-            {
+            {                
                 int result = candAppObj.ManageReligion(1, ReligionName, 1, 0);
-                return Json(result, JsonRequestBehavior.AllowGet);
+                if (result > 0)
+                    return Json(new { Message = "Religion Added Successfully", Icon = "success", Result = result }, JsonRequestBehavior.AllowGet);
+                else if (result == -1)
+                    return Json(new { Message = "Religion Name Already Exists", Icon = "warning", Result = result }, JsonRequestBehavior.AllowGet);
+                else
+                    return Json(new { Message = "Religion Adding Failed", Icon = "error", Result = 0 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
-                return null;
+                return Json(0);
             }
-            
         }
 
         public JsonResult AddNewCitizenDetails(TblCitizenDetails tblCitizenobj, string HidTab1, string CitzOrdrDate = null)
@@ -365,7 +394,7 @@ namespace XoneHR.Controllers
                     tblDoc.DocStypID = Convert.ToInt32(DocumentSubTypeID);
                     tblDoc.DocFiles = Photopath;
 
-                    CandidateItems candobj = candAppObj.AddDocuments(tblDoc);
+                    CandidateItems candobj = candAppObj.AddDocuments(tblDoc, Convert.ToInt32(Request.Form["HidTab2"].ToString()));
 
                     if (candobj.OutputID != 0)
                     {
@@ -443,11 +472,11 @@ namespace XoneHR.Controllers
             return View(DocumentsList);
         }
 
-        public int ApproveCandidate(int appStatus, Int64 CandID = 0)
+        public int ApproveCandidate(int appStatus, Int64 CandID = 0, string Remarks=null)
         {
             if (CandID == 0)
                 CandID = SessionManage.Current.CandID;
-            CandidateItems candObj = candAppObj.CandidateApproval(CandID, appStatus);
+            CandidateItems candObj = candAppObj.CandidateApproval(CandID, appStatus, Remarks);
             if (candObj.OutputID == 2)
             {
                 return 2;
@@ -564,7 +593,7 @@ namespace XoneHR.Controllers
                     }
                 }
 
-                return Json(new { Id = 1 });
+                return Json(new { Id = 1, CanId = SessionManage.Current.CandID });
             }
             else if (candObj.OutputID == 2)
             {
@@ -680,8 +709,15 @@ namespace XoneHR.Controllers
 
         public ActionResult GetInertviewQuestion()
         {
+            InterviewQstnAnsComponent obj = new InterviewQstnAnsComponent();
+
             var ListInterviewQns = candAppObj.GetInertviewQuestion();
-            return View(ListInterviewQns);
+            var ans = candAppObj.GetAnswers();
+
+            obj.Qustns = ListInterviewQns;
+            obj.Answrs = ans;
+
+            return View(obj);
         }
 
         public ActionResult AddInterviewData(string[] QuestID, string[] Answer, string[] AnsRating)
@@ -795,7 +831,7 @@ namespace XoneHR.Controllers
             }
         }
 
-        public int Mobile_Email_Validation(string Mob = null, string email = null, string ph = null, int flag = 0)
+        public int Mobile_Email_Validation(string Mob = null, string email = null, string ph = null, string NRIC = null, string Fin = null, int flag = 0)
         {
             try
             {
@@ -804,8 +840,12 @@ namespace XoneHR.Controllers
                     valid = candAppObj.CheckMobileNoUnique(flag, Mob, 1, 0);
                 else if (flag == 2)
                     valid = candAppObj.EmailUnique(flag, email, 1, 0);
-                else
+                else if(flag == 3)
                     valid = candAppObj.CheckPhNoUnique(flag, ph, 1, 0);
+                else if (flag == 4)
+                    valid = candAppObj.CheckNRIC_Unique(flag, NRIC, 1, 0);
+                else  //
+                    valid = candAppObj.CheckFin_Unique(flag, Fin, 1, 0);
 
                 return valid;
             }
@@ -815,7 +855,7 @@ namespace XoneHR.Controllers
             }
         }
 
-        public int Mobile_Email_ValidationEdit(string Mob = null, string email = null, string ph = null, int flag = 0, Int64 CandID = 0)
+        public int Mobile_Email_ValidationEdit(string Mob = null, string email = null, string ph = null, string NRIC = null, string Fin = null, int flag = 0, Int64 CandID = 0)
         {
             try
             {
@@ -824,8 +864,12 @@ namespace XoneHR.Controllers
                     valid = candAppObj.CheckMobileNoUnique(flag, Mob, 2, CandID);
                 else if (flag == 2)
                     valid = candAppObj.EmailUnique(flag, email, 2, CandID);
-                else
+                else if (flag == 3)
                     valid = candAppObj.CheckPhNoUnique(flag, ph, 2, CandID);
+                else if(flag == 4)
+                    valid = candAppObj.CheckNRIC_Unique(flag, NRIC, 2, CandID);
+                else  //
+                    valid = candAppObj.CheckFin_Unique(flag, Fin, 2, CandID);
 
                 return valid;
             }
@@ -1199,8 +1243,9 @@ namespace XoneHR.Controllers
                 PLRDDetails.CandID = SessionManage.Current.CandID;
                 PLRDDetails.IssueDate = common.CommonDateConvertion(IssueDate);
                 PLRDDetails.ExpiryDate = common.CommonDateConvertion(ExpiryDate);
-                if (LicenseNum != "" && LicenseNum != null)
-                    PLRDDetails.LicenseNum = Convert.ToInt64(LicenseNum);
+                //if (LicenseNum != "" && LicenseNum != null)
+                //    PLRDDetails.LicenseNum = Convert.ToInt64(LicenseNum);
+                PLRDDetails.LicenseNum = LicenseNum;
                 CandidateItems candiobj = candAppObj.AddPLRDDetails(PLRDDetails, Convert.ToInt32(HidTab8));
                 if (candiobj.OutputID != 0)
                 {
@@ -1428,7 +1473,13 @@ namespace XoneHR.Controllers
             return View(Leavedetails);
         }
 
-        public int SaveLeaveDetails(int EmpID, string[] EligibleLeaves = null, string[] EarnedLeaves = null, string[] LeavesTaken = null, string[] LeavesText = null, string[] LeavetypID = null)
+        public ActionResult CheckListTypeEdit(Int64 Emp_ID)
+        {
+            var GetOffboardCheckListType = candAppObj.GetOffboardCheckListTypeEdit(Emp_ID);
+            return View(GetOffboardCheckListType);
+        }
+
+        public int SaveLeaveDetails(int EmpID, string[] EligibleLeaves = null, string[] EarnedLeaves = null, string[] LeavesTaken = null, string[] LeavesText = null, string[] LeavetypID = null, string HidTab9 = null)
         {
             try
             {
@@ -1441,7 +1492,7 @@ namespace XoneHR.Controllers
                     details.LeavesText = LeavesText[i];
                     details.LeavetypID = Convert.ToInt16(LeavetypID[i]);
                     details.EmployeeID = EmpID;
-                    candAppObj.SaveLeaveDetails(details);
+                    candAppObj.SaveLeaveDetails(details, Convert.ToInt32(HidTab9));
                 }
                 return 1;
             }
@@ -1451,20 +1502,28 @@ namespace XoneHR.Controllers
             }
         }
 
-        public ActionResult OffboardCheckListSave(string Data, string Cnd_id)
+        public ActionResult OffboardCheckListSave(string Data, string Cnd_id, string HidTab8=null,int flag=0)
         {
             try
             {
                 var iResult = 0;
                 Int64 Empid = 0;
+                Empid = candAppObj.Find(Convert.ToInt64(Cnd_id));
                 string Items = Data.Replace("\"", "").Replace("[", "").Replace("]", "");
                 if (Items == "")
                 {
-                    return Json(new { Message = "Please Select Atleast One", Result = -1 }, JsonRequestBehavior.AllowGet);
+                    if (flag == 1)
+                    {
+                        candAppObj.CheckListSave(Convert.ToInt64(Cnd_id), Empid);
+                        return Json(new { Message = "Checklist may update on Employee Edit", Result = flag }, JsonRequestBehavior.AllowGet);
+                    }                       
+                    else
+                        return Json(new { Message = "Please Select Atleast One", Result = -1 }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
-                    Empid = candAppObj.Find(Convert.ToInt64(Cnd_id));
+                    
+                    candAppObj.OffboardCheckListDelete(Empid);
                     string[] CheckList = Items.Split(',');
                     for (int i = 0; i < CheckList.Length; i = i + 4)
                     {
@@ -1486,8 +1545,11 @@ namespace XoneHR.Controllers
 
                         usergobj.CheckListStatus = 1;
                         usergobj.EmpID = Empid;
-
-                        candAppObj.OffboardCheckListSave(usergobj, Convert.ToInt64(Cnd_id));
+                        //  candAppObj.OffboardCheckListEdit(Empid, usergobj.CheckListTypeID);
+                        if (HidTab8 != null)
+                            candAppObj.OffboardCheckListSave(usergobj, Convert.ToInt64(Cnd_id), Convert.ToInt32(HidTab8));
+                        else
+                            candAppObj.OffboardCheckListSave(usergobj, Convert.ToInt64(Cnd_id), 0);
                     }
                 }
                 if (Empid > 0)
@@ -1532,5 +1594,12 @@ namespace XoneHR.Controllers
         //        }
         //    }
         //}
+
+        public ActionResult GetEmpSubType(Int16 EmpTypID)
+        {
+            var EmpSub = candAppObj.GetEmpSubType(EmpTypID);
+            return Json(EmpSub, JsonRequestBehavior.AllowGet);
+        }
+
     }
 }

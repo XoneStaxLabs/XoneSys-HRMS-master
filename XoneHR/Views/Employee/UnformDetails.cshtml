@@ -1,0 +1,14 @@
+﻿@model List<XoneHR.Models.UniformComponent>
+@{
+    ViewBag.Title = "UnformDetails";
+}
+
+@foreach(var item in Model)
+{
+    <tr>
+        <td>@item.CheckListDetails</td>
+        <td>@item.Price</td>
+        <td>@item.Quantity</td>
+        <td>@item.Size</td>
+    </tr>
+}

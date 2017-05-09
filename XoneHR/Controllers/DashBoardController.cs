@@ -11,6 +11,7 @@ namespace XoneHR.Controllers
 {
     public class DashBoardController : Controller
     {
+        CommonFunctions common = new CommonFunctions();
 
         private DashBoardBal dashboardObj;
 
@@ -34,7 +35,7 @@ namespace XoneHR.Controllers
             var Results =dashboardObj.DashBoardusers();
             foreach (var items in Results)
             {
-                string path = "/Employee/EmployeeProfile?EmpId=" + items.EmpID;
+                string path = "/Employee/EmployeeProfile?EmpId=" + items.EmpID + "&CandID=" + items.CandID + "&redirectStatus=" + 1;
 
                 sb.Append("<li>");
                 if (items.CandPhoto != "" && items.CandPhoto != null )
@@ -173,6 +174,13 @@ namespace XoneHR.Controllers
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult LeaveNotify()
+        {
+            var LeaveDetails = dashboardObj.LeaveStatusCount();
+            SessionManage.Current.PermitFunctions = common.GetPermissionList("LeaveRequestMain", "Leave");
+            return View(LeaveDetails);
         }
 
     }

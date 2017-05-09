@@ -52,5 +52,7 @@
 }    
 </section>
 
-
-<div id="Projectlist"></div>
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
+    <div id="Projectlist"></div>
+}

@@ -5774,3 +5774,10 @@ button#BtnRemoveAttendance {
     margin-top: 20px !important;
 }
 
+.datefield{border: 1px solid #c2cad8;}
+.datefield input { 
+    border: none; 
+    background: none;
+    color: #000;  
+	outline: 0!important;
+}

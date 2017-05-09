@@ -45,55 +45,42 @@ namespace XoneHR.Controllers
             var DocValidStatus = empObj.ListEmployeesDocs(0, 3);
             SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Employee");
             var prjctdetails = empObj.ProjectDetails();
-
-            foreach (var item in listAllEmpolyees)
+            if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
             {
-                int i = 0;
-                string path = "/Employee/EmployeeProfile?EmpId=" + item.EmpID + "&CandID=" + item.CandID;
-                string EditPath = "/Candidate/Edit?CandID=" + item.CandID + "&EditType=" + 1 + "";
-                var details = DocValidStatus.Where(m => m.CandID == item.CandID).Select(m => m.DocStypID);
-                var DocCount = DocDetails.Where(m => m.DesigID == item.DesigID && m.CizenID == item.CizenID).Select(e => e.DocStypID).Except(details);
-                var salpath = "/Employee/SalaryPayment?EmpId=" + item.EmpID;
-                string OffboardStatus = "";
-                if (item.OFFBoard_Status == 0)
-                    OffboardStatus = "OffBoard";
-                else if (item.OFFBoard_Status == 1)
-                    OffboardStatus = "Approve";
-                else if (item.OFFBoard_Status == 2)
-                    OffboardStatus = "ONP";
-                else
-                    OffboardStatus = "Resign";
+                foreach (var item in listAllEmpolyees)
+                {
+                    int i = 0;
+                    string path = "/Employee/EmployeeProfile?EmpId=" + item.EmpID + "&CandID=" + item.CandID;
+                    string EditPath = "/Candidate/Edit?CandID=" + item.CandID + "&EditType=" + 1 + "";
+                    var details = DocValidStatus.Where(m => m.CandID == item.CandID).Select(m => m.DocStypID);
+                    var DocCount = DocDetails.Where(m => m.DesigID == item.DesigID && m.CizenID == item.CizenID).Select(e => e.DocStypID).Except(details);
+                    var salpath = "/Employee/SalaryPayment?EmpId=" + item.EmpID;
+                    string OffboardStatus = "";
+                    if (item.OFFBoard_Status == 0)
+                        OffboardStatus = "OffBoard";
+                    else if (item.OFFBoard_Status == 1)
+                        OffboardStatus = "Approve";
+                    else if (item.OFFBoard_Status == 2)
+                        OffboardStatus = "ONP";
+                    else
+                        OffboardStatus = "Resign";
 
-                sb.Append("<tr><td>" + item.EmpRegNo + "</td><td><a href='#' data-candID=" + item.CandID + " class='tableNot'>" + DocCount.Count() + "</a> ");
-                if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.CandidateProfile).Select(m => m.UserPermiStatus).SingleOrDefault())
-                    sb.Append("<a href=" + path + " class='text-green bio'><b>&nbsp;&nbsp;" + item.CandName + "</b></a></td>");
-                else
-                    sb.Append("" + item.CandName + "</td>");
-                sb.Append("<td>" + item.EmpTypName + "</td><td>" + item.DesigName + "</td>");
-                //foreach (var prj in prjctdetails)
-                //{
-                //    if (prj.EmpID == item.EmpID)
-                //    {
-                //        sb.Append("<td>" + prj.ProjName + "</td>");
-                //        i++;
-                //    }
-                //}
-                //if (i == 0)
+                    sb.Append("<tr><td>" + item.EmpRegNo + "</td><td><a href='#' data-candID=" + item.CandID + " class='tableNot'>" + DocCount.Count() + "</a> ");
+                    if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.CandidateProfile).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        sb.Append("<a href=" + path + " class='text-green bio'><b>&nbsp;&nbsp;" + item.CandName + "</b></a></td>");
+                    else
+                        sb.Append("" + item.CandName + "</td>");
+                    sb.Append("<td>" + item.EmpTypName + "</td><td>" + item.DesigName + "</td>");
+
                     sb.Append("<td>" + item.Gradename + "</td>");
-                sb.Append("<td>" + item.Citizen + "</td><td>" + item.EmpStartDate.ToString("dd-MM-yyyy") + "</td>");
-                //if(SessionManage.Current.PermitFunctions.Where(m=> m.FunTypeID == FunctionTypes.CandidateProfile).Select(m=>m.UserPermiStatus).SingleOrDefault())
-                //    sb.Append("<td><a href=" + path + "><i class='fa fa-fw fa-eye'></i></a>&nbsp;");
-                //sb.Append("<td><a href='#a' data-empid=" + item.EmpID + " class='BtnOffBoard'><i class=''>OffBoard</i></a>&nbsp;");
-                if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.EmpCV).Select(m => m.UserPermiStatus).SingleOrDefault())
-                    sb.Append("<td><a href='#a' data-empid=" + item.EmpID + " class='BtnCV'><i class='fa fa-file-text-o'></i></a>&nbsp;");
-                //if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.EmpSalDetails).Select(m => m.UserPermiStatus).SingleOrDefault())
-                //    sb.Append("<a href=" + salpath + " class='btnSalary'><i class='fa fa-usd' aria-hidden='true'></i></a>&nbsp;");
-                //if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.Edit).Select(m => m.UserPermiStatus).SingleOrDefault())
-                //    sb.Append("<a href=" + EditPath + " class='' ><i class='fa fa-fw fa-edit'></i></a>&nbsp;");
-                if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
-                    sb.Append("<a href='#a' data-empid=" + item.EmpID + " data-candid=" + item.CandID + " data-name=" + item.CandName + " class='BtnDelete'><i class='fa fa-fw fa-trash-o'></i></a>&nbsp;</td></tr>");
-            }
+                    sb.Append("<td>" + item.Citizen + "</td><td>" + item.EmpStartDate.ToString("dd-MM-yyyy") + "</td>");
+                    if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.EmpCV).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        sb.Append("<td><a href='#a' data-empid=" + item.EmpID + " class='BtnCV'><i class='fa fa-file-text-o'></i></a>&nbsp;");
 
+                    if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.Delete).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        sb.Append("<a href='#a' data-empid=" + item.EmpID + " data-candid=" + item.CandID + " data-name=" + item.CandName + " class='BtnDelete'><i class='fa fa-fw fa-trash-o'></i></a>&nbsp;</td></tr>");
+                }
+            }
             return Content(sb.ToString());
         }
 
@@ -103,10 +90,13 @@ namespace XoneHR.Controllers
             return View(DocDetails);
         }
 
-        public ActionResult EmployeeProfile(string EmpId, string CandID)
+        public ActionResult EmployeeProfile(string EmpId, string CandID,Int16 redirectStatus=0)
         {
             SessionManage.Current.EmpID = Convert.ToInt64(EmpId);
             SessionManage.Current.CandID = Convert.ToInt64(CandID);
+
+            SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Employee");
+            ViewBag.Status = redirectStatus;
 
             var employeeProfileDetails = empObj.ListEmployeesDetails(Convert.ToInt64(EmpId));
             return View(employeeProfileDetails);
@@ -128,6 +118,9 @@ namespace XoneHR.Controllers
         {
             var itemsObj = empObj.ListEmployeeSalarys(SessionManage.Current.EmpID);
             ViewBag.BasicSalary = empObj.GetBasicSal(SessionManage.Current.EmpID);
+            ViewBag.EmpType = empObj.GetEmpType(SessionManage.Current.EmpID);
+            ViewBag.PartTime_Pay = empObj.GetPartialEmpDetails(SessionManage.Current.EmpID);
+           
             return View(itemsObj);
         }
 
@@ -408,6 +401,12 @@ namespace XoneHR.Controllers
         {
             var data = empObj.ListDeductions(Year, Month, EmpID);
             return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult UnformDetails()
+        {
+            var Leavedetails = empObj.UnformDetails(SessionManage.Current.EmpID);
+            return View(Leavedetails);
         }
 
     }

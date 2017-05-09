@@ -50,7 +50,7 @@ namespace XoneHR.Models.BAL
         {
             try
             {
-                var Users = db.DapperToList<DashBoardusers>("select top 8 emp.EmpID,emp.EmpStartDate,cand.CandName,cand.CandPhoto from TblEmployee emp join TblCandidate cand on emp.CandID=cand.CandID where emp.EmpStatus=1 and Emp_IsApproved=1 order by EmpID desc");
+                var Users = db.DapperToList<DashBoardusers>("select top 8 emp.EmpID,emp.EmpStartDate,cand.CandName,cand.CandPhoto,cand.CandID from TblEmployee emp join TblCandidate cand on emp.CandID=cand.CandID where emp.EmpStatus=1 and Emp_IsApproved=1 order by EmpID desc");
                 return Users;
             }
             catch
@@ -235,6 +235,16 @@ namespace XoneHR.Models.BAL
             }
         }
 
+        public List<LeaveApproveAuthorizeStatus> LeaveStatusCount()
+        {
+            try
+            {
+                DynamicParameters para = new DynamicParameters();
+                return db.DapperToList<LeaveApproveAuthorizeStatus>("Select EmpappStatus,count(*)as LeaveCount from TblEmployeeLeaveApp where EmpappStatus in (0,1) group by EmpappStatus", para);
+            }
+            catch(Exception ex)
+            { return null; }
+        }
 
     }
 }

@@ -6,6 +6,7 @@
     var i = 0;
     var EmpStatusName = "";
     XoneHR.Models.CommonFunctions common = new XoneHR.Models.CommonFunctions();
+    XoneHR.Models.BAL.ProjectBalLayer projectObj = new XoneHR.Models.BAL.ProjectBalLayer();
 }
  
 <input type="hidden" value="@ViewBag.StartDate"  id="HidStartdate"/>
@@ -17,7 +18,7 @@
             <tr>
                 <th>ID</th>
                 <th>Date</th>
-                <th>Type (Leave/OFF) </th><!--Type-->
+                <th>Type (Leave/OFF)</th><!--Type-->
                 <th>Status</th><!--Leave Status-->
                 <th>Allocation</th>
             </tr>
@@ -32,10 +33,12 @@
                     @i
                 </td>
                 <td>@item.EmpLeaveDate.ToString("dd/MM/yyyy")
-                    <input type="hidden" name="EmpLeaveDate" value="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" /></td>
+                    <input type="hidden" name="EmpLeaveDate" value="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" />
+                </td>
                 <td>@item.LeaveType
                     <input type="hidden" name="LeaveType" value="@item.LeavetypID" />                
                 </td>
+                
                 <td>
                     @if (item.EmpappStatus == 1)
                     {
@@ -54,30 +57,36 @@
                         EmpStatusName = "Authorized";
                     }
                         @EmpStatusName
-
                 </td>
-                <td><select class="form-control RelifEmp" id="@i" name="RelifeEmpName">
-                    @{var Absencelist = Model.Absencealloobj.Where(p => p.AbsDateFrom == item.EmpLeaveDate && p.AbsEmpID == item.EmpID).FirstOrDefault();}
-                    <option value="0">--Select--</option>
-                    @foreach (var Relif in Model.PrjEmpRelifeObj)
-                    {
-                        if (Absencelist == null)
-                        {
-                            <option value="@Relif.EmpID" data-typeid="@Relif.EmpTypID" data-leavedate="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile">@Relif.CandName</option>
+                <td>
+                    <select class="form-control RelifEmp" id="@i" name="RelifeEmpName">
+                        @{
+                            var Absencelist = Model.Absencealloobj.Where(p => p.AbsDateFrom == item.EmpLeaveDate && p.AbsEmpID == item.EmpID).FirstOrDefault();
+                            var EmpForRelief = projectObj.GetRelifeEmployeeList1(@ViewBag.EmpID, @item.EmpLeaveDate);
                         }
-                        else
+
+                        <option value="0"  >--Select--</option>
+                        @*@foreach (var Relif in Model.PrjEmpRelifeObj)*@
+                        @foreach (var Relif in EmpForRelief)
                         {
-                            if (Relif.EmpID == Absencelist.AbsallEmpID)
-                            {
-                                <option value="@Relif.EmpID" data-typeid="@Relif.EmpTypID" selected="selected" data-leavedate="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile">@Relif.CandName</option>
-                            }
-                            else
+                            if (Absencelist == null)
                             {
                                 <option value="@Relif.EmpID" data-typeid="@Relif.EmpTypID" data-leavedate="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile">@Relif.CandName</option>
                             }
+                            else
+                            {
+                                if (Relif.EmpID == Absencelist.AbsallEmpID)
+                                {
+                                    <option value="@Relif.EmpID" data-typeid="@Relif.EmpTypID" selected="selected" data-leavedate="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile">@Relif.CandName</option>
+                                }
+                                else
+                                {
+                                    <option value="@Relif.EmpID" data-typeid="@Relif.EmpTypID" data-leavedate="@item.EmpLeaveDate.ToString("dd/MM/yyyy")" data-typenam="@Relif.EmpTypName" data-mobile="@Relif.CandMobile">@Relif.CandName</option>
+                                }
+                            }
                         }
-                    }
-                </select></td>
+                    </select>
+                </td>
                  
             </tr>
             }
@@ -96,9 +105,13 @@
                         <td></td>
                         <td>
                             <select class="form-control RelifEmp" id="@i" name="RelifeEmpName">
-                                @{var Absencelist = Model.Absencealloobj.Where(p => p.AbsDateFrom == item.OFFDates && p.AbsEmpID == item.EmpID).FirstOrDefault();}
+                                @{
+                                    var Absencelist = Model.Absencealloobj.Where(p => p.AbsDateFrom == item.OFFDates && p.AbsEmpID == item.EmpID).FirstOrDefault();
+                                    var EmpForRelief = projectObj.GetRelifeEmployeeList1(@ViewBag.EmpID, @item.OFFDates);
+                                 }
                                 <option value="0">--Select--</option>
-                                @foreach (var Relif in Model.PrjEmpRelifeObj)
+                                @*@foreach (var Relif in Model.PrjEmpRelifeObj)*@
+                                @foreach (var Relif in EmpForRelief)
                                 {
                                     if (Absencelist == null)
                                     {

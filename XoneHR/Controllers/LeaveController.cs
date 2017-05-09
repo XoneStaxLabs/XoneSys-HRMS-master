@@ -26,10 +26,10 @@ namespace XoneHR.Controllers
             SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Leave");
             return View();
         }
-        public ActionResult LeaveList(int EmpappStatus)
+        public ActionResult LeaveList(Int64 Empid = 0, int LeaveType = 0, Int16 Status = -1)
         {
-            SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Leave");
-            var LeaveDetails = leaveObj.ListEmployeesLeaves(EmpappStatus);
+            SessionManage.Current.PermitFunctions = common.GetPermissionList("LeaveRequestMain", "Leave");
+            var LeaveDetails = leaveObj.ListEmployeesLeaves(Empid, LeaveType, Status);
             return View(LeaveDetails);
         }
 
@@ -53,7 +53,6 @@ namespace XoneHR.Controllers
 
             return View();
         }
-
 
         public ActionResult AttendanceBooklist(int Codevalue, int ScheduleID, Int64 ProjiD)
         {
@@ -178,8 +177,6 @@ namespace XoneHR.Controllers
                     satitle = "";
                 }
 
-
-
                 //Off:<span class='shiftEmp label label-danger'>" + items.SalaWeekOff + "</span>  
                 sb.Append("<tr><td><img height='70px' width='70px' src=" + items.CandPhoto + " alt='' /><span class='nameEmp'>" + items.CandName + "</span>&nbsp;<span class='shiftEmp label label-success'>" + items.ShiftName + "</span><br /> </td>");
                 sb.Append("<td title=" + stitle + ">" + items.Wsun.Day + "<div class=" + scls + "><a href='#'  class='AddAttend' data-emp=" + items.EmpID + " data-empname=" + items.CandName + " data-Shift=" + shftFrom + " data-ShiftTo=" + shftTo + " data-empdate=" + items.Wsun.Date.ToString("dd/MM/yyyy") + " data-holistatus=" + Convert.ToBoolean(Sun) + " data-off=" + aSun + " data-offstatus=" + Convert.ToBoolean(SunOFF) + " data-Shiftemp=" + items.ShiftID + "><i class='fa fa-plus' aria-hidden='true'></i></a></div></td>");
@@ -189,18 +186,10 @@ namespace XoneHR.Controllers
                 sb.Append("<td title=" + thtitle + ">" + items.Wthu.Day + "<div class=" + thcls + "><a href='#' class='AddAttend' data-emp=" + items.EmpID + " data-empname=" + items.CandName + " data-Shift=" + shftFrom + " data-ShiftTo=" + shftTo + " data-empdate=" + items.Wthu.Date.ToString("dd/MM/yyyy") + " data-holistatus=" + Convert.ToBoolean(Thu) + " data-off=" + aThu + " data-offstatus=" + Convert.ToBoolean(ThuOFF) + " data-Shiftemp=" + items.ShiftID + "><i class='fa fa-plus' aria-hidden='true'></i></a></div></td>");
                 sb.Append("<td title=" + ftitle + ">" + items.Wfri.Day + "<div class=" + fcls + "><a href='#' class='AddAttend' data-emp=" + items.EmpID + " data-empname=" + items.CandName + " data-Shift=" + shftFrom + " data-ShiftTo=" + shftTo + " data-empdate=" + items.Wfri.Date.ToString("dd/MM/yyyy") + " data-holistatus=" + Convert.ToBoolean(Fri) + " data-off=" + aFri + " data-offstatus=" + Convert.ToBoolean(FriOFF) + " data-Shiftemp=" + items.ShiftID + "><i class='fa fa-plus' aria-hidden='true'></i></a></div></td>");
                 sb.Append("<td title=" + satitle + ">" + items.Wsat.Day + "<div class=" + sacls + "><a href='#' class='AddAttend' data-emp=" + items.EmpID + " data-empname=" + items.CandName + " data-Shift=" + shftFrom + " data-ShiftTo=" + shftTo + " data-empdate=" + items.Wsat.Date.ToString("dd/MM/yyyy") + " data-holistatus=" + Convert.ToBoolean(Sat) + " data-off=" + aSat + " data-offstatus=" + Convert.ToBoolean(SatOFF) + " data-Shiftemp=" + items.ShiftID + "><i class='fa fa-plus' aria-hidden='true'></i></a></div></td></tr>");
-
-
+                
             }
-
-
-
-
             return Content(sb.ToString());
-                  
-
         }
-
 
         public JsonResult GetLeaveType(Int64 EmpID)
         {
@@ -237,10 +226,10 @@ namespace XoneHR.Controllers
             //{
             //    return Json(false);
             //}
-            return Json(lobj.OutputID);
-            
+            return Json(lobj.OutputID);            
            
         }
+
         [HttpPost]
         public ActionResult AddnewleaveApplication(LeaveApplication leaveappob, string empStartenddate = null, string EmpLeaveDate = null, string EmpLeavetodate = null,Int64 EmpID = 0)
         {
@@ -278,13 +267,16 @@ namespace XoneHR.Controllers
                 if (output.OutputID == 1 || output.OutputID == 3)
                 {
                     LeaveItems leaveiemObj = leaveObj.AddnewLeaveapplication(leaveappob);
-                   // return Json(new { OutputID = leaveiemObj.OutputID, PendingDays = output.PendingDays }, JsonRequestBehavior.AllowGet);
-                    return Json(new { OutputID = 1, PendingDays = output.PendingDays }, JsonRequestBehavior.AllowGet);
+                    if (leaveiemObj.OutputID == 1)
+                        return Json(new { OutputID = leaveiemObj.OutputID, PendingDays = output.PendingDays }, JsonRequestBehavior.AllowGet);
+                    else
+                    { 
+                        if (leaveiemObj.OutputID == 2) //Already leave applied on requested date
+                            return Json(new { OutputID = -2, PendingDays = 0 }, JsonRequestBehavior.AllowGet);
+                    }
                 }
-                else if (output.OutputID == 2)
-                    return Json(new { OutputID = 2, PendingDays = 0 }, JsonRequestBehavior.AllowGet);
-                else
-                    return Json(new { OutputID = 0, PendingDays = 0 }, JsonRequestBehavior.AllowGet);
+                return Json(new { OutputID = output.OutputID, PendingDays = output.PendingDays }, JsonRequestBehavior.AllowGet);
+
             }
             else
                 return Json(new { OutputID = 0, PendingDays = 0 }, JsonRequestBehavior.AllowGet);
@@ -624,8 +616,13 @@ namespace XoneHR.Controllers
         }
 
         //[AuthorizeAll]
-        public ActionResult LeaveRequestMain()
+        public ActionResult LeaveRequestMain(string Status=null)
         {
+            SessionManage.Current.PermitFunctions = common.GetPermissionList("LeaveRequestMain", "Leave");
+            if (Status != null)
+                ViewBag.Status = Convert.ToInt16(Status);
+            else
+                ViewBag.Status = -1;
             return View();
         }
 
@@ -652,7 +649,7 @@ namespace XoneHR.Controllers
            
             var EmpLeaveDate = Date.Replace("\"", "").Replace("[", "").Replace("]", "").Replace("null", "");
             if (EmpLeaveDate == "")
-                return Json(new { Message = "Please Confirm Atleast One Date", Result = -1 }, JsonRequestBehavior.AllowGet);
+                return Json(new { Message = "Please Confirm Atleast One Date", Result = -1, Icon = "Warning" }, JsonRequestBehavior.AllowGet);
             else
             {
                 string[] EmpLeaveDates = EmpLeaveDate.Split(',');
@@ -667,12 +664,12 @@ namespace XoneHR.Controllers
                 }
                 var result = leaveObj.ApproveLeaveStatus(EmpID, LeavetypID, LeaveDate, Status);
                 if (result == 1)
-                    return Json(new { Message = " Successfully", Result = 1 }, JsonRequestBehavior.AllowGet);
+                    return Json(new { Message = "Leave Approved Successfully", Result = 1, Icon = "success" }, JsonRequestBehavior.AllowGet);
                 else if (result == 2)
-                    return Json(new { Message = " Leave Not Available", Result = 2 }, JsonRequestBehavior.AllowGet);
+                    return Json(new { Message = "Leave Rejected", Result = 2, Icon = "warning" }, JsonRequestBehavior.AllowGet);
                 else
                 {
-                    return Json(new { Message = " Failed !!", Result = 0 }, JsonRequestBehavior.AllowGet);
+                    return Json(new { Message = " Failed !!", Result = 0, Icon = "error" }, JsonRequestBehavior.AllowGet);
                 }
             }                       
 
@@ -730,10 +727,29 @@ namespace XoneHR.Controllers
                 }
                 var result = leaveObj.UnpaidApproveLeave(EmpID, LeavetypID, LeaveDate);
                 if (result == 1)
-                    return Json(new { Message = " Successfully", Result = 1 }, JsonRequestBehavior.AllowGet);               
+                    return Json(new { Message = "Action Success", Result = 1, Icon = "success" }, JsonRequestBehavior.AllowGet);               
                 else
-                    return Json(new { Message = " Failed !!", Result = 0 }, JsonRequestBehavior.AllowGet);
+                    return Json(new { Message = "Action Failed !!", Result = 0, Icon = "error" }, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult LeaveRequestedEmployee()
+        {
+            var Employeelists = leaveObj.LeaveRequestedEmployee();
+            return Json(Employeelists, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult RequestedLeaveTypes(Int64 EmpID)
+        {
+            var types = leaveObj.RequestedLeaveTypes(EmpID);
+            return Json(types, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult RequestedLeaves_Status(int LeaveType,Int64 EmpID)
+        {
+            var Status = leaveObj.RequestedLeaves_Status(LeaveType, EmpID);
+           // var StatusArray = from stat in Status select new[] { stat.EmpappStatus }.ToArray();
+            return Json(Status, JsonRequestBehavior.AllowGet);
         }
 
     }

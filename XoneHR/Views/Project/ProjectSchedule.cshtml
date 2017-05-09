@@ -1,6 +1,6 @@
 ﻿@{
     ViewBag.Title = "ProjectSchedule";
-    var ShcMessage = "";
+    var ShcMessage = "";    
 }
 
 <script src="~/plugins/Toast/src/jquery.toast.js"></script>
@@ -15,7 +15,6 @@
 <script src="~/XoneScripts/Files/Angular.js"></script>
 
 <script type="text/javascript">
-
     var app = angular.module("ProjectSchApp", []);
     app.controller("ProjectSchCntrl", function ($scope, $http) {
 
@@ -38,23 +37,23 @@
         $scope.EmpOffDaysArray = new Array();
         $scope.AddEmp = function () {
             var addToArray = 0;
-
-            if ($("#AssignShiftID").val() == 0) {
+           
+            if ($("#AssignShiftID").val() == 0 || $("#AssignShiftID").val() == null) {
                 addToArray = 1;
                 MsgAlert('Shift Field is Required', 'error');
             }
-            if ($("#SchID").val() == 0) {
+            if ($("#SchID").val() == 0 || $("#SchID").val() == null) {
                 addToArray = 1;
                 MsgAlert('Designation Field is Required', 'error');
             }
-            if ($("#DesigID").val() == 0) {
+            if ($("#DesigID").val() == 0 || $("#DesigID").val() == null) {
                 addToArray = 1;
                 MsgAlert('Designation Field is Required', 'error');
-            } if ($("#GradeID").val() == 0) {
+            } if ($("#GradeID").val() == 0 || $("#GradeID").val() == null) {
                 addToArray = 1;
                 MsgAlert('Grade Field is Required', 'error');
             }
-            else if ($("#EmpID").val() == 0) {
+            else if ($("#EmpID").val() == 0 || $("#EmpID").val() == null) {
                 addToArray = 1;
                 MsgAlert('Employee Field is Required', 'error');
             }
@@ -116,10 +115,10 @@
                         params: { EmpID: $("#EmpID").val() }
                     }).success(function (details) {
                         OffType = details.RestDay_Type;
-                        FixedDay = details.RestDay_Fixed;
+                        FixedDay = details.RestDay_Fixed; var OffStatus = 0;
                         if (OffType == 0) //If Off Optional,
                         {
-                            var OffStatus = $('#OffDates option:selected').length;
+                            OffStatus = $('#OffDates option:selected').length;
                             $http({
                                 url: "/Project/SaveOptionalRestDays",
                                 params: { EmpID: $("#EmpID").val(), EmpOFFs: $("#OffDates").val() }
@@ -131,13 +130,13 @@
                                 method: "GET",
                                 url: "/Project/GetScheduleWiseOffDayStatus",
                                 params: { EmpID: $("#EmpID").val(), SchFromDate: $("#SchID").find('option:selected').attr("data-startdate"), SchEndDate: $("#SchID").find('option:selected').attr("data-enddate"), FixedDay: FixedDay }
-                            }).success(function (dt) {
+                            }).success(function (dt) {                              
                                 if (dt > 0)
                                     OffStatus = dt;
                                 else
-                                    OffStatus = 0;
-                            });
-                        }
+                                    OffStatus = 0;                                
+                            }); 
+                        } 
                         $scope.EmpArray.push({ 'Shift': $("#AssignShiftID option:selected").text(), 'ShiftID': $("#AssignShiftID").val(), 'Schedule': $("#SchID option:selected").text(), 'SchID': $("#SchID").val(), 'EmpName': $("#EmpID option:selected").text(), 'EmpID': $("#EmpID").val(), 'EmpDesigName': $("#DesigID option:selected").text(), 'DesigID': $("#DesigID").val(), 'EmpGrade': $("#GradeID option:selected").text(), 'GradeID': $("#GradeID").val(), 'EmpLeaveStatus': EmpLeaveStatus, 'SchFromDate': $("#SchID").find('option:selected').attr("data-startdate"), 'SchToDate': $("#SchID").find('option:selected').attr("data-enddate"), 'EmpOffs': $("#OffDates").val(), 'OffStatus': OffStatus });
                         ClearParams();
                     });
@@ -799,21 +798,19 @@
 
 <input type="hidden" value="@ViewBag.projectid" id="HidProjID" />
 
-     <section class="content-header">
-        <ol class="breadcrumb">
-            <li></li>
-        </ol>
-        <h1>
-            Project
-            <small>@ViewBag.projectname</small>
-        </h1>
-
-        <div class="breadcrumb" style="right: 0px !important; font-size: 20px !important">
-
-            <label>Project Duration From : </label><small>@ViewBag.ProjFromDate</small><label>&nbsp;&nbsp; To :</label>  <small>@ViewBag.ProjToDate</small>
-            <li><a style="color:#87CEFA;" href="/Project/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
-        </div>
-    </section>
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li></li>
+    </ol>
+    <h1>
+        Project
+        <small>@ViewBag.projectname</small>
+    </h1>
+    <div class="breadcrumb" style="right: 0px !important; font-size: 20px !important">
+        <label>Project Duration From : </label><small>@ViewBag.ProjFromDate</small><label>&nbsp;&nbsp; To :</label>  <small>@ViewBag.ProjToDate</small>
+        <li><a style="color:#87CEFA;" href="/Project/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+    </div>
+</section>
 
     <div class="col-md-3">
         <div class="box box-solid">

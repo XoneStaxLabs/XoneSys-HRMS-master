@@ -1,8 +1,9 @@
-﻿@model IEnumerable<XoneHR.Models.TblQuestions>
+﻿@* @model IEnumerable<XoneHR.Models.TblQuestions>*@
+@model XoneHR.Models.InterviewQstnAnsComponent
 @{
     ViewBag.Title = "GetInertviewQuestion";
     Layout = null;
-    var i = 0;
+    var i = 0;   
 }
 
 <script src="~/plugins/Toast/src/jquery.toast.js"></script>
@@ -81,9 +82,10 @@
         <li><a href="#" class="addnew" data-toggle="modal"><i class="fa fa-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
     </ol>
     </section>
-   
-    @foreach (var item in Model)
-{
+
+    @{var AnswerList = Model.Answrs;}
+    @foreach (var item in Model.Qustns)
+    {
     i = i + 1;
     <div class="ques@(i)" >
         <div class="form-group">
@@ -91,24 +93,42 @@
                 <h6><span>@i. </span>@item.QuestName </h6>
                 <input type="hidden" value="@item.QuestID" name="QuestID" id="QuestID" />
             </div>
-
             <div class="col-sm-8"><button type="button" class="RemoveInterviewQus" data-id="@item.QuestID" data-item="@i"><i class="fa fa-trash"></i></button></div>
-
         </div>
-        <div class="form-group">
-            <label class="col-sm-12" for="exampleInputPassword1">Answer</label>
-            <div class="col-sm-6">
-                <textarea class="form-control" name="Answer" rows="3"></textarea>
+               
+        @if (AnswerList.Where(m => m.QuestID == item.QuestID).Count() > 0)
+        {
+            var QuestID_Ans = AnswerList.Where(m => m.QuestID == item.QuestID).FirstOrDefault();
+            <div class="form-group">
+                <label class="col-sm-12" for="exampleInputPassword1">Answer</label>
+                <div class="col-sm-6">
+                    <textarea class="form-control" name="Answer" rows="3" value="@QuestID_Ans.Answer">@QuestID_Ans.Answer</textarea>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-12" for="exampleInputPassword1">Rating</label>
-            <div class="col-sm-4">
-                <input id="input-21e" value="0" type="number" name="AnsRating" class="rating" min=0 max=5 step=0.5 data-size="xs">
+            <div class="form-group">
+                <label class="col-sm-12" for="exampleInputPassword1">Rating</label>
+                <div class="col-sm-4">
+                    <input id="input-21e" value="@QuestID_Ans.AnsRating" type="number" name="AnsRating" class="rating" min=0 max=5 step=0.5 data-size="xs">
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label class="col-sm-12" for="exampleInputPassword1">Answer</label>
+                <div class="col-sm-6">
+                    <textarea class="form-control" name="Answer" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-12" for="exampleInputPassword1">Rating</label>
+                <div class="col-sm-4">
+                    <input id="input-21e" value="0" type="number" name="AnsRating" class="rating" min=0 max=5 step=0.5 data-size="xs">
+                </div>
+            </div>
+        }        
     </div>
-}
+    }
     <hr class="divider">
 
     <div class="text-right">

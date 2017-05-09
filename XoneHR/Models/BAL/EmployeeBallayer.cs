@@ -427,6 +427,23 @@ namespace XoneHR.Models.BAL
             }
         }
 
+        public Int16 GetEmpType(Int64 EmpID)
+        {
+            DynamicParameters para = new DynamicParameters();
+            para.Add("@EmpID", EmpID);
+
+            var Type = db.DapperSingle("Select EmpTypID from TblEmployee where EmpID=@EmpID", para);  //,EmpPartTime_Pay
+            return Convert.ToInt16(Type);
+        }
+
+        public Int16 GetPartialEmpDetails(Int64 EmpID)
+        {
+            DynamicParameters para = new DynamicParameters();
+            para.Add("@EmpID", EmpID);
+
+            var EmpPartTime_Pay = db.DapperSingle("Select EmpPartTime_Pay from TblEmployee where EmpID=@EmpID", para);
+            return Convert.ToInt16(EmpPartTime_Pay);
+        }
 
         //public List<TblFixecSalaryTypes> GetAllowanceSalaryTypeEMP(Int64 EmpId)
         //{
@@ -524,6 +541,14 @@ namespace XoneHR.Models.BAL
             para.Add("@MonthNumber", id);
 
             return db.DapperSingle("Select DateName( month , DateAdd( month , @MonthNumber , -1 ))", para);
+        }
+
+        public List<UniformComponent> UnformDetails(Int64 EmpID)
+        {
+            DynamicParameters para = new DynamicParameters();
+            para.Add("@EmpID", EmpID);
+
+            return db.DapperToList<UniformComponent>("Select CheckListID,CheckListDetails,b.Price,Quantity,Size from TblOnboardCheckList a join TblCheckListTypes b on a.CheckListTypeID=b.CheckListTypeID where EmpID=@EmpID and CheckListStatus=1", para);
         }
 
     }

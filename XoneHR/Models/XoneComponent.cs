@@ -61,7 +61,7 @@ namespace XoneHR.Models
         public Int64 EmpID { get; set; }
         public string Resident_Name { get; set; }
         public string Gradename { get; set; }
-        public Int64 LicenseNum { get; set; }
+        public string LicenseNum { get; set; }
     }
 
     public class DocumentDetails
@@ -94,10 +94,9 @@ namespace XoneHR.Models
         public float EmpLevyAmnt { get; set; }
         public Int16 Resident_Id { get; set; }
 
-        //Emp_PermenanentType : 1:Permanent Day,2.Permanent Night,3.Not Permanent Employee
-        public Int16 Emp_PermenanentType { get; set; }
+        public Int16 EmpSubTypeID { get; set; }
 
-        public Int64 EmpRegNo { get; set; }
+        public string EmpRegNo { get; set; }
         public Int16 RestDay_Type { get; set; }  // 0: Optional Off, 1: Fixed Off
 
         // public DateTime RestDay_Optional { get; set; }
@@ -167,8 +166,7 @@ namespace XoneHR.Models
         public Int16 OFFBoard_Status { get; set; }
         public float BasicSalary { get; set; }// tblemployeesalary
 
-        //Emp_PermenanentType : 1:Permanent Day,2.Permanent Night,3.Not Permanent Employee
-        public Int16 Emp_PermenanentType { get; set; }
+        public Int16 EmpSubTypeID { get; set; }
 
         public Int16 Resident_Id { get; set; }
         public string PassportNo { get; set; }
@@ -180,7 +178,7 @@ namespace XoneHR.Models
         public DateTime OFFBoard_NoticeEnd { get; set; }
         public Int16 RestDay_Type { get; set; }  // 0: Optional Off, 1: Fixed Off
         public Int16 RestDay_Fixed { get; set; }
-        public Int64 LicenseNum { get; set; }
+        public string LicenseNum { get; set; }
     }
 
     public class RestDays
@@ -366,7 +364,7 @@ namespace XoneHR.Models
         public double EmpappDays { get; set; }
 
         //0-Pending , 1 - Approved , 2-Rejected, 3-Authorized
-        public byte EmpappStatus { get; set; }
+        public Int16 EmpappStatus { get; set; }
 
         public string EmpappRemks { get; set; }
 
@@ -531,8 +529,6 @@ namespace XoneHR.Models
         public string restdayname { get; set; }
     }
 
-
-
     public class SalaryAdvanceslip
     {
         public SalaryslipContent SalaryslipContent { get; set; }
@@ -679,6 +675,7 @@ namespace XoneHR.Models
         public DateTime EmpStartDate { get; set; }
         public string CandName { get; set; }
         public string CandPhoto { get; set; }
+        public Int64 CandID { get; set; }
     }
 
     public class EmployeeValidationDocs
@@ -726,10 +723,9 @@ namespace XoneHR.Models
         // EmpPartTime_Pay: 1- hourly base salary, 2- daily wise base salary 0- its not part time emp
         public Int16 EmpPartTime_Pay { get; set; }
 
-        //Emp_PermenanentType : 1:Permanent Day,2.Permanent Night,3.Not Permanent Employee
-        public Int16 Emp_PermenanentType { get; set; }
+        public Int16 EmpSubTypeID { get; set; }
 
-        public Int64 EmpRegNo { get; set; }
+        public string EmpRegNo { get; set; }
     }
 
     public class EmpAllowanceAssignment
@@ -817,6 +813,8 @@ namespace XoneHR.Models
         public Int64 EmpID { get; set; }
         public string CandName { get; set; }
         public Int16 EmpTypID { get; set; }
+
+        public string EmpSubType { get; set; }
     }
 
     public class EmpBasicDetails
@@ -1029,7 +1027,6 @@ namespace XoneHR.Models
         public bool ReliefConfirmation { get; set; }
         public string CandMobile { get; set; }
         public string EmpTypName { get; set; }
-
     }
 
     public class ScheduleDropList
@@ -1110,6 +1107,7 @@ namespace XoneHR.Models
         public string enddt { get; set; }
         public string color { get; set; }
     }
+
     public class TblSalaryPayComponent
     {
         public Int64 PayId { get; set; }
@@ -1122,4 +1120,44 @@ namespace XoneHR.Models
         public Int16 PayMode { get; set; }
     }
 
+    public class TblCheckListTypesEdit
+    {
+        public Int16 CheckListTypeID { get; set; }
+        public string CheckListDetails { get; set; }
+        public float Price { get; set; }
+
+        public Int64 CheckListID { get; set; }
+        public Int64 EmpID { get; set; }
+
+        public int Quantity { get; set; }
+        public string Size { get; set; }
+        public Int16 CheckListStatus { get; set; }
+    }
+
+    public class InterviewQstnAnsComponent
+    {
+        public List<TblQuestions> Qustns { get; set; }
+        public List<TblCandidateAnswers> Answrs { get; set; }
+    }
+
+    public class EmployeeTypeDetails
+    {
+        public Int16 EmpTypID { get; set; }
+        public Int16 EmpPartTime_Pay { get; set; }
+    }
+
+    public class UniformComponent
+    {
+        public Int64 CheckListID { get; set; }
+        public string CheckListDetails { get; set; }
+        public float Price { get; set; }
+        public int Quantity { get; set; }
+        public string Size { get; set; }
+    }
+
+    public class LeaveApproveAuthorizeStatus
+    {
+        public Int16 EmpappStatus { get; set; } // 0: Pending, 1: Approved, 2: Reject, 3: Authorized
+        public int LeaveCount { get; set; }
+    }
 }

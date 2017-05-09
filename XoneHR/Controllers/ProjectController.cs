@@ -531,6 +531,7 @@ namespace XoneHR.Controllers
 
             ViewBag.StartDate = SchFromDate;
             ViewBag.EndDate = SchToDate;
+            ViewBag.EmpID = EmpID;
 
             RelifeEmpDetails obj = new RelifeEmpDetails();
             obj.PrjLeveobj = projectObj.GetProjectLeaveEmpDetails(EmpID, SchfrmDate.Date, SchEndDate.Date);
@@ -547,8 +548,8 @@ namespace XoneHR.Controllers
         public JsonResult SaveReliefEmployee(string EmpLeaveDate = null, string RelifeEmpName = null, string AbsEmpID = null, string ProjID = null, byte ReliefConfirmation = 0)
         {
             var Iresult = 0;
-            for (int i = 0; i < EmpLeaveDate.Length; i++)
-            {
+            //for (int i = 0; i < EmpLeaveDate.Length; i++)
+            //{
                 if (RelifeEmpName != null)
                 {
                     TblAbscenceAllocate obj = new TblAbscenceAllocate();
@@ -563,7 +564,7 @@ namespace XoneHR.Controllers
                     obj.ReliefConfirmation = Convert.ToBoolean(ReliefConfirmation);
                     Iresult = projectObj.SaveReliefEmployee(obj);
                 }
-            }
+            //}
 
             return Json(Iresult, JsonRequestBehavior.AllowGet);
         }

@@ -346,6 +346,7 @@ if ( typeof Object.create !== 'function' ) {
         textColor: false,
         textAlign: 'left',
         icon: false,
+        preventDuplicates: true,
         beforeShow: function () {},
         afterShown: function () {},
         beforeHide: function () {},

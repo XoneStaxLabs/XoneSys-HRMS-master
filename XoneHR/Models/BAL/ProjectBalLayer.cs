@@ -221,81 +221,81 @@ namespace XoneHR.Models.BAL
             return 1;
         }
 
-        public ProjectItems UpdateEmpProject(ProjectmasterID ProjmasterObj, int temp)
-        {
-            try
-            {
-                DynamicParameters paraobj = new DynamicParameters();
-                paraobj.Add("@EmpID", ProjmasterObj.EmpID);
-                paraobj.Add("@ProjID", ProjmasterObj.ProjID);
-                paraobj.Add("@Temp", temp);
-                paraobj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
-                int Result = db.DapperExecute("USP_UpdateEmpProject", paraobj, CommandType.StoredProcedure);
+        //public ProjectItems UpdateEmpProject(ProjectmasterID ProjmasterObj, int temp)
+        //{
+        //    try
+        //    {
+        //        DynamicParameters paraobj = new DynamicParameters();
+        //        paraobj.Add("@EmpID", ProjmasterObj.EmpID);
+        //        paraobj.Add("@ProjID", ProjmasterObj.ProjID);
+        //        paraobj.Add("@Temp", temp);
+        //        paraobj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
+        //        int Result = db.DapperExecute("USP_UpdateEmpProject", paraobj, CommandType.StoredProcedure);
 
-                ProjectItems projctObj = new ProjectItems();
-                projctObj.OutputID = paraobj.Get<Int32>("ErrorOutput");
-                return projctObj;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //        ProjectItems projctObj = new ProjectItems();
+        //        projctObj.OutputID = paraobj.Get<Int32>("ErrorOutput");
+        //        return projctObj;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
-        public ProjectItems AddNewSchedule(int flag, string schedule, int monthID, Int64 projectid, DateTime startdate, DateTime enddate)
-        {
-            try
-            {
-                DynamicParameters paraObj = new DynamicParameters();
-                paraObj.Add("@flag", flag);
-                paraObj.Add("@schedule", schedule);
-                paraObj.Add("@monthID", monthID);
-                paraObj.Add("@projectId", projectid);
-                paraObj.Add("@startdate", startdate);
-                paraObj.Add("@endate", enddate);
-                paraObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
-                int Result = db.DapperExecute("USP_AddNewSchedule", paraObj, CommandType.StoredProcedure);
+        //public ProjectItems AddNewSchedule(int flag, string schedule, int monthID, Int64 projectid, DateTime startdate, DateTime enddate)
+        //{
+        //    try
+        //    {
+        //        DynamicParameters paraObj = new DynamicParameters();
+        //        paraObj.Add("@flag", flag);
+        //        paraObj.Add("@schedule", schedule);
+        //        paraObj.Add("@monthID", monthID);
+        //        paraObj.Add("@projectId", projectid);
+        //        paraObj.Add("@startdate", startdate);
+        //        paraObj.Add("@endate", enddate);
+        //        paraObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
+        //        int Result = db.DapperExecute("USP_AddNewSchedule", paraObj, CommandType.StoredProcedure);
 
-                ProjectItems projctObj = new ProjectItems();
-                projctObj.OutputID = paraObj.Get<Int32>("ErrorOutput");
-                return projctObj;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //        ProjectItems projctObj = new ProjectItems();
+        //        projctObj.OutputID = paraObj.Get<Int32>("ErrorOutput");
+        //        return projctObj;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
-        public ProjectItems AddNewWeeks(TblWeek weekobj, int Temp = 0)
-        {
-            try
-            {
-                DynamicParameters paraObj = new DynamicParameters();
-                paraObj.Add("@SchID", weekobj.SchID);
-                paraObj.Add("@ShiftID", weekobj.ShiftID);
-                paraObj.Add("@EmpID", weekobj.EmpID);
-                paraObj.Add("@Wsun", weekobj.Wsun);
-                paraObj.Add("@WMon", weekobj.WMon);
-                paraObj.Add("@Wtue", weekobj.Wtue);
-                paraObj.Add("@Wwed", weekobj.Wwed);
-                paraObj.Add("@Wthu", weekobj.Wthu);
-                paraObj.Add("@Wfri", weekobj.Wfri);
-                paraObj.Add("@Wsat", weekobj.Wsat);
-                paraObj.Add("@ProjID", weekobj.ProjID);
-                paraObj.Add("@Temp", Temp);
+        //public ProjectItems AddNewWeeks(TblWeek weekobj, int Temp = 0)
+        //{
+        //    try
+        //    {
+        //        DynamicParameters paraObj = new DynamicParameters();
+        //        paraObj.Add("@SchID", weekobj.SchID);
+        //        paraObj.Add("@ShiftID", weekobj.ShiftID);
+        //        paraObj.Add("@EmpID", weekobj.EmpID);
+        //        paraObj.Add("@Wsun", weekobj.Wsun);
+        //        paraObj.Add("@WMon", weekobj.WMon);
+        //        paraObj.Add("@Wtue", weekobj.Wtue);
+        //        paraObj.Add("@Wwed", weekobj.Wwed);
+        //        paraObj.Add("@Wthu", weekobj.Wthu);
+        //        paraObj.Add("@Wfri", weekobj.Wfri);
+        //        paraObj.Add("@Wsat", weekobj.Wsat);
+        //        paraObj.Add("@ProjID", weekobj.ProjID);
+        //        paraObj.Add("@Temp", Temp);
 
-                paraObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
-                int Result = db.DapperExecute("USP_AddWeeks", paraObj, CommandType.StoredProcedure);
+        //        paraObj.Add("@ErrorOutput", null, DbType.Int32, ParameterDirection.Output);
+        //        int Result = db.DapperExecute("USP_AddWeeks", paraObj, CommandType.StoredProcedure);
 
-                ProjectItems projctObj = new ProjectItems();
-                projctObj.OutputID = paraObj.Get<Int32>("ErrorOutput");
-                return projctObj;
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //        ProjectItems projctObj = new ProjectItems();
+        //        projctObj.OutputID = paraObj.Get<Int32>("ErrorOutput");
+        //        return projctObj;
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
         public List<ProjectDetails> ListProjectDatatable()
         {
@@ -472,20 +472,20 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public WeekDates GetScheduleDate(int schid)
-        {
-            try
-            {
-                DynamicParameters para = new DynamicParameters();
-                para.Add("@schduleID", schid);
+        //public WeekDates GetScheduleDate(int schid)
+        //{
+        //    try
+        //    {
+        //        DynamicParameters para = new DynamicParameters();
+        //        para.Add("@schduleID", schid);
 
-                return db.DapperFirst<WeekDates>("USP_GetScheduleDates", para, CommandType.StoredProcedure);
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //        return db.DapperFirst<WeekDates>("USP_GetScheduleDates", para, CommandType.StoredProcedure);
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
         public List<TblProjectCompenseType> GetCompansationType()
         {
@@ -509,14 +509,14 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public List<Dateschedule> GetDateSchedule(DateTime FromDate, DateTime ToDate)
-        {
-            DynamicParameters param = new DynamicParameters();
-            param.Add("@FromDate", FromDate);
-            param.Add("@ToDate", ToDate);
-            var data = db.DapperToList<Dateschedule>("USP_DateWiseScheduleDetails", param, CommandType.StoredProcedure);
-            return data;
-        }
+        //public List<Dateschedule> GetDateSchedule(DateTime FromDate, DateTime ToDate)
+        //{
+        //    DynamicParameters param = new DynamicParameters();
+        //    param.Add("@FromDate", FromDate);
+        //    param.Add("@ToDate", ToDate);
+        //    var data = db.DapperToList<Dateschedule>("USP_DateWiseScheduleDetails", param, CommandType.StoredProcedure);
+        //    return data;
+        //}
 
         public TblProjectGradeAssign GetProjectDesignationID(Int64 ProjectID)
         {
@@ -564,7 +564,7 @@ namespace XoneHR.Models.BAL
             DynamicParameters param = new DynamicParameters();
             param.Add("@GradeID", GradeID);
 
-            return db.DapperToList<Employees>("select * from TblEmployee as a join TblCandidate as b on a.CandID=b.CandID where a.Emp_IsApproved = 1 and b.GradeID = @GradeID ", param); //and a.EmpTypID = 1
+            return db.DapperToList<Employees>("select * from TblEmployee as a join TblCandidate as b  on a.CandID=b.CandID left join TblEmployeeSubType as c on a.EmpSubTypeID = c.EmpSubTypeID  where a.Emp_IsApproved = 1 and b.GradeID = @GradeID order by b.CandName Asc", param); //and a.EmpTypID = 1
         }
 
         public ScheduleEmps CheckEmpLeaveApply(Int64 EmpID, DateTime SchFrmDate, DateTime SchEdDate)
@@ -615,13 +615,23 @@ namespace XoneHR.Models.BAL
             param.Add("@EmpID", EmpID);
 
             var list = db.DapperToList<ReliefEmpConfirmList>("select  Distinct(a.EmpID),b.CandName, a.EmpTypID, c.EmpTypName , b.CandMobile,b.GradeID from TblEmployee as a join TblCandidate as b on a.CandID=b.CandID  " +
-                                "join TblEmployeeType as c on a.EmpTypID = c.EmpTypID  where a.Emp_IsApproved = 1  and c.EmpTypStatus =1 and a.EmpID != @EmpID ", param);
+                                "join TblEmployeeType as c on a.EmpTypID = c.EmpTypID  where a.Emp_IsApproved = 1  and c.EmpTypStatus =1 and a.EmpID != @EmpID order by b.CandName Asc ", param);
+            return list;
+        }
+
+        public List<ReliefEmpConfirmList> GetRelifeEmployeeList1(Int64 EmpID,DateTime Date)
+        {
+            DynamicParameters param = new DynamicParameters();
+            param.Add("@EmpID", EmpID);
+            param.Add("@Date", Date);
+
+            var list = db.DapperToList<ReliefEmpConfirmList>("USP_GetRelifeEmployeeList", param, CommandType.StoredProcedure);
             return list;
         }
 
         public List<TblAbscenceAllocate> GetAbscenceAllocateList()
         {
-            var Iresultlist = db.DapperToList<TblAbscenceAllocate>("select * from TblAbscenceAllocate as a ");
+            var Iresultlist = db.DapperToList<TblAbscenceAllocate>("select * from TblAbscenceAllocate");
             return Iresultlist;
         }
 
@@ -651,7 +661,7 @@ namespace XoneHR.Models.BAL
             "from TblShift a join Tblschedule b on a.ShiftID=b.ShiftID where a.ProjID=@ProjID and b.ProjID =@ProjID ", paraobj);
 
             //DynamicParameters param = new DynamicParameters();
-            //param.Add("@ProjID", ProjID);            
+            //param.Add("@ProjID", ProjID);
             //param.Add("@Out", 1, DbType.Int32, ParameterDirection.Output);
             //return db.DapperIEnumerable<UserProfileWorkSchedule>("GetShiftCalendarEvents", param, CommandType.StoredProcedure);
         }
@@ -670,12 +680,12 @@ namespace XoneHR.Models.BAL
             }
         }
 
-        public List<ListProjectWiseEmp> GetListProjectWiseEmp(DateTime Date,Int64 ProjID, Int32 ShiftID = 0)
+        public List<ListProjectWiseEmp> GetListProjectWiseEmp(DateTime Date, Int64 ProjID, Int32 ShiftID = 0)
         {
             DynamicParameters param = new DynamicParameters();
             param.Add("@ProjID", ProjID);
             param.Add("@ShiftID", ShiftID);
-            param.Add("@Date",Date);
+            param.Add("@Date", Date);
 
             if (ProjID == 0)
             {
@@ -752,7 +762,7 @@ namespace XoneHR.Models.BAL
         {
             var list = db.DapperToList<ReliefEmpConfirmList>("select Distinct(a.EmpID),b.CandName, a.EmpTypID, c.EmpTypName , b.CandMobile,b.GradeID from TblEmployee as a join TblCandidate as b on a.CandID=b.CandID " +
                                                              "join TblEmployeeType as c on a.EmpTypID = c.EmpTypID " +
-                                                             "where a.Emp_IsApproved = 1  and c.EmpTypStatus =1");
+                                                             "where a.Emp_IsApproved=1  and c.EmpTypStatus=1 order by b.CandName Asc");
             return list;
         }
 
@@ -1174,7 +1184,7 @@ namespace XoneHR.Models.BAL
         {
             DynamicParameters para = new DynamicParameters();
             para.Add("@AbsentEmp", AbsentEmp);
-            para.Add("@AllocateEmp",AllocateEmp);
+            para.Add("@AllocateEmp", AllocateEmp);
             para.Add("@Date", Date);
 
             var result = db.DapperExecute("Delete from TblAbscenceAllocate where AbsEmpID=@AbsentEmp and AbsallEmpID=@AllocateEmp and AbsDateFrom=@Date", para);

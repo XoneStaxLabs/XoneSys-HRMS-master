@@ -72,13 +72,13 @@
     <h1>
         Designation
     </h1>
-@*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
-{*@
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
     <ol class="breadcrumb">
         @*Add New buttonazd*@
         <li><a href="#a" class="addnew" data-toggle="modal"><i class="fa fa-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
     </ol>
-@*}*@    
+}    
 </section>
 <section class="newforms">
 
@@ -101,8 +101,10 @@
             <div id="example1_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="example1"></label></div>
         </div>
     </div>*@
-
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
     <div id="Designationlist"></div>
+}    
 
 </section>
 

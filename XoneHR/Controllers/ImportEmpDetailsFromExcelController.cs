@@ -142,8 +142,7 @@ namespace XoneHR.Controllers
             {
                 var UsyFile = Request.Files[0];
                 if (UsyFile != null)
-                {
-                    // int strFilePath = obj_file.FolderManagement(LoginType.ToString(), GroupID, CompanyID, OFFID);
+                {                    
                     var fileName = Path.GetFileName(UsyFile.FileName);
                     var ext = Path.GetExtension(UsyFile.FileName);
                     FileInfo fileInfo = new FileInfo(Request.Files[0].FileName);
@@ -164,56 +163,88 @@ namespace XoneHR.Controllers
                 Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(Session["path"].ToString());
                 Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
                 Excel.Range xlRange = xlWorksheet.UsedRange;
-
-                //string str = "";
+               
                 int rCnt = 0;
-                //int cCnt = 0;
 
                 DataTable ExcelData = new DataTable();
-                ExcelData.Columns.Add("name", typeof(string));
-                ExcelData.Columns.Add("NRIC_IN_NO", typeof(string));
-                ExcelData.Columns.Add("DATE_OF_BIRTH", typeof(string));
-                ExcelData.Columns.Add("age", typeof(string));
-                ExcelData.Columns.Add("BASIC_SALARY", typeof(string));
-                
-                ExcelData.Columns.Add("Nationality", typeof(string));
-                ExcelData.Columns.Add("FundType", typeof(string));
-
+                ExcelData.Columns.Add("name", typeof(string));                
                 ExcelData.Columns.Add("ADDRESS", typeof(string));
-                ExcelData.Columns.Add("mobile", typeof(string));
                 ExcelData.Columns.Add("phone", typeof(string));
-                ExcelData.Columns.Add("Bank", typeof(string));
-                ExcelData.Columns.Add("Account", typeof(string));
-                ExcelData.Columns.Add("BankCode", typeof(string));
-                ExcelData.Columns.Add("BranchCode", typeof(string));
+                ExcelData.Columns.Add("mobile", typeof(string));
+                ExcelData.Columns.Add("email", typeof(string));
+                ExcelData.Columns.Add("gender", typeof(string));
+                ExcelData.Columns.Add("DATE_OF_BIRTH", typeof(string));                
+                ExcelData.Columns.Add("Race", typeof(string));
+                ExcelData.Columns.Add("HighEducation", typeof(string));
+                ExcelData.Columns.Add("Grade", typeof(string));
+                ExcelData.Columns.Add("Nationality", typeof(string));
+                ExcelData.Columns.Add("NRIC_IN_NO", typeof(string));                
+                ExcelData.Columns.Add("PLRD_Exp", typeof(string));
+                ExcelData.Columns.Add("EmpType", typeof(Int16));
+                ExcelData.Columns.Add("BASIC_SALARY", typeof(string));
+               
                 DataRow newrow;
                 for (rCnt = 2; rCnt <= xlRange.Rows.Count - 1; rCnt++)
                 {
                     newrow = ExcelData.NewRow();
-                    newrow["name"] = Convert.ToString((xlRange.Cells[rCnt, 2] as Excel.Range).Value2);
-                    newrow["NRIC_IN_NO"] = Convert.ToString((xlRange.Cells[rCnt, 3] as Excel.Range).Value2);
-                    newrow["DATE_OF_BIRTH"] = Convert.ToString((xlRange.Cells[rCnt, 4] as Excel.Range).Value2);
-                    newrow["age"] = Convert.ToString((xlRange.Cells[rCnt, 5] as Excel.Range).Value2);
-                    newrow["BASIC_SALARY"] = Convert.ToString((xlRange.Cells[rCnt, 6] as Excel.Range).Value2);
+                    newrow["name"] = Convert.ToString((xlRange.Cells[rCnt,2] as Excel.Range).Value2);
+                    if ((xlRange.Cells[rCnt,3] as Excel.Range).Value2 != null)
+                        newrow["ADDRESS"] = Convert.ToString((xlRange.Cells[rCnt,3] as Excel.Range).Value2);
+                    else
+                        newrow["ADDRESS"] = null;
 
-                    newrow["Nationality"] = Convert.ToString((xlRange.Cells[rCnt, 7] as Excel.Range).Value2);
-                    newrow["FundType"] = Convert.ToString((xlRange.Cells[rCnt, 8] as Excel.Range).Value2);
+                    if ((xlRange.Cells[rCnt, 4] as Excel.Range).Value2 != null)
+                        newrow["phone"] = Convert.ToString((xlRange.Cells[rCnt, 4] as Excel.Range).Value2);
+                    else
+                        newrow["phone"] = null;
 
-                    newrow["ADDRESS"] = Convert.ToString((xlRange.Cells[rCnt, 9] as Excel.Range).Value2);
-                    newrow["mobile"] = Convert.ToString((xlRange.Cells[rCnt, 10] as Excel.Range).Value2);
-                    newrow["phone"] = Convert.ToString((xlRange.Cells[rCnt, 11] as Excel.Range).Value2);
-                    newrow["Bank"] = Convert.ToString((xlRange.Cells[rCnt, 12] as Excel.Range).Value2);
-                    newrow["Account"] = Convert.ToString((xlRange.Cells[rCnt, 13] as Excel.Range).Value2);
-                    newrow["BankCode"] = Convert.ToString((xlRange.Cells[rCnt, 14] as Excel.Range).Value2);
-                    newrow["BranchCode"] = Convert.ToString((xlRange.Cells[rCnt, 15] as Excel.Range).Value2);
+                    if ((xlRange.Cells[rCnt, 5] as Excel.Range).Value2 != null)
+                        newrow["mobile"] = Convert.ToString((xlRange.Cells[rCnt, 5] as Excel.Range).Value2);
+                    else
+                        newrow["mobile"] = null;
+                    
+                    string email = (xlRange.Cells[rCnt,6] as Excel.Range).Value2;
+                    if (email != null)
+                        newrow["email"] = Convert.ToString((xlRange.Cells[rCnt,6] as Excel.Range).Value2);
+                    else
+                        newrow["email"] = null;
+
+                    newrow["gender"] = Convert.ToString((xlRange.Cells[rCnt,7] as Excel.Range).Value2);
+                    //DateTime DATE_OF_BIRTH = DateTime.FromOADate(Convert.ToDouble((xlRange.Cells[rCnt,9] as Excel.Range).Value2));
+                    if ((xlRange.Cells[rCnt,9] as Excel.Range).Value2 != null)
+                        newrow["DATE_OF_BIRTH"] = DateTime.FromOADate(Convert.ToDouble((xlRange.Cells[rCnt, 9] as Excel.Range).Value2));
+                    else
+                        newrow["DATE_OF_BIRTH"] = null;
+
+                    if ((xlRange.Cells[rCnt, 12] as Excel.Range).Value2 != null)
+                        newrow["Race"] = Convert.ToString((xlRange.Cells[rCnt, 12] as Excel.Range).Value2);
+                    else
+                        newrow["Race"] = null;
+
+                    if((xlRange.Cells[rCnt, 13] as Excel.Range).Value2 != null)
+                        newrow["HighEducation"] = Convert.ToString((xlRange.Cells[rCnt,13] as Excel.Range).Value2);
+                    else
+                        newrow["HighEducation"] = null;
+
+                    newrow["Grade"] = Convert.ToString((xlRange.Cells[rCnt,15] as Excel.Range).Value2);
+                    newrow["Nationality"] = Convert.ToString((xlRange.Cells[rCnt,16] as Excel.Range).Value2);
+                    newrow["NRIC_IN_NO"] = Convert.ToString((xlRange.Cells[rCnt,18] as Excel.Range).Value2);
+                   
+                    if ((xlRange.Cells[rCnt,21] as Excel.Range).Value2 != null)
+                        newrow["PLRD_Exp"] = DateTime.FromOADate(Convert.ToDouble((xlRange.Cells[rCnt,21] as Excel.Range).Value2));
+                    else
+                        newrow["PLRD_Exp"] = null;
+
+                    newrow["EmpType"] = Convert.ToInt16((xlRange.Cells[rCnt,24] as Excel.Range).Value2);
+                    newrow["BASIC_SALARY"] = Convert.ToString((xlRange.Cells[rCnt,30] as Excel.Range).Value2);
+                 
                     ExcelData.Rows.Add(newrow);
                 }
 
-
-                int result = BalObj.insertIntoTemp(ExcelData, 1);
+                int result = 0;//int result = BalObj.insertIntoTemp(ExcelData, 1);
                 if (result > 0)
                 {
-                    result = BalObj.ProcessTempData();
+                    //result = BalObj.ProcessTempData();
                     if (result > 0)
                     {
                         return jsnsucess;
@@ -244,7 +275,6 @@ namespace XoneHR.Controllers
                 var UsyFile = Request.Files[0];
                 if (UsyFile != null)
                 {
-                    // int strFilePath = obj_file.FolderManagement(LoginType.ToString(), GroupID, CompanyID, OFFID);
                     var fileName = Path.GetFileName(UsyFile.FileName);
                     var ext = Path.GetExtension(UsyFile.FileName);
                     FileInfo fileInfo = new FileInfo(Request.Files[0].FileName);
@@ -266,29 +296,25 @@ namespace XoneHR.Controllers
                 Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
                 Excel.Range xlRange = xlWorksheet.UsedRange;
 
-                //string str = "";
                 int rCnt = 0;
-                //int cCnt = 0;
 
                 DataTable ExcelData = new DataTable();
                 ExcelData.Columns.Add("NRIC_IN_NO", typeof(string));
-                ExcelData.Columns.Add("Join_Date", typeof(string));
-                ExcelData.Columns.Add("Race", typeof(string));
+                ExcelData.Columns.Add("EmpName", typeof(string));
+                ExcelData.Columns.Add("PLRDIssue_Date", typeof(string));
+                ExcelData.Columns.Add("PLRDExp_Date", typeof(string));
 
                 DataRow newrow;
-                for (rCnt = 4; rCnt <= xlRange.Rows.Count - 1; rCnt++)
+                for (rCnt = 2; rCnt <= xlRange.Rows.Count - 1; rCnt++)
                 {
                     newrow = ExcelData.NewRow();
-                    newrow["NRIC_IN_NO"] = Convert.ToString((xlRange.Cells[rCnt, 3] as Excel.Range).Value2);
-                    
-                    newrow["Race"] = Convert.ToString((xlRange.Cells[rCnt, 10] as Excel.Range).Value2);
-                    //var test=((xlRange.Cells[rCnt, 11] as Excel.Range).Value2);
-                    //double d = Convert.ToDouble((xlRange.Cells[rCnt, 11] as Excel.Range).Value2);
-                    DateTime dateValue = DateTime.FromOADate(Convert.ToDouble((xlRange.Cells[rCnt, 11] as Excel.Range).Value2));
-                    if ((xlRange.Cells[rCnt, 11] as Excel.Range).Value2 != null)
-                        newrow["Join_Date"] = common.ChangeDateToSqlFormat(dateValue); //ToShortDateString();
-                    else
-                        newrow["Join_Date"] = null;
+                    newrow["NRIC_IN_NO"] = Convert.ToString((xlRange.Cells[rCnt, 2] as Excel.Range).Value2);                    
+                    newrow["EmpName"] = Convert.ToString((xlRange.Cells[rCnt, 4] as Excel.Range).Value2);
+                    DateTime Issue_Date = DateTime.FromOADate(Convert.ToDouble((xlRange.Cells[rCnt, 9] as Excel.Range).Value2));
+                    //if ((xlRange.Cells[rCnt, 9] as Excel.Range).Value2 != null)
+                    newrow["PLRDIssue_Date"] = common.ChangeDateToSqlFormat(Issue_Date); //ToShortDateString();
+                    DateTime Exp_Date = DateTime.FromOADate(Convert.ToDouble((xlRange.Cells[rCnt, 7] as Excel.Range).Value2));
+                    newrow["PLRDExp_Date"] = common.ChangeDateToSqlFormat(Exp_Date);
 
                     ExcelData.Rows.Add(newrow);
                 }

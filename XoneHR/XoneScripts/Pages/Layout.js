@@ -52,6 +52,17 @@ function PLRDExpiry() {
     });
 }
 
+function LeaveNotify() {
+    
+    $.ajax({
+        type: "get",
+        url: "/DashBoard/LeaveNotify"
+
+    }).done(function (data) {
+        $("#LeaveNotification").html(data);
+    });
+}
+
 
 $(document).ready(function () {
    
@@ -60,6 +71,7 @@ $(document).ready(function () {
     GetMenuLists();
     PassportExpiry();
     PLRDExpiry();
+    LeaveNotify();
        
     setInterval(function () {
         SessionExpiry()
@@ -102,7 +114,7 @@ $(document).ready(function () {
     });
 
     $('.YearCal').datetimepicker({
-        viewMode: 'years',
+      //  viewMode: 'years',
         format: $("#HidDateFormat").val()
     });
 

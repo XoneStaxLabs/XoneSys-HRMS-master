@@ -104,6 +104,19 @@
         })
     }
 
+    function LoadUnformDetails() {
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Employee/UnformDetails"
+
+        }).done(function (data) {
+
+            $("#Uniformdetails").html(data);
+        })
+    }
+
     function DeclarationtabContentList() {
 
         $.ajax({
@@ -121,6 +134,7 @@
         LoadSalaryDetails();
         LoadLeaveDetails();
         DeclarationtabContentList();
+        LoadUnformDetails();
 
         $("#ddlDocumentTypeID").change(function () {
 
@@ -145,14 +159,21 @@
         <i class="fa fa-users"></i>&nbsp;
         Employees Profile
     </h1>
-
-    <ol class="breadcrumb">
-        <li><a href="/Employee/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
-    </ol>
+    @if (ViewBag.Status == 1)
+    {
+        <ol class="breadcrumb">
+            <li><a href="/DashBoard/DashBoard"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+        </ol>
+    }
+    else
+    {
+        <ol class="breadcrumb">
+            <li><a href="/Employee/Index"><i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
+        </ol>
+    }    
 </section>
 
 <section class="newforms p-t-0">
-
     <div class="tabsnew">
         <!-- Nav tabs -->
         <div class="box box-primary">
@@ -177,13 +198,16 @@
                                 <a href="#history" role="tab" data-toggle="tab">Employer History</a>
                             </li>
                             <li role="presentation" class="list-group-item">
-                                <a href="#emergencycontact" role="tab" data-toggle="tab">Emergency Contact</a>
+                                <a href="#emergencycontact" role="tab" data-toggle="tab">Next of Kin</a>
                             </li>
                             <li role="presentation" class="list-group-item">
                                 <a href="#salary" role="tab" data-toggle="tab">Salary Details</a>
                             </li>
                             <li role="presentation" class="list-group-item">
                                 <a href="#leave" role="tab" data-toggle="tab">Leave Details</a>
+                            </li>
+                            <li role="presentation" class="list-group-item">
+                                <a href="#checklist" role="tab" data-toggle="tab">Uniform Details</a>
                             </li>
                             <li role="presentation" class="list-group-item">
                                 <a href="#declaration" role="tab" data-toggle="tab">Declaration</a>
@@ -199,7 +223,6 @@
                 </div>
                 <div class="col-sm-9">
                     <div class="tab-content">
-
                         <div role="tabpanel" class="tab-pane fade" id="interview">
 
                             <form>
@@ -408,7 +431,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="col-sm-4 padding-0 control-label">Designation Applied For</label>
+                                            <label class="col-sm-4 padding-0 control-label">PLRD Grade@*Designation Applied For*@</label>
                                             <div class="col-sm-8">
                                                 <span>@Model.DesigName</span>
                                             </div>
@@ -416,7 +439,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="col-sm-4 padding-0 control-label">Grade</label>
+                                            <label class="col-sm-4 padding-0 control-label">Employee Grade@*Grade*@</label>
                                             <div class="col-sm-8">
                                                 <span>@Model.Gradename</span>
                                             </div>
@@ -438,7 +461,7 @@
                                 </div>
 
                                 <div class="col-md-12">
-                                    <h4>Nationality & Licensing</h4><hr />
+                                    <h4>Nationality Details</h4><hr />
                                     <div>
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -671,7 +694,7 @@
                         </div>
 
                         <div role="tabpanel" class="tab-pane fade" id="emergencycontact">
-                            <h4>Emergency Contact</h4>
+                            <h4>Next of Kin</h4>
                             <hr class="divider" />
                             <div class="row">
                                 <div class="col-md-6">
@@ -740,6 +763,22 @@
 
                         <div role="tabpanel" class="tab-pane fade" id="declaration">
                             <div id="DeclarationtabContent"></div>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="checklist">
+                            <table class="table table-responsive">
+
+                                <thead>
+                                    <tr>
+                                        <th>Uniform</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Size</th>                                        
+                                    </tr>
+                                </thead>
+
+                                <tbody id="Uniformdetails"></tbody>
+                            </table>
                         </div>
                     </div>
                     <hr class="divider">

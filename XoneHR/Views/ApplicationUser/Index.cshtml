@@ -72,12 +72,12 @@
         <i class="fa fa-book"></i>&nbsp;
         User List
     </h1>
-@*@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
-{*@
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.Create).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
     <ol class="breadcrumb">
         <li><a href="/ApplicationUser/Create"><i class="fa fa-plus"></i> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></li>
     </ol>
-@*}*@    
+}    
 </section>
 
 @*<div class="p-l-15 p-r-15 p-t-15">
@@ -88,8 +88,11 @@
         <option value="3">Organization Type User</option>
     </select>
 </div>*@
+@if (Functionlist.Where(m => m.FunTypeID == XoneHR.Models.FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
+{
+    <div id="UserList"></div>
+}
 
-<div id="UserList"></div>
 
 <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">

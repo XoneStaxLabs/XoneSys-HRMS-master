@@ -29,8 +29,8 @@
                 $.ajax({
                     url: "/OFFBoarding/ReInstateEmployee",
                     data: { EmpId: $(this).attr('data-EmpId') }
-                }).done(function () {
-                    window.location.href = "/OFFBoarding/Index";
+                }).done(function () {                  
+                    ListEmployees();
                 });
             });
             
@@ -55,6 +55,16 @@
                     $("#labelnoticeperiod").html("");
                     $("#EmpStatus").val(0);
                 }                    
+            });
+
+            $(".RejectOffboard").on("click", function () {
+
+                $.ajax({
+                    url: "/OFFBoarding/ReInstateEmployee", //Only delete from TblOffboarding
+                    data: { EmpId: $(this).attr('data-EmpId') }
+                }).done(function (data) {
+                    ListEmployees();
+                })
             });
 
         });
@@ -83,7 +93,10 @@
                         @if (item.OFFBoard_Status == 0)
                         {
                             <td><a href="#" class="text-green bio">Offboard Requested</a></td>
-                            <td><a href="#" data-EmpId='@item.EmpID' class="text-green bio ApproveOffboard"><b>&nbsp;&nbsp;<span class="label label-success">Approve</span></b></a></td>
+                            <td>
+                                <a href="#" data-EmpId='@item.EmpID' class="text-green bio ApproveOffboard"><b>&nbsp;&nbsp;<span class="label label-success">Approve</span></b></a>
+                                <a href="#" data-EmpId="@item.EmpID" class="text-green bio RejectOffboard"><b>&nbsp;&nbsp;<span class="label label-success">Reject</span></b></a>
+                            </td>
                         }
                         else if (item.OFFBoard_Status == 1)
                         {

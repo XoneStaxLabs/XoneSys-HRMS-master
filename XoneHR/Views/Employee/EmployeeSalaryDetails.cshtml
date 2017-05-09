@@ -11,7 +11,21 @@
     <h4>Salary Details</h4>
     <hr class="divider" />
     <div class="row">
-        Basic Salary : @ViewBag.BasicSalary
+        @if(ViewBag.EmpType != 2) //If emp not part time
+        {
+           <label>Basic Salary : @ViewBag.BasicSalary</label>
+        }
+        else
+        {
+            if (ViewBag.PartTime_Pay == 1)
+            {
+                <label>Salary (Hourly Rate): @ViewBag.BasicSalary</label>
+            }
+            else
+            {
+                <label>Salary (Daily Rate): @ViewBag.BasicSalary</label>
+            }
+        }
     </div>
 </div>
 <br />

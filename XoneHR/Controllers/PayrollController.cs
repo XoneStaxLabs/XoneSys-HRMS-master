@@ -23,7 +23,7 @@ namespace XoneHR.Controllers
 
         public ActionResult Index()
         {
-            //SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Payroll");
+            SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Payroll");
             return View();
         }
 
@@ -37,17 +37,24 @@ namespace XoneHR.Controllers
             StringBuilder sb = new StringBuilder();
             var listAllEmpolyees = payrollObj.ListAllEmployees();
 
-            // SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Employee");
-            foreach (var item in listAllEmpolyees)
+            SessionManage.Current.PermitFunctions = common.GetPermissionList("Index", "Payroll");
+            if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.List).Select(m => m.UserPermiStatus).SingleOrDefault())
             {
-                var salpath = "/Employee/SalaryPayment?EmpId=" + item.EmpID;
+                foreach (var item in listAllEmpolyees)
+                {
+                    var salpath = "/Employee/SalaryPayment?EmpId=" + item.EmpID;
 
-                sb.Append("<tr><td>" + item.EmpRegNo + "</td> <td>"+ item.CandName + "</td> <td>" + item.DesigName + "</td> <td>"+ item.Gradename + "</td>");
-                sb.Append("<td><a href=" + salpath + " class='text-green bio btnSalary'><b><span class='label label-success'> Edit Payroll </span></b></a>&nbsp;");  //<i class='fa fa-usd' aria-hidden='true'></i>
-                sb.Append("<a href='#' data-empid="+ item.EmpID + " class='text-green bio Payslip'><b>&nbsp;&nbsp;<span class='label label-success'>Generate Payslip</span></b></a>");
-                sb.Append("<a href='#' data-empid="+ item.EmpID + " class='text-green bio summary'><b>&nbsp;&nbsp;<span class='label label-success'>Summary</span></b></a> </td></tr>");
-
-            } 
+                    sb.Append("<tr><td>" + item.EmpRegNo + "</td> <td>" + item.CandName + "</td> <td>" + item.DesigName + "</td> <td>" + item.Gradename + "</td><td>");
+                    if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.EditPayroll).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        sb.Append("<a href=" + salpath + " class='text-green bio btnSalary'><b><span class='label label-success'> Edit Payroll </span></b></a>&nbsp;");  //<i class='fa fa-usd' aria-hidden='true'></i>
+                    if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.GeneratePayslip).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        sb.Append("<a href='#' data-empid=" + item.EmpID + " class='text-green bio Payslip'><b>&nbsp;&nbsp;<span class='label label-success'>Generate Payslip</span></b></a>");
+                    if (SessionManage.Current.PermitFunctions.Where(m => m.FunTypeID == FunctionTypes.PayrollSummery).Select(m => m.UserPermiStatus).SingleOrDefault())
+                        sb.Append("<a href='#' data-empid=" + item.EmpID + " class='text-green bio summary'><b>&nbsp;&nbsp;<span class='label label-success'>Summary</span></b></a>");
+                    sb.Append("</td></tr>");
+                } 
+            }
+                        
             return Content(sb.ToString());
         }
 
@@ -58,8 +65,7 @@ namespace XoneHR.Controllers
                 ViewBag.EmpName = salslipobj.EmployeeName(EmpID);
                 ViewBag.year = year;
                 ViewBag.month = month;
-           
-            
+                       
             return View();
         }
 

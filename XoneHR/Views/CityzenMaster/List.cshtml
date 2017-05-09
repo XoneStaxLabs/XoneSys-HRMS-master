@@ -14,16 +14,23 @@
     });
 </script>
 
+<style>
+     .disabled {
+        pointer-events: none;
+        cursor: default;
+        opacity: 0.6;
+    }
+</style>
+
 <table id="example2" class="table table-bordered table-hover masterlist">
 
     <thead>
         <tr>
             <th>Sl No.</th>
             <th>Citizen</th>
-            @*<th>Citizen Code</th>*@
             <th>Citizen Number Name</th>
             <th data-sortable="false">Status</th>
-            <th data-sortable="false">Actions</th>
+            <th data-sortable="false">Actions</th>  
         </tr>
     </thead>
     <tbody>
@@ -38,12 +45,10 @@
                 @if (item.IsStatus.ToString() == "True")
                 {
                     status = "Active";
-
                 }
                 else
                 {
                     status = "InActive";
-
                 }
                 <td>@status</td>
                 <td style="width:15%;">
@@ -57,6 +62,10 @@
                         {
                             <a href="" class="btn btn-danger btndelete" data-toggle="modal" data-id="@item.CizenID" data-name="@item.Citizen"><i class="fa fa-fw fa-trash-o"></i></a>
                         }
+                    }
+                    else
+                    {
+                        <a href="" class="btn btn-danger btndelete disabled" data-toggle="modal" data-id="@item.CizenID" data-name="@item.Citizen"><i class="fa fa-fw fa-trash-o" disabled="disabled"></i></a>
                     }
                 </td>
             </tr>

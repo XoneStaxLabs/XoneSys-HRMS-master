@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<XoneHR.Models.PassportExpiryLists>
 @{
     ViewBag.Title = "PassportExpiryList";
+    
 }
 
 
@@ -18,34 +19,45 @@
 
 </script>
 
+<style>
+    #example2 tbody > tr > td:first-child {
+        max-width: 300px !important;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        Passport Expiry Details
+    </h1>
+</section>
 
-<table id="example2" class="table table-bordered table-hover masterlist">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Expiry</th>
-            <th>Days</th>
-        </tr>
-    </thead>
-    <tbody>
-
-        @foreach (var item in Model)
-        {
+<section class="newforms">
+    <table id="example2" class="table table-bordered table-hover masterlist">
+        <thead>
             <tr>
-                <td>@item.CandName</td>
-                <td>@item.CandMobile</td>
-                <td>@item.CandPhone</td>
-                <td>@item.CandEmail</td>
-                <td>@item.PassportExpiry.ToString("dd/MM/yyyy")</td>
-                <td>@item.RemainDays</td>
-
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Expiry</th>
+                <th>Days</th>
             </tr>
-        }
+        </thead>
+        <tbody>
 
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CandName</td>
+                    <td>@item.CandMobile</td>
+                    <td>@item.CandPhone</td>
+                    <td>@item.CandEmail</td>
+                    <td>@item.PassportExpiry.ToString("dd/MM/yyyy")</td>
+                    <td>@item.RemainDays</td>
 
+                </tr>
+            }
+            
+        </tbody>
+    </table>
+</section>
 
-    </tbody>
-</table>
