@@ -22,4 +22,4 @@ namespace XoneHR
             RouteConfig.RegisterRoutes(RouteTable.Routes);            
         }
     }
-}
+} 

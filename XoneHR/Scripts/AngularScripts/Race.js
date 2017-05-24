@@ -33,7 +33,7 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
     ];
     $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('ajax', {
         dataSrc: "data",
-        url: "/MasterLists/CitizenMaster/ListRaceDetails",
+        url: "/MasterLists/RaceMaster/ListRaceDetails",
         type: "POST"
     })
     .withOption('processing', true)
@@ -48,12 +48,9 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
         $("td:first", nRow).html(iDisplayIndex + 1);
         return nRow;
     })
-
-    $scope.ShowHideAddNew = true;
-    $("#Addnew").modal('show');
-    $scope.AddNew = function () {
-        alert();
-        
+       
+    $scope.AddNewBtn = function () {
+        $("#Addnew").modal('show');
     }
 
 }]);

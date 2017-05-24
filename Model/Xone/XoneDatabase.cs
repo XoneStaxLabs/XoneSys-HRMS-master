@@ -29,7 +29,7 @@ namespace Model.Xone
         public Int16 RaceID { get; set; }
         public string RaceName { get; set; }
         public bool RaceStatus { get; set; }
-        public Int64 ModifiedBy { get; set; }
+        public Int64 ModifiedBy { get; set; } 
         public DateTime ModifiedDate { get; set; }
         [Timestamp]
         public byte[] RowVersion { get; set; }

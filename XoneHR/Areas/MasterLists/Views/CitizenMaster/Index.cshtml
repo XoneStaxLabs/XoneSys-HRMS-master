@@ -14,7 +14,7 @@
     <div ng-controller="CitizenListCntrl">
         <h3 class="page-title">
             CITIZENSHIP
-            <small>Manage Citizenship</small>
+            <small>Manage Citizenship</small> 
         </h3>
         <a data-toggle="modal" class="btn btn-sm green mrb20" id="NewAddBtn"> Add New <i class="fa fa-plus"></i> </a>
        
@@ -36,7 +36,7 @@
 
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Citizen Name</label>
+                                        <label class="col-md-3 control-label">Citizen Name *</label>
                                         <div class="col-md-6">
                                             <input type="text" class="form-control" ng-model="CitizenName" name="CitizenName" placeholder="Citizen Name" maxlength="30" autocomplete="off" >
                                         </div>
@@ -74,7 +74,7 @@
                     <div class="modal-body">
                         <div class="portlet-body form">
 
-                            <form class="form-horizontal" action="#" name="CitizenFormEdit" ng-submit="EditCitizenBtn()">
+                            <form class="form-horizontal" action="#" id="" name="CitizenFormEdit" ng-submit="EditCitizenBtn()">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                                     <h4 class="modal-title">Edit Citizenship</h4>
@@ -82,7 +82,7 @@
 
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Citizen Name</label>
+                                        <label class="col-md-3 control-label">Citizen Name *</label>
                                         <div class="col-md-6">
                                             <input type="text" class="form-control" ng-model="CitizenName_edit" placeholder="Citizen Name" maxlength="30" autocomplete="off">
                                             <input type="hidden" ng-model="CitizenID_edit"/>

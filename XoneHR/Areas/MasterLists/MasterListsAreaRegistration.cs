@@ -18,7 +18,7 @@ namespace XoneHR.Areas.MasterLists
                 "MasterLists_default",
                 "MasterLists/{controller}/{action}/{id}",
                 new { action = "Index", id = UrlParameter.Optional }
-            );
+            ); 
         }
     }
 }

@@ -65,7 +65,7 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                  }
              }
          })
-         if ($("#CitizenForm").valid()) {
+         if ($("#CitizenForm").valid()) {             
             
              $http({
                  method: "POST",
@@ -88,7 +88,9 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                  if (response.Result>0)
                      window.location.href = "/MasterLists/CitizenMaster/Index";
              });
-         }         
+         }
+         else
+             $("#Addnew").modal('show');
      }
 
      $scope.EditClick = function (id) {
@@ -109,7 +111,7 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
      
      $scope.EditCitizenBtn = function () {
 
-         $("#CitizenForm").validate({
+         $("#CitizenFormEdit").validate({
              rules: {
                  CitizenName: {
                      required: true
@@ -117,7 +119,7 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
              }
          })
 
-         if ($("#CitizenForm").valid()) {
+         if ($("#CitizenFormEdit").valid()) {
              $http({
                  method: "POST",
                  url: "/MasterLists/CitizenMaster/EditCitizenDetails",
@@ -142,6 +144,8 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                 // $("#EditCitizen").modal('hide');
              });
          }
+         else
+             $("#EditCitizen").modal('show');
      }
 
      $scope.DeleteClick = function (id) {
@@ -154,7 +158,7 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                  CitizenID: id
              }
          }).success(function (response) {
-             alert(response);
+
              $scope.DeleteCitizenName = response;
              $("#Delete").modal('show');
          });
@@ -183,4 +187,4 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
          });
      }
 
-}]);
+}]); 

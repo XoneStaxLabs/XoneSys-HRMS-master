@@ -15,5 +15,5 @@ namespace RepositoryImplement.Xone.RepositoryDerive
         string GetCitizenName(Int16 CitizenID);
         int DeleteCitizen(Int16 CitizenID);
 
-    }
+    } 
 }

@@ -46,7 +46,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
             {
                 GetAll = (from prd in GetAll orderby sortColumn + " " + sortColumnDir select prd).ToList();
             }
-
+             
             recordsTotal = GetAll.Count();
             citizendetail = GetAll.Skip(skip).Take(pageSize).ToList();
 

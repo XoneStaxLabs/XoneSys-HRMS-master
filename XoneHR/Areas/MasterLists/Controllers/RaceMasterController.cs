@@ -44,7 +44,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
             if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDir)))
             {
                 GetAll = (from prd in GetAll orderby sortColumn + " " + sortColumnDir select prd).ToList();
-            }
+            } 
 
             recordsTotal = GetAll.Count();
             racedetails = GetAll.Skip(skip).Take(pageSize).ToList();

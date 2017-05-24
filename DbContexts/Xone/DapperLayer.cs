@@ -16,7 +16,8 @@ namespace DbContexts.Xone
 
         public DapperLayer()
         {
-            Con = new SqlConnection("Data Source=DESKTOP-FL1E6LD\\SQLEXPRESS; User ID=sa;Password=sqladmin;;Initial Catalog=Xone;MultipleActiveResultSets=True");
+            //Con = new SqlConnection("Data Source=DESKTOP-FL1E6LD\\SQLEXPRESS; User ID=sa;Password=sqladmin;;Initial Catalog=Xone;MultipleActiveResultSets=True");
+            Con = new SqlConnection(ConfigurationManager.ConnectionStrings["XoneContext"].ToString());
             Command = new SqlCommand();
         }
 

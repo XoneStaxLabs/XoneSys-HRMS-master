@@ -8,4 +8,4 @@ namespace Model.Xone
     public class XoneComponents
     {
     }
-}
+} 

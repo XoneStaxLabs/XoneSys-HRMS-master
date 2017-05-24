@@ -15,7 +15,7 @@ namespace DbContexts.Xone
             AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = true;
         }
-
+         
         protected override void Seed(XoneContext context)
         {
 

@@ -12,10 +12,10 @@ namespace DbContexts.Xone
     public class XoneContext : DbContext
     {
 
-        public XoneContext() 
+        public XoneContext()  
         {
-            Database.Connection.ConnectionString = "Data Source=192.168.0.101; Initial Catalog=Xone; UID=sa; Password=sqladmin; MultipleActiveResultSets=True";
-            Database.SetInitializer<XoneContext>(new MigrateDatabaseToLatestVersion<XoneContext, ConfigurationData>());
+            //Database.Connection.ConnectionString = "Data Source=192.168.0.101; Initial Catalog=Xone; UID=sa; Password=sqladmin; MultipleActiveResultSets=True";
+            Database.SetInitializer<XoneContext>(new MigrateDatabaseToLatestVersion<XoneContext, ConfigurationData>("XoneContext"));
         }
 
 
