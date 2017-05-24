@@ -1,0 +1,142 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<script src="~/assets/global/plugins/datatables/datatables.min.js"></script>
+<script src="~/Scripts/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/angular-datatables.min.js"></script>
+<link href="~/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" />
+<script src="~/Scripts/AngularScripts/Citizenship.js"></script>
+<link href="~/assets/global/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script src="~/assets/global/plugins/Toast/src/jquery.toast.js"></script>
+
+<div ng-app="CitizenApp">
+    <div ng-controller="CitizenListCntrl">
+        <h3 class="page-title">
+            CITIZENSHIP
+            <small>Manage Citizenship</small>
+        </h3>
+        <a data-toggle="modal" class="btn btn-sm green mrb20" id="NewAddBtn"> Add New <i class="fa fa-plus"></i> </a>
+       
+        <div class="portlet-body mt20">
+            <table id="entry-grid" datatable dt-options="dtOptions" dt-columns="dtColumns" class="table table-striped table-hover table-bordered"></table>
+        </div>
+
+        <div class="modal fade" id="Addnew" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="portlet-body form">
+
+                            <form class="form-horizontal" action="#" id="CitizenForm" name="CitizenForm" ng-submit="AddNewSave()">                  
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                    <h4 class="modal-title">Add New Citizenship</h4>
+                                </div>
+
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Citizen Name</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="CitizenName" name="CitizenName" placeholder="Citizen Name" maxlength="30" autocomplete="off" >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Citizen Code</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="CitizenCode" name="CitizenCode" placeholder="Citizen Code" autocomplete="off" maxlength="30" >
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Citizen Desc</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="CitizenDesc" name="CitizenDesc" placeholder="Description" autocomplete="off" maxlength="30" >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn green" id="SaveCitizen">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+        </div>
+
+        <div class="modal fade" id="EditCitizen" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="portlet-body form">
+
+                            <form class="form-horizontal" action="#" name="CitizenFormEdit" ng-submit="EditCitizenBtn()">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                    <h4 class="modal-title">Edit Citizenship</h4>
+                                </div>
+
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Citizen Name</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="CitizenName_edit" placeholder="Citizen Name" maxlength="30" autocomplete="off">
+                                            <input type="hidden" ng-model="CitizenID_edit"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Citizen Code</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="CitizenCode_edit" placeholder="Citizen Code" autocomplete="off" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Citizen Desc</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="CitizenDesc_edit" placeholder="Description" autocomplete="off" maxlength="30">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn green">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+        </div>
+
+        <div class="modal fade" id="Delete" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <form class="form-horizontal" name="DeleteForm" role="form" ng-submit="DeleteCitizen()">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">Delete Citizenship</h4>
+                        </div>
+                        <div class="modal-body">
+                            Do You Want to Delete this Item ? <label><b > {{DeleteCitizenName}}</b></label>
+                            <input type="hidden" ng-model="CitizenId_Dlt"  />                         
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn danger" >Delete</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
