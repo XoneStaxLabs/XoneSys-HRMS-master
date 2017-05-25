@@ -38,7 +38,7 @@
 
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Race Name</label>
+                                        <label class="col-md-3 control-label">Race Name *</label>
                                         <div class="col-md-6">
                                             <input type="text" class="form-control" ng-model="RaceName" name="RaceName" placeholder="Race Name" maxlength="30" autocomplete="off">
                                         </div>
@@ -64,7 +64,7 @@
                     <div class="modal-body">
                         <div class="portlet-body form">
 
-                            <form class="form-horizontal" action="#" name="RaceFormEdit" ng-submit="AddNewSave()">
+                            <form class="form-horizontal" action="#" id="RaceFormEdit" ng-submit="EditRaceBtn()">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
                                     <h4 class="modal-title">Edit Race</h4>
@@ -72,16 +72,17 @@
 
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Race Name</label>
+                                        <label class="col-md-3 control-label">Race Name *</label>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control" ng-model="RaceName_edit" placeholder="Race Name" maxlength="30" autocomplete="off">
+                                            <input type="text" class="form-control" name="RaceName_edit" ng-model="RaceName_edit" placeholder="Race Name" maxlength="30" autocomplete="off">
+                                            <input type="hidden" ng-model="RaceID" />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn green" id="SaveRace">Save</button>
+                                    <button type="submit" class="btn green">Save</button>
                                 </div>
                             </form>
 

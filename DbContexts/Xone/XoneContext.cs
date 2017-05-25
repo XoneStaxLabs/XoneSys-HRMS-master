@@ -27,6 +27,9 @@ namespace DbContexts.Xone
 
         public DbSet<TblCitizenDetails> TblCitizenDetails { get; set; }
         public DbSet<TblRace> TblRace { get; set; }
-        
+
+        public DbSet<TblCandidate> TblCandidate { get; set; }
+
+
     }
 }

@@ -29,8 +29,9 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                 var count = db.TblCitizenDetails.Where(m => (m.CitizenName == obj.CitizenName || m.CitizenCode == obj.CitizenCode) && m.IsStatus == true).Count();
                 if (count == 0)
                 {
-                    obj.CreatedDate = DateTime.Now;
+                    obj.CreatedDate = DateTimeOffset.Now;
                     obj.IsStatus = true;
+                    obj.IsDeletable = true;
                     db.TblCitizenDetails.Add(obj);
                     db.SaveChanges();
                     return 1;
@@ -55,7 +56,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
         {
             try
             {
-                var count = db.TblCitizenDetails.Where(m => (m.CitizenName == obj.CitizenName || m.CitizenCode == obj.CitizenCode) && m.IsStatus == true && m.CitizenID != obj.CitizenID).Count();
+                var count = db.TblCitizenDetails.Where(m => (m.CitizenName == obj.CitizenName || m.CitizenCode == obj.CitizenCode) && m.IsStatus == true && m.CitizenID != obj.CitizenID && m.IsDeletable == true).Count();
                 if (count == 0)
                 {
                     TblCitizenDetails citizen = new TblCitizenDetails();
@@ -63,7 +64,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                     citizen.CitizenName = obj.CitizenName;
                     citizen.CitizenDesc = obj.CitizenDesc;
                     citizen.CitizenCode = obj.CitizenCode;
-                    citizen.LastUpdatedDate = DateTime.Now;
+                    citizen.LastUpdatedDate = DateTimeOffset.Now;
                     db.Entry(citizen).State = EntityState.Modified;
                     db.SaveChanges();
                     return 1;
@@ -88,9 +89,12 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             {
                 TblCitizenDetails citizen = new TblCitizenDetails();
                 citizen = db.TblCitizenDetails.Find(CitizenID);
-                citizen.IsStatus = false;
-                db.Entry(citizen).State = EntityState.Modified;
-                db.SaveChanges();
+                if(citizen.IsDeletable == true)
+                {
+                    citizen.IsStatus = false;
+                    db.Entry(citizen).State = EntityState.Modified;
+                    db.SaveChanges();                    
+                }
                 return 1;
             }
             catch(Exception ex)
@@ -98,6 +102,15 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                 return -1;
             }
             
+        }
+
+        public bool CheckCitizenDeleteAvailability(Int64 CitizenID)
+        {//Candidate is active not checked
+            var count = db.TblCandidate.Where(m => m.CitizenID == CitizenID).Count();
+            if (count == 0)
+                return true;
+            else
+                return false;
         }
 
 

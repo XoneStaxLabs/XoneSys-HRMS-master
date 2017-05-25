@@ -66,5 +66,45 @@ namespace XoneHR.Areas.MasterLists.Controllers
                 return Fail;
         }
 
+        public JsonResult GetDetailsForEdit(Int16 RaceID)
+        {
+            TblRace race = new TblRace();
+            race = IRaceMaster.GetDetailsForEdit(RaceID);
+            return Json(race, JsonRequestBehavior.AllowGet);
+        }
+
+        public int EditRaceDetails(TblRace race)
+        {
+            var Result = IRaceMaster.EditRaceDetails(race);
+            var Success = Json(new { Message = "Data Save Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
+            var Fail = Json(new { Message = "Data Save Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
+            var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
+            
+            return Result;
+        }
+
+        public bool CheckRaceDeletableStatus(Int16 RaceId)
+        {
+            var Status = IRaceMaster.CheckRaceDeletableStatus(RaceId);
+            return Status;
+        }
+
+        public JsonResult GetRaceName(Int16 RaceId)
+        {
+            var name = IRaceMaster.GetRaceName(RaceId);
+            return Json(name, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeleteRace(Int16 RaceId)
+        {
+            var Result = IRaceMaster.DeleteRace(RaceId);
+            var Success = Json(new { Message = "Data Deleted Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
+            var Fail = Json(new { Message = "Data Delete Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
+            if (Result == 1)
+                return Success;
+            else
+                return Fail;
+        }
+
     }
 }

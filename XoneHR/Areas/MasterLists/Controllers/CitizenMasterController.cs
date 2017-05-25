@@ -91,6 +91,12 @@ namespace XoneHR.Areas.MasterLists.Controllers
 
         }
 
+        public bool CheckCitizenDeleteAvailability(Int64 CitizenID)
+        {
+            var Status = ICitizenMaster.CheckCitizenDeleteAvailability(CitizenID);
+            return Status;
+        }
+
         public JsonResult GetCitizenName(Int16 CitizenID)
         {
             var name = ICitizenMaster.GetCitizenName(CitizenID);

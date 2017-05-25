@@ -85,8 +85,8 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                      loader: false,
                      icon: response.Icon
                  })
-                 if (response.Result>0)
-                     window.location.href = "/MasterLists/CitizenMaster/Index";
+                 if (response.Result > 0)
+                 { window.location.href = "/MasterLists/CitizenMaster/Index"; }
              });
          }
          else
@@ -110,16 +110,17 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
      }
      
      $scope.EditCitizenBtn = function () {
-
+       
          $("#CitizenFormEdit").validate({
              rules: {
-                 CitizenName: {
+                 CitizenName_edit: {
                      required: true
                  }
              }
          })
 
          if ($("#CitizenFormEdit").valid()) {
+
              $http({
                  method: "POST",
                  url: "/MasterLists/CitizenMaster/EditCitizenDetails",
@@ -140,28 +141,50 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                      icon: response.Icon
                  })
                  if (response.Result > 0)
-                    window.location.href = "/MasterLists/CitizenMaster/Index";
-                // $("#EditCitizen").modal('hide');
+                 { window.location.href = "/MasterLists/CitizenMaster/Index"; }
+                 // $("#EditCitizen").modal('hide');
              });
          }
-         else
+         else {
              $("#EditCitizen").modal('show');
+         }
      }
 
      $scope.DeleteClick = function (id) {
 
          $scope.CitizenId_Dlt = id;
+
          $http({
              method: "GET",
-             url: "/MasterLists/CitizenMaster/GetCitizenName",
-             params: {
-                 CitizenID: id
-             }
+             url: "/MasterLists/CitizenMaster/CheckCitizenDeleteAvailability",
+             params: { CitizenId: $scope.CitizenId_Dlt }
          }).success(function (response) {
+             if (response) {
+                 $http({
+                     method: "GET",
+                     url: "/MasterLists/CitizenMaster/GetCitizenName",
+                     params: {
+                         CitizenID: id
+                     }
+                 }).success(function (response) {
 
-             $scope.DeleteCitizenName = response;
-             $("#Delete").modal('show');
+                     $scope.DeleteCitizenName = response;
+                     $("#Delete").modal('show');
+                 });
+             }
+             else {
+                 $.toast({
+                     text: "This Citizen Used For Cadidate Registration",
+                     position: 'top-right',
+                     showHideTransition: 'slide',
+                     loader: false,
+                     icon: "error"
+                 })
+
+             }
          });
+
+         
      }
 
      $scope.DeleteCitizen = function () {
@@ -183,7 +206,7 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                  icon: response.Icon
              })
              if (response.Result > 0)
-                 window.location.href = "/MasterLists/CitizenMaster/Index";
+             { window.location.href = "/MasterLists/CitizenMaster/Index"; }
          });
      }
 

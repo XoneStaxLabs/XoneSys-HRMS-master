@@ -53,4 +53,146 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
         $("#Addnew").modal('show');
     }
 
+    $scope.AddNewSave = function () {
+        
+        $("#RaceForm").validate({
+            rules: {
+                RaceName: {
+                    required:true
+                }
+            }
+        })
+        if($("#RaceForm").valid())
+        {
+            $http(({
+                method: "POST",
+                url: "/MasterLists/RaceMaster/AddNewRace",
+                data: {
+                    RaceName: $scope.RaceName
+                }
+            })).success(function (reponse) {
+                $.toast({
+                    text: response.Message,
+                    position: 'top-right',
+                    hideAfter: 2000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: response.Icon
+                })
+                if (response.Result > 0)
+                {
+                    window.location.href = "/MasterLists/RaceMaster/Index";
+                }
+            });
+        }
+        else {
+            $("#Addnew").modal('show');
+        }
+
+    }
+
+    $scope.EditClick = function (id) {
+
+        $scope.RaceID = id;
+        $http({
+            method: "GET",
+            url: "/MasterLists/RaceMaster/GetDetailsForEdit",
+            params: { RaceID: $scope.RaceID }
+        }).success(function (response) {
+            $scope.RaceName_edit = response.RaceName;
+        });
+        $("#EditRace").modal('show');
+    }
+
+    $scope.EditRaceBtn = function () {
+
+        $("#RaceFormEdit").validate({
+            rules: {
+                RaceName_edit: {
+                    required:true
+                }
+            }
+        });
+        if ($("#RaceFormEdit").valid()) {
+
+            $http({
+                method: "POST",
+                url: "/MasterLists/RaceMaster/EditRaceDetails",
+                data: {
+                    RaceID: $scope.RaceID,
+                    RaceName: $scope.RaceName_edit
+                }
+            }).success(function (response) {
+                $.toast({
+                    text: response.Message,
+                    position: 'top-right',
+                    hideAfter: 2000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: response.Icon
+                })
+                if (response.Result > 0) {
+                    window.location.href = "/MasterLists/RaceMaster/Index";
+                }
+            });
+        }
+        else {
+            $("#EditRace").modal('show');
+        }
+    }
+
+    $scope.DeleteClick = function (id) {
+        $scope.RaceId_Dlt = id;
+
+        $http({
+            method: "GET",
+            url: "/MasterLists/RaceMaster/CheckRaceDeletableStatus",
+            params: { RaceId: $scope.RaceId_Dlt }
+        }).success(function (response) {
+            if (response) {
+                $http({
+                    method: "GET",
+                    url: "/MasterLists/RaceMaster/GetRaceName",
+                    params: {
+                        RaceId: $scope.RaceId_Dlt
+                    }
+                }).success(function (response) {
+
+                    $scope.DeleteRaceName = response;
+                    $("#Delete").modal('show');
+                });
+            }
+            else {
+                $.toast({
+                    text: "This Race Used For Cadidate Registration",
+                    position: 'top-right',
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: "error"
+                })
+            }
+        });
+    }
+
+    $scope.DeleteRace = function () {
+        $http({
+            method: "POST",
+            url: "/MasterLists/RaceMaster/DeleteRace",
+            params: {
+                RaceId: $scope.RaceId_Dlt
+            }
+        }).success(function (response) {
+            $.toast({
+                text: response.Message,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: response.Icon
+            })
+            if (response.Result > 0)
+            { window.location.href = "/MasterLists/RaceMaster/Index"; }
+        });
+    }
+
 }]);

@@ -10,6 +10,12 @@ namespace RepositoryImplement.Xone.RepositoryDerive
     {
         IEnumerable<TblRace> ListRaceDetails();
         int CreateRace(TblRace RaceObj);
+        TblRace GetDetailsForEdit(Int16 RaceID);
+        int EditRaceDetails(TblRace RaceObj);
+        bool CheckRaceDeletableStatus(Int16 RaceID);
+        string GetRaceName(Int16 RaceID);
+        int DeleteRace(Int16 RaceID);
+
     }
 
 

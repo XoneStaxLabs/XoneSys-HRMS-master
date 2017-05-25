@@ -14,6 +14,7 @@ namespace RepositoryImplement.Xone.RepositoryDerive
         int EditCitizenDetails(TblCitizenDetails obj);
         string GetCitizenName(Int16 CitizenID);
         int DeleteCitizen(Int16 CitizenID);
+        bool CheckCitizenDeleteAvailability(Int64 CitizenID);
 
     } 
 }
