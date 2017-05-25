@@ -29,7 +29,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                 var count = db.TblCitizenDetails.Where(m => (m.CitizenName == obj.CitizenName || m.CitizenCode == obj.CitizenCode) && m.IsStatus == true).Count();
                 if (count == 0)
                 {
-                    obj.ModifiedDate = DateTime.Now;
+                    obj.CreatedDate = DateTime.Now;
                     obj.IsStatus = true;
                     db.TblCitizenDetails.Add(obj);
                     db.SaveChanges();
@@ -63,7 +63,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                     citizen.CitizenName = obj.CitizenName;
                     citizen.CitizenDesc = obj.CitizenDesc;
                     citizen.CitizenCode = obj.CitizenCode;
-                    citizen.ModifiedDate = DateTime.Now;
+                    citizen.LastUpdatedDate = DateTime.Now;
                     db.Entry(citizen).State = EntityState.Modified;
                     db.SaveChanges();
                     return 1;
