@@ -17,7 +17,7 @@ namespace Model.Xone
         public bool IsDeletable { get; set; }
         public bool IsStatus { get; set; }
         public Int64 ModifiedBy { get; set; }
-        public DateTime ModifiedDate { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
         [Timestamp]
         public byte[] RowVersion { get; set; }
 
@@ -30,7 +30,7 @@ namespace Model.Xone
         public string RaceName { get; set; }
         public bool RaceStatus { get; set; }
         public Int64 ModifiedBy { get; set; } 
-        public DateTime ModifiedDate { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
         [Timestamp]
         public byte[] RowVersion { get; set; }
     }
