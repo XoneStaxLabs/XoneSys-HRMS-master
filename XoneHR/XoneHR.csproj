@@ -5454,7 +5454,9 @@
     <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\AngularScripts\Citizenship.js" />
+    <Content Include="Scripts\AngularScripts\LanguageDetails.js" />
     <Content Include="Scripts\AngularScripts\Race.js" />
+    <Content Include="Scripts\AngularScripts\Skillset.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Areas\MasterLists\Views\web.config" />
@@ -5809,6 +5811,8 @@
     <Content Include="assets\layouts\layout7\img\Thumbs.db" />
     <Content Include="assets\pages\media\blog\Thumbs.db" />
     <Content Include="assets\pages\media\pages\Thumbs.db" />
+    <Content Include="Areas\MasterLists\Views\LanguageMaster\Index.cshtml" />
+    <Content Include="Areas\MasterLists\Views\SkillsetMaster\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\dirPagination.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -6449,13 +6453,16 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\MasterLists\Controllers\CitizenMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\LanguageMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\RaceMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\SkillsetMasterController.cs" />
     <Compile Include="Areas\MasterLists\MasterListsAreaRegistration.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\DependencyResolverService.cs" />
+    <Compile Include="Models\SessionManage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

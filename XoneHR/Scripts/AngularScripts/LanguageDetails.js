@@ -1,5 +1,5 @@
-﻿var app = angular.module('RaceApp', ['datatables']);
-app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBuilder', '$compile', function ($scope, $http, DTOptionsBuilder, DTColumnBuilder, $compile) {
+﻿var app = angular.module('LanguageApp', ['datatables']);
+app.controller('LngCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBuilder', '$compile', function ($scope, $http, DTOptionsBuilder, DTColumnBuilder, $compile) {
 
     var index = 1;
     countIndex = function () {
@@ -18,22 +18,21 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
     };
 
     $scope.dtColumns = [
-        DTColumnBuilder.newColumn(countIndex, "Sl No"),
-        DTColumnBuilder.newColumn("RaceName", "Race Name").withOption('name', 'Name'),
+        DTColumnBuilder.newColumn(countIndex, 'Sl No'),
+        DTColumnBuilder.newColumn("LanguageName", "Language").withOption('name', 'Name'),
         DTColumnBuilder.newColumn(null).withTitle('Action').notSortable()
         .renderWith(function (data, type, full, meta) {
-            return '<button type="button" class="btn btn-outline btn-circle btn-sm purple EditClick" ng-click="EditClick(' + data.RaceID + ')">' +
-                '   <i class="fa fa-edit"></i>' +
+            return '<button type="button" class="btn btn-outline btn-circle btn-sm purple EditClick" ng-click="EditClick(' + data.LanguageID + ')">' +
+                ' <i class="fa fa-edit"></i>' +
                 '</button>&nbsp;' +
-
-                '<button  type="button" class="btn btn-outline btn-circle dark btn-sm black BtnClick" ng-click="DeleteClick(' + data.RaceID + ')">' +
-                '   <i class="fa fa-trash-o"></i>' +
-                '</button> ';
-        }),
+                '<button  type="button" class="btn btn-outline btn-circle dark btn-sm black BtnClick" ng-click="DeleteClick(' + data.LanguageID + ')">' +
+                '<i class="fa fa-trash-o"></i>' +
+                '</button>';
+        })
     ];
     $scope.dtOptions = DTOptionsBuilder.newOptions().withOption('ajax', {
         dataSrc: "data",
-        url: "/MasterLists/RaceMaster/ListRaceDetails",
+        url: "/MasterLists/LanguageMaster/ListLanguageDetails",
         type: "POST"
     })
     .withOption('processing', true)
@@ -48,79 +47,19 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
         $("td:first", nRow).html(iDisplayIndex + 1);
         return nRow;
     })
-       
-    $scope.AddNewBtn = function () {
+
+    $scope.NewAddBtn = function () {
         $("#Addnew").modal('show');
     }
-
     $scope.AddNewSave = function () {
-        
-        $("#RaceForm").validate({
-            rules: {
-                RaceName: {
-                    required:true
-                }
-            }
-        })
-        if($("#RaceForm").valid())
+        $("#LngForm").validate();
+        if($("#LngForm").valid())
         {
-            $http(({
-                method: "POST",
-                url: "/MasterLists/RaceMaster/AddNewRace",
-                data: {
-                    RaceName: $scope.RaceName
-                }
-            })).success(function (reponse) {
-                $.toast({
-                    text: response.Message,
-                    position: 'top-right',
-                    hideAfter: 2000,
-                    showHideTransition: 'slide',
-                    loader: false,
-                    icon: response.Icon
-                })
-                if (response.Result > 0)
-                {
-                    window.location.href = "/MasterLists/RaceMaster/Index";
-                }
-            });
-        }
-        else {
-            $("#Addnew").modal('show');
-        }
-
-    }
-
-    $scope.EditClick = function (id) {
-
-        $scope.RaceID = id;
-        $http({
-            method: "GET",
-            url: "/MasterLists/RaceMaster/GetDetailsForEdit",
-            params: { RaceID: $scope.RaceID }
-        }).success(function (response) {
-            $scope.RaceName_edit = response.RaceName;
-        });
-        $("#EditRace").modal('show');
-    }
-
-    $scope.EditRaceBtn = function () {
-
-        $("#RaceFormEdit").validate({
-            rules: {
-                RaceName_edit: {
-                    required:true
-                }
-            }
-        });
-        if ($("#RaceFormEdit").valid()) {
-
             $http({
                 method: "POST",
-                url: "/MasterLists/RaceMaster/EditRaceDetails",
+                url: "/MasterLists/LanguageMaster/AddNewLanguage",
                 data: {
-                    RaceID: $scope.RaceID,
-                    RaceName: $scope.RaceName_edit
+                    LanguageName: $scope.LanguageName
                 }
             }).success(function (response) {
                 $.toast({
@@ -132,54 +71,97 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
                     icon: response.Icon
                 })
                 if (response.Result > 0) {
-                    window.location.href = "/MasterLists/RaceMaster/Index";
+                    window.location.href = "/MasterLists/LanguageMaster/Index";
                 }
-            });
+            })
         }
         else {
-            $("#EditRace").modal('show');
+            $("#Addnew").modal('show');
         }
     }
+    $scope.EditClick = function (id) {
 
-    $scope.DeleteClick = function (id) {
-        $scope.RaceId_Dlt = id;
-
+        $scope.LanguageID = id;
         $http({
             method: "GET",
-            url: "/MasterLists/RaceMaster/CheckRaceDeletableStatus",
-            params: { RaceId: $scope.RaceId_Dlt }
+            url: "/MasterLists/LanguageMaster/GetLangDetails",
+            params: {
+                LanguageID: $scope.LanguageID
+            }
         }).success(function (response) {
-            if (response) {
+            $scope.LanguageName_edit = response.LanguageName;            
+        });
+        $("#EditLng").modal('show');
+    }
+    $scope.EditLngBtn = function () {
+        $("#LngFormEdit").validate();
+        if($("#LngFormEdit").valid())
+        {
+            $http({
+                method: "POST",
+                url: "/MasterLists/LanguageMaster/EditLngDetails",
+                data: {
+                    LanguageID:$scope.LanguageID,
+                    LanguageName: $scope.LanguageName_edit
+                }
+            }).success(function (response) {
+                $.toast({
+                    text: response.Message,
+                    position: 'top-right',
+                    hideAfter: 2000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: response.Icon
+                })
+                if (response.Result > 0) {
+                    window.location.href = "/MasterLists/LanguageMaster/Index";
+                }
+            })
+        }
+        else {
+            $("#EditLng").modal('show');
+        }
+    }
+    $scope.DeleteClick = function (id) {
+
+        $scope.LanguageID_Dlt = id;
+        $http({
+            method: "GET",
+            url: "/MasterLists/LanguageMaster/CheckDeletableStatus",
+            params: { LanguageID: $scope.LanguageID_Dlt }
+        }).success(function (response) {
+            
+            if(response)
+            {
                 $http({
                     method: "GET",
-                    url: "/MasterLists/RaceMaster/GetRaceName",
+                    url: "/MasterLists/LanguageMaster/GetLanguageName",
                     params: {
-                        RaceId: $scope.RaceId_Dlt
+                        LanguageID: $scope.LanguageID_Dlt
                     }
-                }).success(function (data) {
-
-                    $scope.DeleteRaceName = data;
-                    $("#Delete").modal('show');
+                }).success(function (response) {
+                    $scope.DeleteLngName = response;
                 });
+                $("#Delete").modal('show');
             }
             else {
                 $.toast({
-                    text: "This Race Used For Cadidate Registration",
+                    text: "This Language Used For Cadidate Registration",
                     position: 'top-right',
                     showHideTransition: 'slide',
                     loader: false,
                     icon: "error"
                 })
             }
-        });
+        })
     }
+    $scope.DeleteLng = function () {
 
-    $scope.DeleteRace = function () {
         $http({
             method: "POST",
-            url: "/MasterLists/RaceMaster/DeleteRace",
+            url: "/MasterLists/LanguageMaster/DeleteLanguage",
             params: {
-                RaceId: $scope.RaceId_Dlt
+                LanguageID: $scope.LanguageID_Dlt
             }
         }).success(function (response) {
             $.toast({
@@ -191,8 +173,8 @@ app.controller('RaceCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColumnBui
                 icon: response.Icon
             })
             if (response.Result > 0)
-            { window.location.href = "/MasterLists/RaceMaster/Index"; }
-        });
+            { window.location.href = "/MasterLists/LanguageMaster/Index"; }
+        })
     }
 
 }]);

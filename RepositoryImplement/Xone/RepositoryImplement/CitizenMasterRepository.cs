@@ -1,11 +1,9 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Model.Xone;
 using RepositoryImplement.Xone.RepositoryDerive;
 using DbContexts.Xone;
-using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 
 namespace RepositoryImplement.Xone.RepositoryImplement
@@ -16,19 +14,21 @@ namespace RepositoryImplement.Xone.RepositoryImplement
         private XoneContext db = new XoneContext();
         private DapperLayer DapperObj = new DapperLayer();
 
+
         public IEnumerable<TblCitizenDetails> CitizenDetails()
         {
             return db.TblCitizenDetails.Where(m => m.IsStatus == true).ToList();
 
         }
 
-        public int CreateCitizen(TblCitizenDetails obj)
+        public int CreateCitizen(TblCitizenDetails obj, Int64 UID)
         {
             try
             {
                 var count = db.TblCitizenDetails.Where(m => (m.CitizenName == obj.CitizenName || m.CitizenCode == obj.CitizenCode) && m.IsStatus == true).Count();
                 if (count == 0)
                 {
+                    obj.CreatedBy = UID;
                     obj.CreatedDate = DateTimeOffset.Now;
                     obj.IsStatus = true;
                     obj.IsDeletable = true;
@@ -52,7 +52,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             return db.TblCitizenDetails.Where(m => m.CitizenID == CitizenID).FirstOrDefault();
         }
 
-        public int EditCitizenDetails(TblCitizenDetails obj)
+        public int EditCitizenDetails(TblCitizenDetails obj, Int64 UID)
         {
             try
             {
@@ -64,6 +64,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                     citizen.CitizenName = obj.CitizenName;
                     citizen.CitizenDesc = obj.CitizenDesc;
                     citizen.CitizenCode = obj.CitizenCode;
+                    citizen.LastUpdatedBy = UID;
                     citizen.LastUpdatedDate = DateTimeOffset.Now;
                     db.Entry(citizen).State = EntityState.Modified;
                     db.SaveChanges();
@@ -83,7 +84,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             return db.TblCitizenDetails.Where(m => m.CitizenID == CitizenID).Select(m => m.CitizenName).SingleOrDefault();
         }
 
-        public int DeleteCitizen(Int16 CitizenID)
+        public int DeleteCitizen(Int16 CitizenID,Int64 UID)
         {
             try
             {
@@ -92,6 +93,8 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                 if(citizen.IsDeletable == true)
                 {
                     citizen.IsStatus = false;
+                    citizen.LastUpdatedBy = UID;
+                    citizen.LastUpdatedDate = DateTimeOffset.Now;
                     db.Entry(citizen).State = EntityState.Modified;
                     db.SaveChanges();                    
                 }
@@ -100,8 +103,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             catch(Exception ex)
             {
                 return -1;
-            }
-            
+            }            
         }
 
         public bool CheckCitizenDeleteAvailability(Int64 CitizenID)

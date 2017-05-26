@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using RepositoryImplement.Xone.RepositoryDerive;
 using Model.Xone;
+using RepositoryImplement.Xone.RepositoryDerive;
 using XoneHR.Models;
 
 namespace XoneHR.Areas.MasterLists.Controllers
 {
-    public class RaceMasterController : Controller
+    public class LanguageMasterController : Controller
     {
-        private readonly IRaceMaster IRaceMaster;
-        public RaceMasterController(IRaceMaster IRaceMaster)
+        private readonly ILanguageMaster ILanguageMaster;
+
+        public LanguageMasterController(ILanguageMaster ILanguageMaster)
         {
-            this.IRaceMaster = IRaceMaster;
+            this.ILanguageMaster = ILanguageMaster;
         }
 
         public ActionResult Index()
@@ -22,7 +23,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
             return View();
         }
 
-        public ActionResult ListRaceDetails()
+        public ActionResult ListLanguageDetails()
         {
             var draw = Request.Form.GetValues("draw").FirstOrDefault();
             var start = Request.Form.GetValues("start").FirstOrDefault();
@@ -31,30 +32,32 @@ namespace XoneHR.Areas.MasterLists.Controllers
             var sortColumnDir = Request.Form.GetValues("order[0][dir]").FirstOrDefault();
             var searchValue = Request.Form.GetValues("search[value]").FirstOrDefault();
 
-            List<TblRace> racedetails = new List<TblRace>();
-                int pageSize = length != null ? Convert.ToInt32(length) : 0;
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-                int recordsTotal = 0;
+            List<TblLanguageDetails> Lngdetails = new List<TblLanguageDetails>();
+            int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            int skip = start != null ? Convert.ToInt32(start) : 0;
+            int recordsTotal = 0;
 
-            var GetAll = IRaceMaster.ListRaceDetails();
+            var GetAll = ILanguageMaster.ListLanguageDetails();
             if (!string.IsNullOrEmpty(searchValue))
             {
-                GetAll = GetAll.Where(m => m.RaceName.ToLower().Trim().Contains(searchValue.ToLower().Trim())).ToList();
+                GetAll = GetAll.Where(a => a.LanguageName.ToLower().Trim().Contains(searchValue.ToLower().Trim())).ToList();
             }
 
             if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDir)))
             {
                 GetAll = (from prd in GetAll orderby sortColumn + " " + sortColumnDir select prd).ToList();
-            } 
+            }
 
             recordsTotal = GetAll.Count();
-            racedetails = GetAll.Skip(skip).Take(pageSize).ToList();
-            return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = racedetails });
+            Lngdetails = GetAll.Skip(skip).Take(pageSize).ToList();
+
+            return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = Lngdetails });
+
         }
 
-        public JsonResult AddNewRace(TblRace RaceObj)
+        public ActionResult AddNewLanguage(TblLanguageDetails LngDetails)
         {
-            var Result = IRaceMaster.CreateRace(RaceObj, SessionManage.Current.UID);
+            var Result = ILanguageMaster.CreateLanguage(LngDetails, SessionManage.Current.UID);
             var Success = Json(new { Message = "Data Save Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
             var Fail = Json(new { Message = "Data Save Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
             var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
@@ -67,16 +70,16 @@ namespace XoneHR.Areas.MasterLists.Controllers
                 return Fail;
         }
 
-        public JsonResult GetDetailsForEdit(Int16 RaceID)
+        public JsonResult GetLangDetails(Int16 LanguageID)
         {
-            TblRace race = new TblRace();
-            race = IRaceMaster.GetDetailsForEdit(RaceID);
-            return Json(race, JsonRequestBehavior.AllowGet);
+            TblLanguageDetails lngdetails = new TblLanguageDetails();
+            lngdetails = ILanguageMaster.GetLangDetails(LanguageID);
+            return Json(lngdetails, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult EditRaceDetails(TblRace race)
+        public ActionResult EditLngDetails(TblLanguageDetails LngObj)
         {
-            var Result = IRaceMaster.EditRaceDetails(race, SessionManage.Current.UID);
+            var Result = ILanguageMaster.EditLngDetails(LngObj, SessionManage.Current.UID);
             var Success = Json(new { Message = "Data Save Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
             var Fail = Json(new { Message = "Data Save Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
             var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
@@ -89,24 +92,20 @@ namespace XoneHR.Areas.MasterLists.Controllers
                 return Fail;
         }
 
-        public bool CheckRaceDeletableStatus(Int16 RaceId)
+        public JsonResult GetLanguageName(Int16 LanguageID)
         {
-            return IRaceMaster.CheckRaceDeletableStatus(RaceId);
-            //if (Status)
-            //    return Json(1, JsonRequestBehavior.AllowGet);
-            //else
-            //    return Json(0, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult GetRaceName(Int16 RaceId)
-        {
-            var name = IRaceMaster.GetRaceName(RaceId);
+            var name = ILanguageMaster.GetLanguageName(LanguageID);
             return Json(name, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult DeleteRace(Int16 RaceId)
+        public bool CheckDeletableStatus(Int16 LanguageID)
         {
-            var Result = IRaceMaster.DeleteRace(RaceId,SessionManage.Current.UID);
+            return ILanguageMaster.CheckDeletableStatus(LanguageID);            
+        }
+
+        public ActionResult DeleteLanguage(Int16 LanguageID)
+        {
+            var Result = ILanguageMaster.DeleteLanguage(LanguageID, SessionManage.Current.UID);
             var Success = Json(new { Message = "Data Deleted Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
             var Fail = Json(new { Message = "Data Delete Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
             if (Result == 1)
@@ -114,6 +113,6 @@ namespace XoneHR.Areas.MasterLists.Controllers
             else
                 return Fail;
         }
-        
+
     }
 }

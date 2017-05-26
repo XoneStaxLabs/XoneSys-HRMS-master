@@ -166,9 +166,9 @@ app.controller('CitizenListCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTCo
                      params: {
                          CitizenID: id
                      }
-                 }).success(function (response) {
+                 }).success(function (data) {
 
-                     $scope.DeleteCitizenName = response;
+                     $scope.DeleteCitizenName = data;
                      $("#Delete").modal('show');
                  });
              }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using RepositoryImplement.Xone.RepositoryDerive;
+using XoneHR.Models;
 
 namespace XoneHR.Areas.MasterLists.Controllers
 {
@@ -55,7 +56,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
               
         public ActionResult CreateCitizen(TblCitizenDetails citizenobj)
         {
-            var Result = ICitizenMaster.CreateCitizen(citizenobj);
+            var Result = ICitizenMaster.CreateCitizen(citizenobj, SessionManage.Current.UID);
             var Success = Json(new { Message = "Data Save Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
             var Fail = Json(new { Message = "Data Save Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
             var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
@@ -77,7 +78,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
 
         public ActionResult EditCitizenDetails(TblCitizenDetails citizenobj)
         {
-            var Result = ICitizenMaster.EditCitizenDetails(citizenobj);
+            var Result = ICitizenMaster.EditCitizenDetails(citizenobj, SessionManage.Current.UID);
             var Success = Json(new { Message = "Data Update Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
             var Fail = Json(new { Message = "Data Update Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
             var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
@@ -93,8 +94,8 @@ namespace XoneHR.Areas.MasterLists.Controllers
 
         public bool CheckCitizenDeleteAvailability(Int64 CitizenID)
         {
-            var Status = ICitizenMaster.CheckCitizenDeleteAvailability(CitizenID);
-            return Status;
+            return ICitizenMaster.CheckCitizenDeleteAvailability(CitizenID);
+            
         }
 
         public JsonResult GetCitizenName(Int16 CitizenID)
@@ -105,7 +106,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
 
         public JsonResult DeleteCitizen(Int16 CitizenID)
         {
-            var Result = ICitizenMaster.DeleteCitizen(CitizenID);
+            var Result = ICitizenMaster.DeleteCitizen(CitizenID,SessionManage.Current.UID);
             var Success = Json(new { Message = "Data Deleted Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
             var Fail = Json(new { Message = "Data Delete Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
             if (Result == 1)

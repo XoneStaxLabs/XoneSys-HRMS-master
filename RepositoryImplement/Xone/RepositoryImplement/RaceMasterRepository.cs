@@ -19,13 +19,14 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             return db.TblRace.Where(m => m.RaceStatus == true).ToList();
         }
 
-        public int CreateRace(TblRace RaceObj)
+        public int CreateRace(TblRace RaceObj, Int64 UID)
         {
             try
             {
                 var count = db.TblRace.Where(m => m.RaceName == RaceObj.RaceName && m.RaceStatus == true).Count();
                 if (count == 0)
                 {
+                    RaceObj.CreatedBy = UID;
                     RaceObj.CreatedDate = DateTimeOffset.Now;
                     RaceObj.RaceStatus = true;
                     db.TblRace.Add(RaceObj);
@@ -48,7 +49,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             return db.TblRace.Where(m => m.RaceID == RaceID).FirstOrDefault();
         }
 
-        public int EditRaceDetails(TblRace RaceObj)
+        public int EditRaceDetails(TblRace RaceObj, Int64 UID)
         {
             try
             {
@@ -58,6 +59,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                     TblRace racedetails = new TblRace();
                     racedetails = db.TblRace.Find(RaceObj.RaceID);
                     racedetails.RaceName = RaceObj.RaceName;
+                    racedetails.LastUpdatedBy = UID;
                     racedetails.LastUpdatedDate = DateTimeOffset.Now;
                     db.Entry(racedetails).State = EntityState.Modified;
                     db.SaveChanges();
@@ -86,13 +88,15 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             return db.TblRace.Where(m => m.RaceID == RaceID).Select(m => m.RaceName).SingleOrDefault();
         }
 
-        public int DeleteRace(Int16 RaceID)
+        public int DeleteRace(Int16 RaceID, Int64 UID)
         {
             try
             {
                 TblRace race = new TblRace();
                 race = db.TblRace.Find(RaceID);
                 race.RaceStatus = false;
+                race.LastUpdatedBy = UID;
+                race.LastUpdatedDate = DateTimeOffset.Now;
                 db.Entry(race).State = EntityState.Modified;
                 db.SaveChanges();
 

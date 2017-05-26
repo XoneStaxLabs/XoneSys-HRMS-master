@@ -39,6 +39,60 @@ namespace Model.Xone
         public byte[] RowVersion { get; set; }
     }
 
+    public class TblLanguageDetails
+    {
+        [Key]
+        public Int16 LanguageID { get; set; }
+        public string LanguageName { get; set; }
+        public bool LanguageStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblSkillDetails
+    {
+        [Key]
+        public Int32 SkillID { get; set; }
+        public string SkillName { get; set; }
+        public string Description { get; set; }
+        public bool SkillStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
+
+    public class TblCandidateLanguage
+    {
+        [Key]
+        public Int32 CandLangID { get; set; }
+        public Int64 CandID { get; set; }
+        public Int16 LanguageID { get; set; }
+        public Int64 ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblCandidateSkillset
+    {
+        [Key]
+        public Int32 CandSklID { get; set; }
+        public Int64 CandID { get; set; }
+        public Int32 SkilID { get; set; }
+        public Int64 ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
 
     public class TblCandidate
     {
