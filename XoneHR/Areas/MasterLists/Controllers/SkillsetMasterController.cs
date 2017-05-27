@@ -91,5 +91,27 @@ namespace XoneHR.Areas.MasterLists.Controllers
                 return Fail;
         }
 
+        public bool CheckDeletableStatus(int SkillID)
+        {
+            return ISkillsetMaster.CheckDeletableStatus(SkillID);
+        }
+        
+        public JsonResult GetSkillName(int SkillID)
+        {
+            var name = ISkillsetMaster.GetSkillName(SkillID);
+            return Json(name, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult DeleteSkillset(int SkillID)
+        {
+            var Result = ISkillsetMaster.DeleteSkillset(SkillID, SessionManage.Current.UID);
+            var Success = Json(new { Message = "Data Deleted Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
+            var Fail = Json(new { Message = "Data Delete Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
+            if (Result == 1)
+                return Success;
+            else
+                return Fail;
+        }
+
     }
 }

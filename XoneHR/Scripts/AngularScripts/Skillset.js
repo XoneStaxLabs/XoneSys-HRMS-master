@@ -52,6 +52,7 @@ app.controller('SkillsetCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColum
     $scope.NewAddBtn = function () {
         $("#Addnew").modal('show');
     }
+
     $scope.AddNewSave = function () {
         $("#skillForm").validate();
         if ($("#skillForm").valid()) {
@@ -59,7 +60,8 @@ app.controller('SkillsetCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColum
                 method: "POST",
                 url: "/MasterLists/SkillsetMaster/AddNewSkills",
                 data: {
-                    SkillName: $scope.SkillName
+                    SkillName: $scope.SkillName,
+                    Description: $scope.Description
                 }
             }).success(function (response) {
                 $.toast({
@@ -124,6 +126,59 @@ app.controller('SkillsetCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColum
         else {
             $("#Editskillsets").modal('show');
         }
+    }
+
+    $scope.DeleteClick = function (id) {      
+        $scope.SkillID_Dlt = id;
+        $http({
+            method: "GET",
+            url: "/MasterLists/SkillsetMaster/CheckDeletableStatus",
+            params: { SkillID: $scope.SkillID_Dlt }
+        }).success(function (response) {
+            if(response)
+            {
+                $http({
+                    method: "GET",
+                    url: "/MasterLists/SkillsetMaster/GetSkillName",
+                    params: {
+                        SkillID: $scope.SkillID_Dlt
+                    }
+                }).success(function (response) {
+                    $scope.DeleteSkilset = response;
+                });
+                $("#Delete").modal('show');
+            }
+            else {
+                $.toast({
+                    text: "This Skill Used For Cadidate Registration",
+                    position: 'top-right',
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: "error"
+                })
+            }
+        });
+    }
+
+    $scope.DeleteSkillset = function () {
+        $http({
+            method: "POST",
+            url: "/MasterLists/SkillsetMaster/DeleteSkillset",
+            params: {
+                SkillID: $scope.SkillID_Dlt
+            }
+        }).success(function (response) {
+            $.toast({
+                text: response.Message,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: response.Icon
+            })
+            if (response.Result > 0)
+            { window.location.href = "/MasterLists/SkillsetMaster/Index"; }
+        })
     }
 
 }]);

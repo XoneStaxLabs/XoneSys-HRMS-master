@@ -76,6 +76,39 @@ namespace RepositoryImplement.Xone.RepositoryImplement
             }
         }
 
+        public bool CheckDeletableStatus(Int32 SkillID)
+        {
+            var count = db.TblCandidateSkillset.Where(m => m.CandSklID == SkillID).Count();
+            if (count == 0)
+                return true;
+            else
+                return false;
+        }
+
+        public string GetSkillName(Int32 SkillID)
+        {
+            return db.TblSkillDetails.Where(m => m.SkillID == SkillID).Select(m => m.SkillName).SingleOrDefault();
+        }
+
+        public int DeleteSkillset(Int32 SkillID, Int64 UID)
+        {
+            try
+            {
+                TblSkillDetails skills = new TblSkillDetails();
+                skills = db.TblSkillDetails.Find(SkillID);
+                skills.SkillStatus = false;
+                skills.LastUpdatedBy = UID;
+                skills.LastUpdatedDate = DateTimeOffset.Now;
+                db.Entry(skills).State = EntityState.Modified;
+                db.SaveChanges();
+                return 1;
+            }
+            catch(Exception ex)
+            {
+                return -1;
+            }
+        }
+
         public void Dispose()
         {
             db.Dispose();
