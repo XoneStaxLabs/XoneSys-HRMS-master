@@ -29,10 +29,15 @@ namespace DbContexts.Xone
         public DbSet<TblRace> TblRace { get; set; }   
         public DbSet<TblLanguageDetails> TblLanguageDetails { get; set; }
         public DbSet<TblSkillDetails> TblSkillDetails { get; set; }
+        public DbSet<TblDocumentTypes> TblDocumentTypes { get; set; }
+        public DbSet<TblDocumentSubTypes> TblDocumentSubTypes { get; set; }
+
+
 
         public DbSet<TblCandidate> TblCandidate { get; set; }
         public DbSet<TblCandidateLanguage> TblCandidateLanguage { get; set; }
         public DbSet<TblCandidateSkillset> TblCandidateSkillset { get; set; }
+        public DbSet<TblCandidateDocuments> TblCandidateDocuments { get; set; }
 
     }
 }

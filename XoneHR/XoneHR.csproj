@@ -5454,6 +5454,7 @@
     <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\AngularScripts\Citizenship.js" />
+    <Content Include="Scripts\AngularScripts\DocumentType.js" />
     <Content Include="Scripts\AngularScripts\LanguageDetails.js" />
     <Content Include="Scripts\AngularScripts\Race.js" />
     <Content Include="Scripts\AngularScripts\Skillset.js" />
@@ -5813,6 +5814,7 @@
     <Content Include="assets\pages\media\pages\Thumbs.db" />
     <Content Include="Areas\MasterLists\Views\LanguageMaster\Index.cshtml" />
     <Content Include="Areas\MasterLists\Views\SkillsetMaster\Index.cshtml" />
+    <Content Include="Areas\MasterLists\Views\DocumentTypeMaster\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\dirPagination.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -6453,6 +6455,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\MasterLists\Controllers\CitizenMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\DocumentTypeMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\LanguageMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\RaceMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\SkillsetMasterController.cs" />

@@ -29,7 +29,7 @@ namespace Xone
             container.RegisterType<IRaceMaster, RaceMasterRepository>();
             container.RegisterType<ILanguageMaster, LanguageMasterRepository>();
             container.RegisterType<ISkillsetMaster, SkillsetMasterRepository>();
-
+            container.RegisterType<IDocumentTypeMaster, DocumentTypeMasterRepository>();
 
         }
     }

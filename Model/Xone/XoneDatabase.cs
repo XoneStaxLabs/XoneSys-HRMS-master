@@ -69,27 +69,33 @@ namespace Model.Xone
         public byte[] RowVersion { get; set; }
     }
 
-    public class TblCandidateLanguage
+    public class TblDocumentTypes
     {
         [Key]
-        public Int32 CandLangID { get; set; }
-        public Int64 CandID { get; set; }
-        public Int16 LanguageID { get; set; }
-        public Int64 ModifiedBy { get; set; }
-        public DateTimeOffset ModifiedDate { get; set; }
+        public int DocTypeID { get; set; }
+        public string DocTypeName { get; set; }
+        public bool DocTypeStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
         [Timestamp]
         public byte[] RowVersion { get; set; }
-
     }
 
-    public class TblCandidateSkillset
+    public class TblDocumentSubTypes
     {
         [Key]
-        public Int32 CandSklID { get; set; }
-        public Int64 CandID { get; set; }
-        public Int32 SkilID { get; set; }
-        public Int64 ModifiedBy { get; set; }
-        public DateTimeOffset ModifiedDate { get; set; }
+        public int DocSubtypeID { get; set; }
+        public int DocTypeID { get; set; }
+        [ForeignKey("DocTypeID")]        
+        public virtual TblDocumentTypes TblDocumentTypes { get; set; }
+        public string DocSubtypeName { get; set; }
+        public bool DocSubtypeStatus { get; set; }
+        public  Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
         [Timestamp]
         public byte[] RowVersion { get; set; }
     }
@@ -120,6 +126,46 @@ namespace Model.Xone
         public string CandHgEducation { get; set; }
         public Int64 CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
+        public Int64 ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblCandidateLanguage
+    {
+        [Key]
+        public Int32 CandLangID { get; set; }
+        public Int64 CandID { get; set; }
+        public Int16 LanguageID { get; set; }
+        public Int64 ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblCandidateSkillset
+    {
+        [Key]
+        public Int32 CandSklID { get; set; }
+        public Int64 CandID { get; set; }
+        public Int32 SkilID { get; set; }
+        public Int64 ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }   
+
+    public class TblCandidateDocuments
+    {
+        [Key]
+        public int CanddocID { get; set; }
+        public Int64 CandID { get; set; }
+        public int DocStypID { get; set; }
+        public string CandDocuments { get; set; }
+        public DateTimeOffset CandDocAddeddate { get; set; }
         public Int64 ModifiedBy { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }
         [Timestamp]
