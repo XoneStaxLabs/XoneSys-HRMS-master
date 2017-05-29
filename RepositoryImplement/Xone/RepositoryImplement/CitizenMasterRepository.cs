@@ -5,6 +5,7 @@ using Model.Xone;
 using RepositoryImplement.Xone.RepositoryDerive;
 using DbContexts.Xone;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 
 namespace RepositoryImplement.Xone.RepositoryImplement
 {
@@ -73,7 +74,11 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                 else
                     return 0;                
             }
-            catch(Exception ex)
+            catch(DbUpdateConcurrencyException ConcurrencyExp)
+            {
+                return -2;
+            }
+            catch (Exception ex)
             {
                 return -1;
             }

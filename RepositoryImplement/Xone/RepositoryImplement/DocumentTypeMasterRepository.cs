@@ -6,6 +6,7 @@ using Model.Xone;
 using DbContexts.Xone;
 using RepositoryImplement.Xone.RepositoryDerive;
 using System.Data.Entity;
+using System.Transactions;
 
 namespace RepositoryImplement.Xone.RepositoryImplement
 {
@@ -62,6 +63,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
                     db.Entry(doctype).State = EntityState.Modified;
                     db.SaveChanges();
                     return 1;
+
                 }
                 else
                     return 0;
@@ -85,15 +87,30 @@ namespace RepositoryImplement.Xone.RepositoryImplement
         {
             try
             {
-                TblDocumentTypes doctype = new TblDocumentTypes();
-                doctype = db.TblDocumentTypes.Find(DocTypeID);
-                doctype.DocTypeStatus = false;
-                doctype.LastUpdatedBy = UID;
-                doctype.LastUpdatedDate = DateTimeOffset.Now;
-                db.Entry(doctype).State = EntityState.Modified;
-                db.SaveChanges();
-
-                return 1;
+                using (TransactionScope scope = new TransactionScope())
+                {
+                    TblDocumentTypes doctype = new TblDocumentTypes();
+                    doctype = db.TblDocumentTypes.Find(DocTypeID);
+                    doctype.DocTypeStatus = false;
+                    doctype.LastUpdatedBy = UID;
+                    doctype.LastUpdatedDate = DateTimeOffset.Now;
+                    db.Entry(doctype).State = EntityState.Modified;
+                    db.SaveChanges();
+                                       
+                    TblDocumentSubTypes docsubtype = new TblDocumentSubTypes();
+                    var DocSubtypeID = db.TblDocumentSubTypes.Where(m => m.DocTypeID == DocTypeID).Select(m => m.DocSubtypeID).ToList();
+                    foreach (var id in DocSubtypeID)
+                    {
+                        docsubtype = db.TblDocumentSubTypes.Find(id);
+                        docsubtype.DocSubtypeStatus = false;
+                        docsubtype.LastUpdatedBy = UID;
+                        docsubtype.LastUpdatedDate = DateTimeOffset.Now;
+                        db.Entry(docsubtype).State = EntityState.Modified;
+                        db.SaveChanges();
+                    }
+                    return 1;
+                }
+                
             }
             catch (Exception ex)
             {
