@@ -81,7 +81,7 @@ namespace Model.Xone
         public DateTimeOffset LastUpdatedDate { get; set; }
         [Timestamp]
         public byte[] RowVersion { get; set; }
-    }
+    } 
 
     public class TblDocumentSubTypes
     {

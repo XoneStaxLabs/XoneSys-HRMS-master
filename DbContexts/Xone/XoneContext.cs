@@ -9,7 +9,7 @@ using Model.Xone;
 
 namespace DbContexts.Xone
 {
-    public class XoneContext : DbContext
+    public class XoneContext : DbContext 
     { 
 
         public XoneContext()  

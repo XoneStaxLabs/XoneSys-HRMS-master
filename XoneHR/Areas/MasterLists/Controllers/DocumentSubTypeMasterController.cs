@@ -105,7 +105,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
             var name = IDocSubTypeMaster.GetDocumentName(DocSubtypeID);
             return Json(name, JsonRequestBehavior.AllowGet);
         }
-
+         
         public ActionResult DeleteDocType(int DocSubtypeID)
         {
             var Result = IDocSubTypeMaster.DeleteDocType(DocSubtypeID, SessionManage.Current.UID);

@@ -18,4 +18,4 @@ namespace RepositoryImplement.Xone.RepositoryDerive
         int DeleteDocType(Int32 DocSubtypeID, Int64 UID);
 
     }
-} 
+}  
