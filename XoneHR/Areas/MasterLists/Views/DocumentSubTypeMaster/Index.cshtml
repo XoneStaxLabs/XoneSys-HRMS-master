@@ -46,7 +46,10 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Document Type *</label>
                                         <div class="col-md-6">
-                                            <select ng-model="DocTypeID" ng-options="doctype as doctype.DocSubtypeName for doctype in DoctypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required></select>
+                                            <select ng-model="DocTypeID" ng-options="doctype.DocTypeID as doctype.DocTypeName for doctype in DoctypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -59,7 +62,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                 
                                 <div class="modal-footer">
                                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
                                     <button type="submit" class="btn green">Save</button>
@@ -89,7 +92,9 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label">Document Type *</label>
                                         <div class="col-md-6">
-                                            <select required></select>
+                                            <select ng-model="DocTypeID_edit" ng-options="doctype.DocTypeID as doctype.DocTypeName for doctype in DoctypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -98,8 +103,8 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label"> Name *</label>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control" name="" ng-model="" placeholder="Document Type" maxlength="30" autocomplete="off" required>
-                                            <input type="hidden" ng-model="" />
+                                            <input type="text" class="form-control" name="DocSubtypeName_edit" ng-model="DocSubtypeName_edit" placeholder="Document Sub Type" maxlength="30" autocomplete="off" required>
+                                            <input type="hidden" ng-model="DocSubtypeID" />
                                         </div>
                                     </div>
                                 </div>
@@ -128,7 +133,7 @@
                         </div>
                         <div class="modal-body">
                             Do You Want to Delete this Item ? <label><b> {{DeleteDocType}}</b></label>
-                            <input type="hidden" ng-model="" />
+                            <input type="hidden" ng-model="DocSubtypeID_Dlt" />
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>

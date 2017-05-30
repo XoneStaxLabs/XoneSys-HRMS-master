@@ -12,4 +12,4 @@ namespace Model.Xone
         public string DocSubtypeName { get; set; }
         public string DocTypeName { get; set; }
     }
-} 
+}  

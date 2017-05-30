@@ -68,7 +68,7 @@ namespace Model.Xone
         [Timestamp]
         public byte[] RowVersion { get; set; }
     }
-
+     
     public class TblDocumentTypes
     {
         [Key]
@@ -164,6 +164,8 @@ namespace Model.Xone
         public int CanddocID { get; set; }
         public Int64 CandID { get; set; }
         public int DocStypID { get; set; }
+        [ForeignKey("DocStypID")]
+        public virtual TblDocumentSubTypes TblDocumentSubTypes { get; set; }
         public string CandDocuments { get; set; }
         public DateTimeOffset CandDocAddeddate { get; set; }
         public Int64 ModifiedBy { get; set; }

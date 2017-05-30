@@ -8,7 +8,7 @@ using System.Linq;
 using System.Web;
 
 namespace DbContexts.Xone
-{
+{ 
     public class DapperLayer
     {
         private IDbConnection Con;

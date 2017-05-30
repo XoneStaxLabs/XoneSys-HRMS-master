@@ -23,11 +23,11 @@ app.controller('DocumentCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColum
         DTColumnBuilder.newColumn("DocTypeName", "Document Type").withOption('name', 'Name'),
         DTColumnBuilder.newColumn(null).withTitle('Action').notSortable()
         .renderWith(function (data, type, full, meta) {
-            return '<button type="button" class="btn btn-outline btn-circle btn-sm purple EditClick" ng-click="EditClick(' + data.DocTypeID + ', ' + data.DocSubtypeID + ')">' +
+            return '<button type="button" class="btn btn-outline btn-circle btn-sm purple EditClick" ng-click="EditClick(' + data.DocSubtypeID + ')">' +
                 '   <i class="fa fa-edit"></i>' +
                 '</button>&nbsp;' +
 
-                '<button  type="button" class="btn btn-outline btn-circle dark btn-sm black BtnClick" ng-click="DeleteClick(' + data.DocTypeID + ',' + data.DocSubtypeID + ')">' +
+                '<button  type="button" class="btn btn-outline btn-circle dark btn-sm black BtnClick" ng-click="DeleteClick(' + data.DocSubtypeID + ')">' +
                 '   <i class="fa fa-trash-o"></i>' +
                 '</button> ';
         }),
@@ -60,6 +60,135 @@ app.controller('DocumentCntrl', ['$scope', '$http', 'DTOptionsBuilder', 'DTColum
         url: "/MasterLists/DocumentSubTypeMaster/GetDocTypes"
     }).success(function (response) {
         $scope.DoctypeList = response;
-    })
+    });
+
+    $scope.AddNewSave = function () {
+
+        $("#DocumentForm").validate();
+        if($("#DocumentForm").valid())
+        {
+            $http({
+                method: "POST",
+                url: "/MasterLists/DocumentSubTypeMaster/CreateDocumentSubType",
+                data: {
+                    DocTypeID: $scope.DocTypeID,
+                    DocSubtypeName: $scope.DocSubtypeName
+                }
+            }).success(function (response) {
+                $.toast({
+                    text: response.Message,
+                    position: 'top-right',
+                    hideAfter: 2000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: response.Icon
+                })
+                if (response.Result > 0) {
+                    window.location.href = "/MasterLists/DocumentSubTypeMaster/Index";
+                }
+            })
+        }
+        else {
+            $("#Addnew").modal('show');
+        }
+    }
+
+    $scope.EditClick = function (id) {
+
+        $scope.DocSubtypeID = id;
+        $http({
+            method: "GET",
+            url: "/MasterLists/DocumentSubTypeMaster/GetDetailsForEdit",
+            params: { DocSubtypeID: $scope.DocSubtypeID }
+        }).success(function (response) {
+            $scope.DocTypeID_edit = response.DocTypeID;
+            $scope.DocSubtypeName_edit = response.DocSubtypeName;
+        });
+
+        $("#EditDocuments").modal('show');
+    }
+
+    $scope.EditDocBtn = function () {
+        $("#DocumentFormEdit").validate();
+        if($("#DocumentFormEdit").valid())
+        {
+            $http({
+                method: "POST",
+                url: "/MasterLists/DocumentSubTypeMaster/EditDocumentSubType",
+                data: {
+                    DocTypeID: $scope.DocTypeID_edit,
+                    DocSubtypeID:$scope.DocSubtypeID,
+                    DocSubtypeName: $scope.DocSubtypeName_edit
+                }
+            }).success(function (response) {
+                $.toast({
+                    text: response.Message,
+                    position: 'top-right',
+                    hideAfter: 2000,
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: response.Icon
+                })
+                if (response.Result > 0) {
+                    window.location.href = "/MasterLists/DocumentSubTypeMaster/Index";
+                }
+            })
+        }
+    }
+
+    $scope.DeleteClick = function (id) {
+        $scope.DocSubtypeID_Dlt = id;
+        $http({
+            method: "GET",
+            url: "/MasterLists/DocumentSubTypeMaster/CheckDeletableStatus",
+            params: { DocSubtypeID: $scope.DocSubtypeID_Dlt }
+        }).success(function (response) {
+            if (response) {
+                $http({
+                    method: "GET",
+                    url: "/MasterLists/DocumentSubTypeMaster/GetDocumentName",
+                    params: {
+                        DocSubtypeID: $scope.DocSubtypeID_Dlt
+                    }
+                }).success(function (data) {
+
+                    $scope.DeleteDocType = data;
+                });
+
+                $("#Delete").modal('show');
+            }
+            else {
+                $.toast({
+                    text: "This DocumentSubType Used For Cadidate Registration",
+                    position: 'top-right',
+                    showHideTransition: 'slide',
+                    loader: false,
+                    icon: "error"
+                })
+            }
+        });
+
+    }
+
+    $scope.DeleteDocBtn = function () {
+        $http({
+            method: "POST",
+            url: "/MasterLists/DocumentSubTypeMaster/DeleteDocType",
+            params: {
+                DocSubtypeID: $scope.DocSubtypeID_Dlt
+            }
+        }).success(function (response) {
+            $.toast({
+                text: response.Message,
+                position: 'top-right',
+                hideAfter: 2000,
+                showHideTransition: 'slide',
+                loader: false,
+                icon: response.Icon
+            })
+            if (response.Result > 0)
+            { window.location.href = "/MasterLists/DocumentSubTypeMaster/Index"; }
+        });
+    }
 
 }]);
