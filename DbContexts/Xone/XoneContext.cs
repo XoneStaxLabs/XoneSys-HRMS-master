@@ -34,7 +34,7 @@ namespace DbContexts.Xone
         public DbSet<TblUserType> TblUserType { get; set; }
         public DbSet<TblDepartment> TblDepartment { get; set; }
         public DbSet<TblHolidayList> TblHolidayList { get; set; }
-
+        public DbSet<TblDeductionType> TblDeductionType { get; set; }
 
 
         public DbSet<TblCandidate> TblCandidate { get; set; }

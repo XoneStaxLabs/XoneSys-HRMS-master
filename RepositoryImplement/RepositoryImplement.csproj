@@ -112,17 +112,21 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xone\RepositoryDerive\ICitizenMaster.cs" />
+    <Compile Include="Xone\RepositoryDerive\IDeductionTypeMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\IDepartmentMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\IDocSubTypeMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\IDocumentTypeMaster.cs" />
+    <Compile Include="Xone\RepositoryDerive\IGradeMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\IHolidayMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\ILanguageMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\IRaceMaster.cs" />
     <Compile Include="Xone\RepositoryDerive\ISkillsetMaster.cs" />
     <Compile Include="Xone\RepositoryImplement\CitizenMasterRepository.cs" />
+    <Compile Include="Xone\RepositoryImplement\DeductionTypeMasterRepository.cs" />
     <Compile Include="Xone\RepositoryImplement\DepartmentMasterRepository.cs" />
     <Compile Include="Xone\RepositoryImplement\DocSubTypeRepository.cs" />
     <Compile Include="Xone\RepositoryImplement\DocumentTypeMasterRepository.cs" />
+    <Compile Include="Xone\RepositoryImplement\GradeMasterRepository.cs" />
     <Compile Include="Xone\RepositoryImplement\HolidayMasterRepository.cs" />
     <Compile Include="Xone\RepositoryImplement\LanguageMasterRepository.cs" />
     <Compile Include="Xone\RepositoryImplement\RaceMasterRepository.cs" />

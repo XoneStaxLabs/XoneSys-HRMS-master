@@ -221,6 +221,19 @@ namespace Model.Xone
         [Timestamp]
         public byte[] RowVersion { get; set; }
     }
+    public class TblDeductionType
+    {
+        [Key]
+        public Int32 DeductTypeID { get; set; }
+        public string DeductionType { get; set; }
+        public bool DeductionStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
 
 
 }

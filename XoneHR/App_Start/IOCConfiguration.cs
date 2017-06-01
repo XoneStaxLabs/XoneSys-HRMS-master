@@ -33,6 +33,9 @@ namespace Xone
             container.RegisterType<IDocSubTypeMaster, DocSubTypeRepository>();
             container.RegisterType<IDepartmentMaster, DepartmentMasterRepository>();
             container.RegisterType<IHolidayMaster, HolidayMasterRepository>();
+            container.RegisterType<IGradeMaster, GradeMasterRepository>();
+            container.RegisterType<IDeductionTypeMaster, DeductionTypeMasterRepository>();
+
 
         }
     }
