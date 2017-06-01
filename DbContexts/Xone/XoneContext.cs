@@ -31,6 +31,9 @@ namespace DbContexts.Xone
         public DbSet<TblSkillDetails> TblSkillDetails { get; set; }
         public DbSet<TblDocumentTypes> TblDocumentTypes { get; set; }
         public DbSet<TblDocumentSubTypes> TblDocumentSubTypes { get; set; }
+        public DbSet<TblUserType> TblUserType { get; set; }
+        public DbSet<TblDepartment> TblDepartment { get; set; }
+        public DbSet<TblHolidayList> TblHolidayList { get; set; }
 
 
 

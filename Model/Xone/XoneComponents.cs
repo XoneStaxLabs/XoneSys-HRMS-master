@@ -12,4 +12,21 @@ namespace Model.Xone
         public string DocSubtypeName { get; set; }
         public string DocTypeName { get; set; }
     }
+
+    public class DepartmentList
+    {
+        public Int32 DeptID { get; set; }
+        public string DeptCode { get; set; }
+        public string DeptName { get; set; }
+        public string UserType { get; set; }
+    }
+
+    public class HolidayList
+    {
+        public int HolidayID { get; set; }
+        public string Holiday { get; set; }
+        public DateTime HolidayDate { get; set; }
+        public string Description { get; set; }
+    }
+
 }  

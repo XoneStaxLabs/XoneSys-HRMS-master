@@ -100,6 +100,39 @@ namespace Model.Xone
         public byte[] RowVersion { get; set; }
     }
 
+    public class TblUserType
+    {
+        [Key]
+        public Int32 UserTypeId { get; set; }
+        public string UserType { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        public bool UserTypeStatus { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }        
+    }
+
+    public class TblDepartment
+    {
+       [Key]
+       public Int32 DeptID { get; set; }
+       public string DeptCode { get; set; }
+       public string DeptName { get; set; }
+       public bool DeptStatus { get; set; }
+       public Int32 UserTypeId { get; set; }
+       [ForeignKey("UserTypeId")]
+       public virtual TblUserType TblUserType { get; set; }
+       public Int64 CreatedBy { get; set; }
+       public DateTimeOffset CreatedDate { get; set; }
+       public Int64 LastUpdatedBy { get; set; }
+       public DateTimeOffset LastUpdatedDate { get; set; }
+       [Timestamp]
+       public byte[] RowVersion { get; set; }
+
+    }
+    
     public class TblCandidate
     {
         [Key]
@@ -174,5 +207,20 @@ namespace Model.Xone
         public byte[] RowVersion { get; set; }
 
     }
+
+    public class TblHolidayList
+    {
+        [Key]
+        public int HolidayID { get; set; }
+        public string Holiday { get; set; }
+        public DateTimeOffset HolidayDate { get; set; }
+        public string Description { get; set; }
+        public bool HoliStatus { get; set; }
+        public Int64 ModifiedBy { get; set; }
+        public DateTimeOffset ModifiedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
+
 
 }

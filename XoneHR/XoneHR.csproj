@@ -5454,8 +5454,10 @@
     <Content Include="Scripts\angular-route.min.js" />
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\AngularScripts\Citizenship.js" />
+    <Content Include="Scripts\AngularScripts\Department.js" />
     <Content Include="Scripts\AngularScripts\DocSubType.js" />
     <Content Include="Scripts\AngularScripts\DocumentType.js" />
+    <Content Include="Scripts\AngularScripts\Holiday.js" />
     <Content Include="Scripts\AngularScripts\LanguageDetails.js" />
     <Content Include="Scripts\AngularScripts\Race.js" />
     <Content Include="Scripts\AngularScripts\Skillset.js" />
@@ -5817,6 +5819,8 @@
     <Content Include="Areas\MasterLists\Views\SkillsetMaster\Index.cshtml" />
     <Content Include="Areas\MasterLists\Views\DocumentTypeMaster\Index.cshtml" />
     <Content Include="Areas\MasterLists\Views\DocumentSubTypeMaster\Index.cshtml" />
+    <Content Include="Areas\MasterLists\Views\DepartmentMaster\Index.cshtml" />
+    <Content Include="Areas\MasterLists\Views\HolidayMaster\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\dirPagination.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -6457,8 +6461,10 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\MasterLists\Controllers\CitizenMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\DepartmentMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\DocumentSubTypeMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\DocumentTypeMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\HolidayMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\LanguageMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\RaceMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\SkillsetMasterController.cs" />

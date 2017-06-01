@@ -24,7 +24,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
         {
             try
             {
-                var count = db.TblDocumentTypes.Where(m => m.DocTypeName == DocObj.DocTypeName).Count();
+                var count = db.TblDocumentTypes.Where(m => m.DocTypeName == DocObj.DocTypeName && m.DocTypeStatus == true).Count();
                 if (count == 0)
                 {
                     DocObj.DocTypeStatus = true;
@@ -52,7 +52,7 @@ namespace RepositoryImplement.Xone.RepositoryImplement
         {
             try
             {
-                var count = db.TblDocumentTypes.Where(m => m.DocTypeName == DocObj.DocTypeName && m.DocTypeID != DocObj.DocTypeID).Count();
+                var count = db.TblDocumentTypes.Where(m => m.DocTypeName == DocObj.DocTypeName && m.DocTypeID != DocObj.DocTypeID && m.DocTypeStatus == true).Count();
                 if (count == 0)
                 {
                     TblDocumentTypes doctype = new TblDocumentTypes();

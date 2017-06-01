@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Web;
-
+using DbContexts.Xone;
+using Model.Xone;
 
 namespace DbContexts.Xone
 {
@@ -15,7 +16,7 @@ namespace DbContexts.Xone
             AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = true;
         }
-         
+                
         protected override void Seed(XoneContext context)
         {
 
@@ -27,6 +28,10 @@ namespace DbContexts.Xone
 
             //     );
 
+            context.TblUserType.AddOrUpdate(
+                new TblUserType { UserTypeId = 1, UserType = "Application", CreatedBy = 1, CreatedDate = DateTimeOffset.Now, LastUpdatedBy = 1, LastUpdatedDate = DateTimeOffset.Now, UserTypeStatus = true },
+                new TblUserType { UserTypeId = 2, UserType = "Employee", CreatedBy = 1, CreatedDate = DateTimeOffset.Now, LastUpdatedBy = 1, LastUpdatedDate = DateTimeOffset.Now, UserTypeStatus = true }
+                );
 
         }
     }

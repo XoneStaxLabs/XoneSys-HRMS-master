@@ -9,19 +9,13 @@
 <link href="~/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" />
 <link href="~/assets/global/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
 <script src="~/assets/global/plugins/Toast/src/jquery.toast.js"></script>
-<script src="~/Scripts/AngularScripts/DocSubType.js"></script>
+<script src="~/Scripts/AngularScripts/Holiday.js"></script>
 
-<style>
-    .col-md-3 {
-    width: 30%;
-}
-</style>
-
-<div ng-app="DocumentApp">
-    <div ng-controller="DocumentCntrl">
+<div ng-app="HoliApp">
+    <div ng-controller="HoliCntrl">
         <h3 class="page-title">
-            Document Sub Type
-            <small>Manage DocumentSubType</small>
+            Holiday
+            <small>Manage Holiday</small>
         </h3>
 
         <a data-toggle="modal" class="btn btn-sm green mrb20" ng-click="AddNewBtn()"> Add New <i class="fa fa-plus"></i> </a>
@@ -36,33 +30,37 @@
                     <div class="modal-body">
                         <div class="portlet-body form">
 
-                            <form class="form-horizontal" action="#" id="DocumentForm" name="DocumentForm" ng-submit="AddNewSave()">
+                            <form class="form-horizontal" action="#" id="HoliForm" name="HoliForm" ng-submit="AddNewSave()">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                                    <h4 class="modal-title">Add New Document Sub Type</h4>
+                                    <h4 class="modal-title">Add New Holiday</h4>
                                 </div>
 
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Document Type *</label>
+                                        <label class="col-md-3 control-label">Holiday *</label>
                                         <div class="col-md-6">
-                                            <select ng-model="DocTypeID" ng-options="doctype.DocTypeID as doctype.DocTypeName for doctype in DoctypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
-                                                <option value="">--Select--</option>
-                                            </select>
-                                            
+                                            <input type="text" class="form-control" ng-model="Holiday" name="Holiday" placeholder="Day" maxlength="30" autocomplete="off" required>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Name *</label>
+                                        <label class="col-md-3 control-label">Date *</label>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control" ng-model="DocSubtypeName" name="DocSubtypeName" placeholder="Document Type" maxlength="30" autocomplete="off" required>
+                                            @*<input type="text" class="form-control daterangepicker-single" ng-model="HolidayDate" name="HolidayDate" placeholder="Date" maxlength="30" autocomplete="off" required>*@
+                                            <input type="text" ng-model="HolidayDate" class="form-control daterangepicker-single" id="HolidayDate" placeholder="Date" >  
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Description</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="Description" name="Description" placeholder="Description" maxlength="30" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
-                                                            
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn green">Save</button>
+                                    <button type="submit" class="btn green" >Save</button>
                                 </div>
                             </form>
 
@@ -73,32 +71,41 @@
             </div>
         </div>
 
-        <div class="modal fade" id="EditDocuments" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="EditHoli" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-body">
                         <div class="portlet-body form">
 
-                            <form class="form-horizontal" action="#" id="DocumentFormEdit" ng-submit="EditDocBtn()">
+                            <form class="form-horizontal" action="#" id="HoliFormEdit" ng-submit="EditHoliBtn()">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                                    <h4 class="modal-title">Edit Document Sub Type</h4>
+                                    <h4 class="modal-title">Edit Holiday</h4>
                                 </div>
 
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label">Document Type *</label>
+                                        <label class="col-md-3 control-label">Holiday *</label>
                                         <div class="col-md-6">
-                                            <select ng-model="DocTypeID_edit" ng-options="doctype.DocTypeID as doctype.DocTypeName for doctype in DoctypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
-                                                <option value="">--Select--</option>
-                                            </select>
+                                            <input type="text" class="form-control" ng-model="Holiday_edit" placeholder="Day" maxlength="30" autocomplete="off" required>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="form-body">
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label"> Name *</label>
+                                        <label class="col-md-3 control-label">Date *</label>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control" name="DocSubtypeName_edit" ng-model="DocSubtypeName_edit" placeholder="Document Sub Type" maxlength="30" autocomplete="off" required>
-                                            <input type="hidden" ng-model="DocSubtypeID" />
+                                            <input type="text" class="form-control daterangepicker-single" ng-model="HolidayDate_edit" placeholder="Date" maxlength="30" autocomplete="off" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Description</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="Description_edit" name="Description" placeholder="Description" maxlength="30" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -120,14 +127,14 @@
             <div class="modal-dialog">
                 <div class="modal-content">
 
-                    <form class="form-horizontal" name="DeleteForm" role="form" ng-submit="DeleteDocBtn()">
+                    <form class="form-horizontal" name="DeleteForm" role="form" ng-submit="DeleteHoli()">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                            <h4 class="modal-title">Delete Document Sub Type</h4>
+                            <h4 class="modal-title">Delete Holiday</h4>
                         </div>
                         <div class="modal-body">
-                            Do You Want to Delete this Item ? <label><b> {{DeleteDocType}}</b></label>
-                            <input type="hidden" ng-model="DocSubtypeID_Dlt" />
+                            Do You Want to Delete this Item ? <label><b> {{DeleteHoliday}}</b></label>
+                            <input type="hidden" ng-model="HolidayID_Dlt" />
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
@@ -138,7 +145,5 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
-  
