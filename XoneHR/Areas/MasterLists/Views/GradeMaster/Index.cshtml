@@ -9,7 +9,7 @@
 <link href="~/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" />
 <link href="~/assets/global/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
 <script src="~/assets/global/plugins/Toast/src/jquery.toast.js"></script>
-
+<script src="~/Scripts/AngularScripts/Grade.js"></script>
 
 <div ng-app="GradeApp">
     <div ng-controller="GradeCntrl">
@@ -38,9 +38,31 @@
 
                                 <div class="form-body">
                                     <div class="form-group">
+                                        <label class="col-md-3 control-label"> Department *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="DeptID" ng-options="dept.DeptID as dept.DeptName for dept in DeptList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" ng-change="DeptChange()" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Designation *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="DesignationID" ng-options="desig.DesignationID as desig.DesignationName for desig in DesigList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <label class="col-md-3 control-label"> Name *</label>
                                         <div class="col-md-6">
-                                            <input type="text" class="form-control" ng-model="" name="" placeholder="Race Name" maxlength="30" autocomplete="off">
+                                            <input type="text" class="form-control" ng-model="Gradename" name="Gradename" placeholder="Grade" maxlength="30" autocomplete="off" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Code *</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="GradeCode" name="GradeCode" placeholder="Code" maxlength="30" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -55,6 +77,79 @@
                     </div>
                 </div>
                 <!-- /.modal-content -->
+            </div>
+        </div>
+
+        <div class="modal fade" id="EditGrade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="portlet-body form">
+
+                            <form class="form-horizontal" action="#" id="GradeFormEdit" name="GradeFormEdit" ng-submit="EditGradeBtn()">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                    <h4 class="modal-title">Edit Grade</h4>
+                                </div>
+
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Department *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="DeptID" ng-options="dept.DeptID as dept.DeptName for dept in DeptList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Designation *</label>
+                                        <div class="col-md-6">
+                                           <select ng-model="DesignationID" ng-options="desig.DesignationID as desig.DesignationName for desig in DesigList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>                                    
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Name *</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="Gradename_edit" name="Gradename_edit" placeholder="Grade" maxlength="30" autocomplete="off" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn green" id="SaveRace">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+        </div>
+
+        <div class="modal fade" id="Delete" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <form class="form-horizontal" name="DeleteForm" role="form" ng-submit="DeleteGradeBtn()">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">Delete Grade</h4>
+                        </div>
+                        <div class="modal-body">
+                            Do You Want to Delete this Item ? <label><b> {{DeleteGradeType}}</b></label>
+                            <input type="hidden" ng-model="GradeID_Dlt" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn danger">Delete</button>
+                        </div>
+                    </form>
+
+                </div>
             </div>
         </div>
 

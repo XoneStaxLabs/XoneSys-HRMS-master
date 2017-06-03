@@ -235,5 +235,114 @@ namespace Model.Xone
         public byte[] RowVersion { get; set; }
     }
 
+    public class TblCheckListTypes
+    {
+        [Key]
+        public int ChkListTypeId { get; set; }
+        public string ChkListItem { get; set; }
+        public float ChkListPrice { get; set; }
+        public bool ChkListStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblDesignation
+    {
+        [Key]
+        public int DesignationID { get; set; }
+        public string DesignationCode { get; set; }
+        public string DesignationName { get; set; }
+        public bool DesigStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblDeptDesignationMapping
+    {
+        [Key]
+        public int DeptDesignationId { get; set; }
+        public int DeptID { get; set; }
+        [ForeignKey("DeptID")]
+        public virtual TblDepartment TblDepartment { get; set; }
+        public int DesignationID { get; set; }
+        [ForeignKey("DesignationID")]
+        public virtual TblDesignation TblDesignation { get; set; }
+        public bool MappingStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+
+    }
+
+    public class TblGrade
+    {
+        [Key]
+        public int GradeID { get; set; }
+        public string GradeCode { get; set; }
+        public string Gradename { get; set; }
+        public int GradeHierarchy { get; set; }
+        public bool GradeStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
+
+    public class TblGradeDesignationMapping
+    {
+        [Key]
+        public int GradeDesignationId { get; set; }
+        public int GradeID { get; set; }
+        [ForeignKey("GradeID")]
+        public virtual TblGrade TblGrade { get; set; }
+        public int DesignationID { get; set; }
+        [ForeignKey("DesignationID")]
+        public virtual TblDesignation TblDesignation { get; set; }
+        public bool MappingStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }        
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
+
+    public class TblValidDoctypeMaster
+    {
+        [Key]
+        public int ValidDocTypID { get; set; }
+        public int DocSubtypeID { get; set; }
+        [ForeignKey("DocSubtypeID")]
+        public virtual TblDocumentSubTypes TblDocumentSubTypes { get; set; }
+        public int DesignationID { get; set; }
+        [ForeignKey("DesignationID")]
+        public virtual TblDesignation TblDesignation { get; set; }
+        public Int16 CitizenID { get; set; }
+        [ForeignKey("CitizenID")]
+        public virtual TblCitizenDetails TblCitizenDetails { get; set; }
+        public bool DocStatus { get; set; }
+        public Int64 CreatedBy { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public Int64 LastUpdatedBy { get; set; }
+        public DateTimeOffset LastUpdatedDate { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
+    }
+
 
 }

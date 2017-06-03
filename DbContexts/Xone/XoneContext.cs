@@ -35,6 +35,12 @@ namespace DbContexts.Xone
         public DbSet<TblDepartment> TblDepartment { get; set; }
         public DbSet<TblHolidayList> TblHolidayList { get; set; }
         public DbSet<TblDeductionType> TblDeductionType { get; set; }
+        public DbSet<TblCheckListTypes> TblCheckListTypes { get; set; }
+        public DbSet<TblDesignation> TblDesignation { get; set; }
+        public DbSet<TblGrade> TblGrade { get; set; }
+        public DbSet<TblGradeDesignationMapping> TblGradeDesignationMapping { get; set; }
+        public DbSet<TblDeptDesignationMapping> TblDeptDesignationMapping { get; set; }
+        public DbSet<TblValidDoctypeMaster> TblValidDoctypeMaster { get; set; }
 
 
         public DbSet<TblCandidate> TblCandidate { get; set; }

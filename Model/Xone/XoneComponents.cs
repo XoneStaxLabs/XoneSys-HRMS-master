@@ -29,4 +29,21 @@ namespace Model.Xone
         public string Description { get; set; }
     }
 
+    public class GradeList
+    {
+        public int GradeID { get; set; }
+        public int GradeCode { get; set; }
+        public string Gradename { get; set; }
+        public string DesignationName { get; set; }
+        public string DeptName { get; set; }
+    }
+    public class CandidateDocTypeDetail
+    {
+        public int ValidDocTypID { get; set; }
+        public string CitizenName { get; set; }
+        public string DesignationName { get; set; }
+        public string DocSubtypeName { get; set; }
+    }
+
+
 }  

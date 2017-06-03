@@ -5227,8 +5227,11 @@
     <Content Include="Scripts\AngularScripts\Citizenship.js" />
     <Content Include="Scripts\AngularScripts\DeductionType.js" />
     <Content Include="Scripts\AngularScripts\Department.js" />
+    <Content Include="Scripts\AngularScripts\DesigDocType.js" />
     <Content Include="Scripts\AngularScripts\DocSubType.js" />
     <Content Include="Scripts\AngularScripts\DocumentType.js" />
+    <Content Include="Scripts\AngularScripts\EmpCheckList.js" />
+    <Content Include="Scripts\AngularScripts\Grade.js" />
     <Content Include="Scripts\AngularScripts\Holiday.js" />
     <Content Include="Scripts\AngularScripts\LanguageDetails.js" />
     <Content Include="Scripts\AngularScripts\Race.js" />
@@ -5594,6 +5597,8 @@
     <Content Include="Areas\MasterLists\Views\HolidayMaster\Index.cshtml" />
     <Content Include="Areas\MasterLists\Views\GradeMaster\Index.cshtml" />
     <Content Include="Areas\MasterLists\Views\DeductionTypeMaster\Index.cshtml" />
+    <Content Include="Areas\MasterLists\Views\EmpCheckListMaster\Index.cshtml" />
+    <Content Include="Areas\MasterLists\Views\DesigDocTypeMaster\Index.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\dirPagination.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -6236,8 +6241,10 @@
     <Compile Include="Areas\MasterLists\Controllers\CitizenMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\DeductionTypeMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\DepartmentMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\DesigDocTypeMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\DocumentSubTypeMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\DocumentTypeMasterController.cs" />
+    <Compile Include="Areas\MasterLists\Controllers\EmpCheckListMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\GradeMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\HolidayMasterController.cs" />
     <Compile Include="Areas\MasterLists\Controllers\LanguageMasterController.cs" />

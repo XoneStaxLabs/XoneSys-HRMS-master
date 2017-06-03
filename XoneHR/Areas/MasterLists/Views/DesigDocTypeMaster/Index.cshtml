@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<script src="~/assets/global/plugins/datatables/datatables.min.js"></script>
+<script src="~/Scripts/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/angular-datatables.min.js"></script>
+<link href="~/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/assets/global/plugins/Toast/src/jquery.toast.css" rel="stylesheet" />
+<script src="~/assets/global/plugins/Toast/src/jquery.toast.js"></script>
+<script src="~/Scripts/AngularScripts/DesigDocType.js"></script>
+
+<style>
+    .col-md-3 {
+    width: 30%;
+}
+</style>
+
+<div ng-app="MyApp">
+    <div ng-controller="MyCntrl">
+        <h3 class="page-title">
+            Valid Documents
+            <small>Manage Valid Documents</small>
+        </h3>
+        <a data-toggle="modal" class="btn btn-sm green mrb20" ng-click="NewAddBtn()"> Add New <i class="fa fa-plus"></i> </a>
+
+        <div class="portlet-body mt20">
+            <table id="entry-grid" datatable dt-options="dtOptions" dt-columns="dtColumns" class="table table-striped table-hover table-bordered"></table>
+        </div>
+
+        <div class="modal fade" id="Addnew" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="portlet-body form">
+
+                            <form class="form-horizontal" action="#" id="DocForm" name="DocForm" ng-submit="AddNewSave()">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                    <h4 class="modal-title">Add New Grade</h4>
+                                </div>
+
+                                <div class="form-body">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Citizen  *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="CitizenID" ng-options="city.CitizenID as city.CitizenName for city in CitizenList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Designation  *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="DesignationID" ng-options="desig.DesignationID as desig.DesignationName for desig in DesigList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Document Type  *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="DocTypeID" ng-options="doc.DocTypeID as doc.DocTypeName for doc in DocTypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" ng-change="DocTypeChange()" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Document Sub Type  *</label>
+                                        <div class="col-md-6">
+                                            <select ng-model="DocSubtypeID" ng-options="doc.DocSubtypeID as doc.DocSubtypeName for doc in DocSubTypeList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                                <option value="">--Select--</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn green" id="SaveRace">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+        </div>
+
+        <div class="modal fade" id="Delete" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <form class="form-horizontal" name="DeleteForm" role="form" ng-submit="DeleteDocType()">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">Delete Valid DocTypes</h4>
+                        </div>
+                        <div class="modal-body">
+                            Do You Want to Delete this Item ? <label><b > {{DeleteDocTypeLabel}}</b></label>
+                            <input type="hidden" ng-model="ValidDocType_Dlt"  />                         
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn danger" >Delete</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

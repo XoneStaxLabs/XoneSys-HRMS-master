@@ -35,6 +35,9 @@ namespace Xone
             container.RegisterType<IHolidayMaster, HolidayMasterRepository>();
             container.RegisterType<IGradeMaster, GradeMasterRepository>();
             container.RegisterType<IDeductionTypeMaster, DeductionTypeMasterRepository>();
+            container.RegisterType<ICheckListMaster, CheckListMasterRepository>();
+
+            container.RegisterType<IDesigDocTypeMaster, DesigDocTypeMasterRepository>();
 
 
         }
