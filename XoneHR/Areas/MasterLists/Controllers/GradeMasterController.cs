@@ -18,7 +18,7 @@ namespace XoneHR.Areas.MasterLists.Controllers
             this.IGradeMasterObj = IGradeMaster;
         }
 
-        public ActionResult Index()
+        public ActionResult Index() 
         {
             return View();
         }
@@ -65,20 +65,57 @@ namespace XoneHR.Areas.MasterLists.Controllers
             return Json(list, JsonRequestBehavior.AllowGet);
         }
 
-        //public ActionResult AddNewGrade(int DesignationID,string Gradename,string GradeCode)
-        //{
-        //    var Result = IGradeMasterObj.AddNewGrade(DesignationID, Gradename, GradeCode,SessionManage.Current.UID);
-        //    var Success = Json(new { Message = "Data Save Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
-        //    var Fail = Json(new { Message = "Data Save Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
-        //    var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
+        public ActionResult AddNewGrade(int DesignationID, string Gradename, string GradeCode)
+        {
+            var Result = IGradeMasterObj.AddNewGrade(DesignationID, Gradename, GradeCode, SessionManage.Current.UID);
+            var Success = Json(new { Message = "Data Save Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
+            var Fail = Json(new { Message = "Data Save Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
+            var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
 
-        //    if (Result == 1)
-        //        return Success;
-        //    else if (Result == 0)
-        //        return AlreadyExist;
-        //    else
-        //        return Fail;
-        //}
+            if (Result == 1)
+                return Success;
+            else if (Result == 0)
+                return AlreadyExist;
+            else
+                return Fail;
+        }
+
+        public JsonResult GetDetailsForEdit(int GradeID,int GradeDesignationId)
+        {
+            var list = IGradeMasterObj.GetDetailsForEdit(GradeID, GradeDesignationId);
+            return Json(list, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult EditGrade(GradeList GradeList)
+        {
+            var Result = IGradeMasterObj.EditGrade(GradeList, SessionManage.Current.UID);
+            var Success = Json(new { Message = "Data Updated Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
+            var Fail = Json(new { Message = "Data Updation Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
+            var AlreadyExist = Json(new { Message = "Data Already Exist", Icon = "warning", Result = 0 }, JsonRequestBehavior.AllowGet);
+
+            if (Result == 1)
+                return Success;
+            else if (Result == 0)
+                return AlreadyExist;
+            else
+                return Fail;
+        }
+
+        public JsonResult GetGradeName(int GradeID)
+        {
+            var text = IGradeMasterObj.GetGradeName(GradeID);
+            return Json(text, JsonRequestBehavior.AllowGet);
+        }
+        public JsonResult DeleteGrade(int GradeID,int GradeDesignationId)
+        {
+            var Result = IGradeMasterObj.DeleteGrade(GradeID, GradeDesignationId, SessionManage.Current.UID);
+            var Success = Json(new { Message = "Data Deleted Successfully", Icon = "success", Result = Result }, JsonRequestBehavior.AllowGet);
+            var Fail = Json(new { Message = "Data Delete Failed", Icon = "error", Result = -1 }, JsonRequestBehavior.AllowGet);
+            if (Result == 1)
+                return Success;
+            else
+                return Fail;
+        }
 
     }
 }

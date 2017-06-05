@@ -11,7 +11,12 @@ namespace RepositoryImplement.Xone.RepositoryDerive
     {
         IEnumerable<GradeList> ListGradeDetails();
         IEnumerable<TblDepartment> GetDepartment();
-        List<TblDesignation> GetDesignation(Int32 DeptID);
-        /*int AddNewGrade(int DesignationID, string Gradename, string GradeCode, Int64 UID);*/
+        List<TblDesignation> GetDesignation(Int32 DeptID=0);
+        int AddNewGrade(int DesignationID, string Gradename, string GradeCode, Int64 UID);
+        GradeList GetDetailsForEdit(int GradeID,int GradeDesignationId);
+        int EditGrade(GradeList editObj, Int64 UID);
+        string GetGradeName(int GradeID);
+        int DeleteGrade(int GradeID, int GradeDesignationId,Int64 UID);
+
     }
 }

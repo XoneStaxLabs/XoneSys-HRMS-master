@@ -32,10 +32,13 @@ namespace Model.Xone
     public class GradeList
     {
         public int GradeID { get; set; }
-        public int GradeCode { get; set; }
+        public string GradeCode { get; set; }
         public string Gradename { get; set; }
         public string DesignationName { get; set; }
+        public int DeptID { get; set; }
+        public int DesignationID { get; set; }
         public string DeptName { get; set; }
+        public int GradeDesignationId { get; set; }
     }
     public class CandidateDocTypeDetail
     {

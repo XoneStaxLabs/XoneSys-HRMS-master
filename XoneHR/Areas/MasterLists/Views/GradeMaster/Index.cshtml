@@ -60,7 +60,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-md-3 control-label"> Code *</label>
+                                        <label class="col-md-3 control-label"> Code </label>
                                         <div class="col-md-6">
                                             <input type="text" class="form-control" ng-model="GradeCode" name="GradeCode" placeholder="Code" maxlength="30" autocomplete="off">
                                         </div>
@@ -96,7 +96,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label"> Department *</label>
                                         <div class="col-md-6">
-                                            <select ng-model="DeptID" ng-options="dept.DeptID as dept.DeptName for dept in DeptList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                            <select ng-model="DeptID_edit" ng-options="dept.DeptID as dept.DeptName for dept in DeptList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" disabled="isDisabled" required>
                                                 <option value="">--Select--</option>
                                             </select>
                                         </div>
@@ -104,7 +104,7 @@
                                     <div class="form-group">
                                         <label class="col-md-3 control-label"> Designation *</label>
                                         <div class="col-md-6">
-                                           <select ng-model="DesignationID" ng-options="desig.DesignationID as desig.DesignationName for desig in DesigList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
+                                           <select ng-model="DesignationID_edit" ng-options="desig.DesignationID as desig.DesignationName for desig in DesigList" class="form-control input-sm select2-multiple select2-hidden-accessible" tabindex="-1" aria-hidden="true" required>
                                                 <option value="">--Select--</option>
                                             </select>
                                         </div>                                    
@@ -113,6 +113,14 @@
                                         <label class="col-md-3 control-label"> Name *</label>
                                         <div class="col-md-6">
                                             <input type="text" class="form-control" ng-model="Gradename_edit" name="Gradename_edit" placeholder="Grade" maxlength="30" autocomplete="off" required>
+                                            <input type="hidden" ng-model="GradeID" />
+                                            <input type="hidden" ng-model="GradeDesignationId" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label"> Code </label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" ng-model="GradeCode_edit" name="GradeCode_edit" placeholder="Code" maxlength="30" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -142,6 +150,7 @@
                         <div class="modal-body">
                             Do You Want to Delete this Item ? <label><b> {{DeleteGradeType}}</b></label>
                             <input type="hidden" ng-model="GradeID_Dlt" />
+                            <input type="hidden" ng-model="GradeDesignationId_Dlt" />
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
